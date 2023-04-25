@@ -1,0 +1,9 @@
+{
+  "name": "react-portable",
+  "version": "0.0.0",
+  "description": "🎒ReactPortable: A lightweight, script-free library enabling React components to run seamlessly on any webpage, including those without frontend frameworks.",
+  "main": "index.js",
+  "repository": "git@github.com:aiji42/react-portable.git",
+  "author": "Aiji Ueijima <aiji42@gmail.com>",
+  "license": "MIT"
+}
