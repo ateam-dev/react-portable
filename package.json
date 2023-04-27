@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "git@github.com:aiji42/react-portable.git",
   "author": "Aiji Ueijima <aiji42@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^2.8.8"
+  }
 }
