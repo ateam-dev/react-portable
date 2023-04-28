@@ -1,12 +1,18 @@
 import { component$ } from "@builder.io/qwik";
-
 import { qwikify$ } from "@builder.io/qwik-react";
-import ReactComponent from "~/integrations/react/Sample";
+import { routeLoader$ } from "@builder.io/qwik-city";
+// @ts-ignore
+import * as virtual from "react-portal:virtual";
 
-const Component = qwikify$(ReactComponent, { eagerness: "hover" });
+const Component = qwikify$(virtual.default, virtual.option);
 
-const Page = component$(() => {
-  return <Component />;
+const getProps = routeLoader$<any>(
+  virtual.loader ??
+    (() => {
+      return {};
+    })
+);
+
+export default component$(() => {
+  return <Component {...getProps().value} />;
 });
-
-export default Page;
