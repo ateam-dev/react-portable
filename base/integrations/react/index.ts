@@ -1,11 +1,13 @@
 import Sample from "./Sample.react";
-import { RequestEventLoader } from "@builder.io/qwik-city/middleware/request-handler";
 import { QwikifyOptions } from "@builder.io/qwik-react/lib/types/react/types";
+
+import "./global.css";
 
 export default Sample;
 
-export const loader = ({ query }: RequestEventLoader) => {
-  const n = query.get("n");
+export const loader = (request: Request) => {
+  const url = new URL(request.url);
+  const n = url.searchParams.get("n");
 
   return { n: Number(n ?? "0") };
 };

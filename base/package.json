@@ -5,22 +5,11 @@
     "node": ">=15.0.0"
   },
   "private": true,
-  "scripts": {
-    "build": "qwik build",
-    "build.client": "vite build -- --react-portal=integrations/react/index.ts",
-    "build.preview": "vite build --ssr src/entry.preview.tsx -- --react-portal=integrations/react/index.ts",
-    "deploy": "echo 'Run \"npm run qwik add\" to install a server adapter'",
-    "dev": "vite --mode ssr  -- --react-portal=integrations/react/index.ts",
-    "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
-    "preview": "qwik build preview && vite preview --open",
-    "start": "vite --open --mode ssr -- --react-portal=integrations/react/index.ts",
-    "qwik": "qwik"
-  },
+  "scripts": {},
   "devDependencies": {
     "@builder.io/qwik": "1.0.0",
-    "@builder.io/qwik-city": "~1.0.0",
     "@builder.io/qwik-react": "0.5.0",
-    "@types/node": "^20.0.0",
+    "@cloudflare/workers-types": "^4.20230419.0",
     "@types/react": "18.2.5",
     "@types/react-dom": "18.2.3",
     "autoprefixer": "^10.4.14",
@@ -29,8 +18,11 @@
     "react-dom": "18.2.0",
     "tailwindcss": "^3.3.1",
     "typescript": "5.0.4",
-    "undici": "5.22.0",
     "vite": "4.3.4",
     "vite-tsconfig-paths": "4.2.0"
+  },
+  "dependencies": {
+    "@cloudflare/kv-asset-handler": "^0.3.0",
+    "wrangler": "^2.19.0"
   }
 }
