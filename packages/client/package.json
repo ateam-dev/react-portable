@@ -1,0 +1,21 @@
+{
+  "name": "react-portable-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build:inline": "vite build -c ./vite.inline.config.ts",
+    "build": "npm run build:inline; npx vite build"
+  },
+  "devDependencies": {
+    "vite": "^4.3.5",
+    "vite-plugin-dts": "^2.3.0",
+    "writable-dom": "^1.0.3"
+  },
+  "peerDependencies": {},
+  "dependencies": {},
+  "engines": {}
+}
