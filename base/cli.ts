@@ -9,7 +9,8 @@ import { program } from "commander";
 import { PluginOption } from "vite";
 import { UnstableDevWorker } from "wrangler";
 
-const clientEntryFile = "root.ts";
+const reactEntryFile = "entry.js";
+const clientEntryFile = "root.js";
 const clientOutDir = "client";
 const ssrEntryFile = "worker.js";
 const ssrOutDir = "server";
@@ -39,7 +40,7 @@ const vitePlugins = (entry: string, srcDir: string): PluginOption[] => [
       outDir: path.resolve(srcDir, clientOutDir),
     },
     ssr: {
-      input: path.resolve(__dirname, "../dist", ssrEntryFile),
+      input: path.resolve(srcDir, ssrEntryFile),
       outDir: path.resolve(srcDir, ssrOutDir),
     },
   }),
@@ -60,16 +61,24 @@ const launchWorkerPlugin = (
 const createOutputDir = (dir: string) => {
   if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(
-    path.resolve(dir, clientEntryFile),
-    `import { component$ } from "@builder.io/qwik";
-  import { qwikify$ } from "@builder.io/qwik-react";
-  import * as reactPortable from "react-portable:virtual";
-  export default component$(qwikify$(reactPortable.default, reactPortable.option));`
+
+  fs.cpSync(
+    path.resolve(__dirname, "../dist", reactEntryFile),
+    path.resolve(dir, reactEntryFile)
+  );
+  fs.cpSync(
+    path.resolve(__dirname, "../dist", clientEntryFile),
+    path.resolve(dir, clientEntryFile)
+  );
+  fs.cpSync(
+    path.resolve(__dirname, "../dist", ssrEntryFile),
+    path.resolve(dir, ssrEntryFile)
   );
 
   process.on("exit", () => {
+    fs.rmSync(path.resolve(dir, reactEntryFile), { force: true });
     fs.rmSync(path.resolve(dir, clientEntryFile), { force: true });
+    fs.rmSync(path.resolve(dir, ssrEntryFile), { force: true });
   });
 };
 
@@ -189,11 +198,7 @@ program
   .option("-p, --port <number>", "使用するポート")
   .action((entry, { port }: { port?: number }) => {
     const outDir = path.join(path.dirname(entry), distDir);
-    const workerEntry = path.join(
-      outDir,
-      ssrOutDir,
-      ssrEntryFile.replace(/\.tsx?$/, ".js")
-    );
+    const workerEntry = path.join(outDir, ssrOutDir, ssrEntryFile);
     const bucketDir = path.relative(
       process.cwd(),
       path.resolve(outDir, clientOutDir)

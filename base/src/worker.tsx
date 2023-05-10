@@ -3,20 +3,14 @@ import { getAssetFromKV } from "@cloudflare/kv-asset-handler";
 import manifestJSON from "__STATIC_CONTENT_MANIFEST";
 import { renderToStream } from "@builder.io/qwik/server";
 import { manifest } from "@qwik-client-manifest";
-// @ts-ignore
-import * as reactPortable from "react-portable:virtual";
-// @ts-ignore
-import Root from "react-portable:root-entry";
+import { getProps } from "./entry";
+import Root from "./root";
 
 export interface Env {
   __STATIC_CONTENT: KVNamespace;
 }
 
 const ASSET_MANIFEST = JSON.parse(manifestJSON);
-
-const getProps = async (request: Request) => {
-  return (await reactPortable.loader?.(request)) ?? {};
-};
 
 const createStream = () => {
   const { writable, readable } = new TransformStream();
