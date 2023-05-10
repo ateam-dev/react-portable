@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as fs from "fs";
 import * as path from "path";
 import * as wrangler from "wrangler";
@@ -24,9 +25,6 @@ const vitePlugins = (entry: string, srcDir: string): PluginOption[] => [
       if (id === "react-portable:virtual") {
         return path.resolve(process.cwd(), entry);
       }
-      if (id === "react-portable:root-entry") {
-        return path.resolve(srcDir, clientEntryFile);
-      }
     },
     transform(code: string, id: string) {
       if (id.endsWith(".tsx") || id.endsWith(".jsx"))
@@ -49,6 +47,7 @@ const vitePlugins = (entry: string, srcDir: string): PluginOption[] => [
   qwikReact(),
 ];
 
+// TODO: これプロジェクトルートにしたいなー
 const createOutputDir = (dir: string) => {
   if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
   fs.mkdirSync(dir, { recursive: true });

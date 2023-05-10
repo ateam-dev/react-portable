@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {},
-  "references": [
-    { "path": "tsconfig.cli.json" },
-    { "path": "tsconfig.qwik.json" }
-  ]
-}

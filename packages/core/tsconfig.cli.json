@@ -8,5 +8,7 @@
     "skipLibCheck": true,
     "outDir": "bin"
   },
-  "include": ["cli.ts"],
+  "include": [
+    "cli.ts"
+  ],
 }

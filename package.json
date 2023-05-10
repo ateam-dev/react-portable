@@ -6,22 +6,11 @@
   "repository": "git@github.com:aiji42/react-portable.git",
   "author": "Aiji Ueijima <aiji42@gmail.com>",
   "license": "MIT",
+  "workspaces": {
+    "packages": ["packages/*", "examples/*"]
+  },
   "devDependencies": {
-    "@types/react": "^18.2.6",
-    "@types/react-dom": "^18.2.4",
     "prettier": "^2.8.8"
   },
-  "dependencies": {
-    "@builder.io/qwik": "^1.1.0",
-    "@builder.io/qwik-react": "^0.5.0",
-    "@cloudflare/kv-asset-handler": "^0.3.0",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.23",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "tailwindcss": "^3.3.2",
-    "vite": "^4.3.5",
-    "vite-tsconfig-paths": "^4.2.0",
-    "wrangler": "^2.20.0"
-  }
+  "private": true
 }

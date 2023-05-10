@@ -1,9 +1,8 @@
-import Sample from "./Sample.react";
-import { QwikifyOptions } from "@builder.io/qwik-react/lib/types/react/types";
+import Entry from "./entry";
 
 import "./global.css";
 
-export default Sample;
+export default Entry;
 
 export const loader = (request: Request) => {
   const url = new URL(request.url);
@@ -12,7 +11,7 @@ export const loader = (request: Request) => {
   return { n: Number(n ?? "0") };
 };
 
-export const option: QwikifyOptions = {
+export const option = {
   eagerness: "hover",
   event: ["focusin"],
 };

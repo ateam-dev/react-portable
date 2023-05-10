@@ -16,5 +16,7 @@
     "types": ["node", "vite/client", "@cloudflare/workers-types"],
     "outDir": "dist"
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

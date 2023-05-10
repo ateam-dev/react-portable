@@ -1,9 +1,6 @@
 {
-  "name": "my-qwik-basic-starter",
-  "description": "App with Routing built-in (recommended)",
-  "engines": {
-    "node": ">=15.0.0"
-  },
+  "name": "react-portable-core",
+  "version": "0.0.0",
   "bin": {
     "react-portable": "./bin/cli.js"
   },
@@ -15,6 +12,7 @@
   "scripts": {
     "build": "npm run build:cli && npm run build:script",
     "build:cli": "tsc -b tsconfig.cli.json",
+    "build:cli:watch": "tsc -b tsconfig.cli.json --watch",
     "build:script": "tsc -b tsconfig.qwik.json"
   },
   "devDependencies": {
@@ -34,5 +32,8 @@
     "vite": "4.3.4",
     "vite-tsconfig-paths": "4.2.0",
     "wrangler": "^2.19.0"
+  },
+  "engines": {
+    "node": ">=15.0.0"
   }
 }
