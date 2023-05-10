@@ -57,7 +57,7 @@ export default {
     const props = await getProps(request);
     renderToStream(<Root {...props} />, {
       manifest,
-      containerTagName: "react-portable",
+      containerTagName: "react-portable-fragment",
       qwikLoader: { include: "always" },
       // FIXME: 本番ではオリジンを直接指定する
       base: `${url.origin}/build`,
