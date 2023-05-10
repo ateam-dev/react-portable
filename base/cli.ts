@@ -49,15 +49,6 @@ const vitePlugins = (entry: string, srcDir: string): PluginOption[] => [
   qwikReact(),
 ];
 
-const launchWorkerPlugin = (
-  workerEntry: string,
-  bucketDir: string,
-  option: { port?: number; host?: string } = {}
-): PluginOption => ({
-  name: "start-dev-worker",
-  writeBundle: () => launchDevWorker(workerEntry, bucketDir, option),
-});
-
 const createOutputDir = (dir: string) => {
   if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -86,7 +77,7 @@ let worker: UnstableDevWorker;
 const launchDevWorker = async (
   workerEntry: string,
   bucketDir: string,
-  option: { port?: number; host?: string } = {}
+  option: { port?: number; liveReload?: boolean } = {}
 ) => {
   if (worker) await worker.stop();
 
@@ -95,7 +86,7 @@ const launchDevWorker = async (
     local: true,
     port: option.port ?? worker?.port,
     experimental: {
-      liveReload: true,
+      liveReload: option.liveReload,
     },
   });
 
@@ -155,7 +146,7 @@ program
   .command("dev <entry>")
   .description("開発モード")
   .option("-p, --port <number>", "使用するポート")
-  .action((entry: string, { port }: { port?: number }) => {
+  .action(async (entry: string, { port }: { port?: number }) => {
     const ourDir = path.join(path.dirname(entry), distDir);
     createOutputDir(ourDir);
     const workerEntry = path.join(ourDir, ssrOutDir, ssrEntryFile);
@@ -163,13 +154,25 @@ program
       process.cwd(),
       path.resolve(ourDir, clientOutDir)
     );
+    // 一回 manifest を先に作るために、client をプロダクションビルドする
+    await buildClient(entry, ourDir).catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+    // manifest 作成後に watch モードで、クライアントとSSRのビルドを立ち上げる
     buildClient(entry, ourDir, { isDev: true }).catch((e) => {
       console.error(e);
       process.exit(1);
     });
     buildSSR(entry, ourDir, {
       isDev: true,
-      additionalPlugins: [launchWorkerPlugin(workerEntry, bucketDir, { port })],
+      additionalPlugins: [
+        {
+          name: "start-dev-worker",
+          writeBundle: () =>
+            launchDevWorker(workerEntry, bucketDir, { port, liveReload: true }),
+        },
+      ],
     }).catch((e) => {
       console.error(e);
       process.exit(1);
@@ -179,14 +182,14 @@ program
 program
   .command("build <entry>")
   .description("ビルドモード")
-  .action((entry: string) => {
+  .action(async (entry: string) => {
     const ourDir = path.join(path.dirname(entry), distDir);
     createOutputDir(ourDir);
-    buildClient(entry, ourDir).catch((e) => {
+    await buildClient(entry, ourDir).catch((e) => {
       console.error(e);
       process.exit(1);
     });
-    buildSSR(entry, ourDir).catch((e) => {
+    await buildSSR(entry, ourDir).catch((e) => {
       console.error(e);
       process.exit(1);
     });
@@ -203,7 +206,10 @@ program
       process.cwd(),
       path.resolve(outDir, clientOutDir)
     );
-    launchDevWorker(workerEntry, bucketDir, { port });
+    launchDevWorker(workerEntry, bucketDir, { port }).catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
   });
 
 program
