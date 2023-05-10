@@ -16,20 +16,22 @@
     "build:script": "tsc -b tsconfig.qwik.json"
   },
   "devDependencies": {
+    "@builder.io/qwik": "1.1.0",
+    "@builder.io/qwik-react": "0.5.0",
     "@cloudflare/workers-types": "^4.20230419.0",
     "@types/node": "^20.1.1",
     "typescript": "5.0.4"
   },
   "peerDependencies": {
-    "react": ">=18.0.0",
+    "@builder.io/qwik": ">=1.0.0",
+    "@builder.io/qwik-react": ">=0.5.0",
+    "react": ">=18.0.1",
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
-    "@builder.io/qwik": "1.0.0",
-    "@builder.io/qwik-react": "0.5.0",
     "@cloudflare/kv-asset-handler": "^0.3.0",
     "commander": "^10.0.1",
-    "vite": "4.3.4",
+    "vite": "^4.3.5",
     "vite-tsconfig-paths": "4.2.0",
     "wrangler": "^2.19.0"
   },

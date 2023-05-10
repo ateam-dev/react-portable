@@ -17,10 +17,10 @@
   resolved "https://registry.yarnpkg.com/@builder.io/qwik-react/-/qwik-react-0.5.0.tgz#bbc536abc6a556a0e5df48051ed901409dbac8ba"
   integrity sha512-JdJWQWOJGv7ddQqEZwzR8wPh0IoCQZwD9qo75+reiQaLp6eH+Pjsm/kn1LaMQt6u72pCCNjnj5kEn/bnbfnIjQ==
 
-"@builder.io/qwik@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.0.0.tgz#0dfa16f11be9df7d1cf5ac91adab04bb915066d0"
-  integrity sha512-U1eTIKTBUiW2dbPMCaTzS7K1bMCI9ovtfsvdduwnVThGXRSrX+v2X4U/UmHHPzfOjC55X5wYLc17cw5EwFBVVA==
+"@builder.io/qwik@1.1.0", "@builder.io/qwik@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.1.0.tgz#e3b7b77b615557ebb339cacca53f4b72a18ce36b"
+  integrity sha512-A8PlZi8iQcBLYHmpgRClhLKNM35RVn4wL0Ek6ETRKhH+Oh6iRgN0YcHCQO2APmlc1ajAE4tRfFRH2lroi3nREQ==
 
 "@cloudflare/kv-asset-handler@^0.2.0":
   version "0.2.0"
@@ -1908,17 +1908,6 @@ vite-tsconfig-paths@4.2.0:
     debug "^4.1.1"
     globrex "^0.1.2"
     tsconfck "^2.1.0"
-
-vite@4.3.4:
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.3.4.tgz#1c518d763d5a700d890c3a19ab59220f06e7a7d5"
-  integrity sha512-f90aqGBoxSFxWph2b39ae2uHAxm5jFBBdnfueNxZAT1FTpM13ccFQExCaKbR2xFW5atowjleRniQ7onjJ22QEg==
-  dependencies:
-    esbuild "^0.17.5"
-    postcss "^8.4.23"
-    rollup "^3.21.0"
-  optionalDependencies:
-    fsevents "~2.3.2"
 
 vite@^4.3.5:
   version "4.3.5"
