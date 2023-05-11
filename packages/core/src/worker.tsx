@@ -65,7 +65,7 @@ export default {
     const { writer, readable, stream } = createStream();
 
     const props = await getProps(stripedRequest);
-    renderToStream(<Root {...props} />, {
+    renderToStream(<Root _props={props} />, {
       manifest,
       containerTagName: "react-portable-fragment",
       qwikLoader: { include: "always" },
