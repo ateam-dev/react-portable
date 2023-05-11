@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useReducer } from "react";
 
 export const ReactPortable = ({
@@ -13,5 +12,5 @@ export const ReactPortable = ({
     mounted();
   }, []);
   if (force) return <react-portable src={src} />;
-  return <react-portable src={src} suspend={String(!mounted)} />;
+  return <react-portable src={src} suspend={String(!isMounted)} />;
 };
