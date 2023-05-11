@@ -1,7 +1,7 @@
 import {
-  srcToFragmentId,
   fragmentIdToSrc,
   reactPortableInlineScript,
+  srcToFragmentId,
 } from "react-portable-client";
 
 export interface Env {
@@ -35,7 +35,8 @@ export default {
 
     const fragmentsPromise = Promise.all(
       Array.from(await fragmentIds.pull()).map(async (id) => {
-        return fragments.set(id, await fetchFragment(id));
+        const fragmentRes = await fetchFragment(id);
+        if (fragmentRes.ok) fragments.set(id, await fragmentRes.text());
       })
     );
 
@@ -77,7 +78,6 @@ const fragmentIdsStore = (key: string, env: Env) => {
     return fragmentIds;
   };
 
-  // TODO: キャッシュ期間を考えなくていいか？
   const push = async (newFragmentIds: Set<string>) => {
     if (!isSetEqual(fragmentIds, newFragmentIds))
       await env.FRAGMENTS_LIST.put(
@@ -91,17 +91,44 @@ const fragmentIdsStore = (key: string, env: Env) => {
 };
 
 const proxy = (request: Request): [Request, Promise<Response>] => {
-  const url = new URL(request.url);
-  url.host = "0.0.0.0";
-  url.port = "3000";
+  let url = new URL(request.url);
+  const type = url.pathname.startsWith("/_fragments/") ? "fragment" : "origin";
+
+  if (type === "origin") {
+    // TODO: Varsから読み取る
+    url.host = "0.0.0.0:3000";
+  }
+  if (type === "fragment") {
+    url = getFragmentRemoteUrl(url);
+  }
+
   const proxyRequest = new Request(url, request);
   return [proxyRequest, fetch(proxyRequest)];
 };
 
+const getFragmentRemoteUrl = (unknownUrl: string | URL) => {
+  let url: URL;
+  try {
+    url = new URL(unknownUrl);
+  } catch (_) {
+    url = new URL(`http://0.0.0.0${unknownUrl}`);
+  }
+
+  const match = url.pathname.match(/^\/_fragments\/([^\/]*)\//);
+  const code = match?.[1];
+
+  if (code) {
+    // TODO: Varsから読み取る
+    url.host = "0.0.0.0:3001";
+    url.protocol = "http:";
+  }
+  return url;
+};
+
 const fetchFragment = async (id: string) => {
   const src = fragmentIdToSrc(id);
-  const res = await fetch(src);
-  return res.text();
+  if (!src.includes("/_fragments/")) return new Response("", { status: 400 });
+  return await fetch(getFragmentRemoteUrl(src));
 };
 
 class PiercingHandler {
