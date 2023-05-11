@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "react-portable dev ./src/index.ts",
+    "dev": "react-portable dev ./src/index.ts -p 3001",
     "build": "react-portable build ./src/index.ts",
-    "preview": "react-portable build ./src/index.ts && react-portable start ./src/index.ts"
+    "preview": "react-portable build ./src/index.ts && react-portable start ./src/index.ts -p 3001"
   },
   "dependencies": {
     "@builder.io/qwik": "^1.1.0",
