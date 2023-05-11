@@ -30,26 +30,22 @@ const createStream = () => {
   return { writer, readable, stream };
 };
 
+const stripUrl = (url: URL) => {
+  url.pathname = url.pathname.replace(/^\/_fragments\/[^\/]*\//, "/");
+  return url;
+};
+
 const handleAssets = async (
   request: Request,
   env: Env,
   ctx: ExecutionContext
 ) => {
-  const response = await getAssetFromKV(
+  return getAssetFromKV(
     { request, waitUntil: (promise) => ctx.waitUntil(promise) },
     { ASSET_NAMESPACE: env.__STATIC_CONTENT, ASSET_MANIFEST }
   ).catch((e) => {
     console.error(e);
     return new Response("An unexpected error occurred", { status: 500 });
-  });
-  return new Response(response.body, {
-    headers: {
-      ...Object.fromEntries(response.headers.entries()),
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Allow-Credentials": "true",
-    },
   });
 };
 
@@ -60,30 +56,27 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     const url = new URL(request.url);
+    const stripedRequest = new Request(stripUrl(url), request);
 
     // asset
-    if (url.pathname.startsWith("/build/"))
-      return handleAssets(request, env, ctx);
+    if (url.pathname.includes("/build/"))
+      return handleAssets(stripedRequest, env, ctx);
 
     const { writer, readable, stream } = createStream();
 
-    const props = await getProps(request);
+    const props = await getProps(stripedRequest);
     renderToStream(<Root {...props} />, {
       manifest,
       containerTagName: "react-portable-fragment",
       qwikLoader: { include: "always" },
-      // FIXME: 本番ではオリジンを直接指定する
-      base: `${url.origin}/build`,
+      // FIXME: Varsからコードを取ってくる
+      base: `/_fragments/${"example"}/build`,
       stream,
     }).finally(() => writer.close());
 
     return new Response(readable, {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Credentials": "true",
       },
     });
   },
