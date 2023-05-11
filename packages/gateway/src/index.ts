@@ -1,5 +1,6 @@
 import {
-  getFragmentId,
+  srcToFragmentId,
+  fragmentIdToSrc,
   reactPortableInlineScript,
 } from "react-portable-client";
 
@@ -15,7 +16,10 @@ export interface Env {
   //
   // Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
   // MY_SERVICE: Fetcher;
+  FRAGMENTS_LIST: KVNamespace;
 }
+
+type FragmentMap = Map<string, string>;
 
 export default {
   async fetch(
@@ -23,68 +27,110 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    let fragments: [string, string][] = [];
+    const [proxyRequest, proxyPromise] = proxy(request);
 
-    const url = new URL(request.url);
-    url.host = "0.0.0.0";
-    url.port = "3000";
-    const newRequest = new Request(url, request);
-    const response = await fetch(newRequest);
+    const fragments: FragmentMap = new Map();
 
-    const contentType = response.headers.get("content-type");
+    const fragmentIds = fragmentIdsStore(proxyRequest.url, env);
+
+    const fragmentsPromise = Promise.all(
+      Array.from(await fragmentIds.pull()).map(async (id) => {
+        return fragments.set(id, await fetchFragment(id));
+      })
+    );
+
+    const [response] = await Promise.all([proxyPromise, fragmentsPromise]);
+
     // アセットへのリクエストはスルー
-    if (!contentType || !contentType.includes("text/html")) return response;
+    if (!response.headers.get("content-type")?.includes("text/html"))
+      return response;
 
-    // HTML内のreact-portableを探索してfragmentをフェッチし、fragments に格納
-    const outletHandler = new ReactFragmentHandler();
-    let rewriter = new HTMLRewriter().on("react-portable", outletHandler);
-    await rewriter.transform(response.clone()).text();
+    const piercingHandler = new PiercingHandler(fragments);
+    const rewriter = new HTMLRewriter()
+      .on("head", new HeadHandler(fragments))
+      .on("react-portable", piercingHandler);
 
-    rewriter = new HTMLRewriter()
-      .on("head", new BodyHandler(outletHandler.fragments))
-      .on("react-portable", new ReactFragmentHandler2(outletHandler.fragments));
+    const piercedResponse = rewriter.transform(response);
+    const copied = piercedResponse.clone();
 
-    return rewriter.transform(response);
+    ctx.waitUntil(
+      (async () => {
+        // HTMLRewriterが完了するのを待つ必要がある
+        await copied.text();
+        return fragmentIds.push(piercingHandler.fragmentIds);
+      })()
+    );
+
+    return piercedResponse;
   },
 };
 
-class ReactFragmentHandler {
-  public fragments: [string, string][] = [];
+const fragmentIdsStore = (key: string, env: Env) => {
+  let fragmentIds: Set<string> = new Set();
+  const pull = async () => {
+    if (fragmentIds.size === 0)
+      fragmentIds = new Set(
+        await env.FRAGMENTS_LIST.get<Array<string>>(key, {
+          type: "json",
+        })
+      );
+    return fragmentIds;
+  };
 
-  async element(element: Element) {
-    const src = element.getAttribute("src");
+  // TODO: キャッシュ期間を考えなくていいか？
+  const push = async (newFragmentIds: Set<string>) => {
+    if (!isSetEqual(fragmentIds, newFragmentIds))
+      await env.FRAGMENTS_LIST.put(
+        key,
+        JSON.stringify(Array.from(newFragmentIds))
+      );
+    fragmentIds = newFragmentIds;
+  };
 
-    if (src) {
-      const fragmentId = getFragmentId(src);
-      const res = await fetch(createFragmentRequest(src));
-      const fragment = await res.text();
-      this.fragments.push([fragmentId, fragment]);
-    }
-  }
-}
+  return { push, pull };
+};
 
-class ReactFragmentHandler2 {
-  private readonly fragments: [string, string][];
+const proxy = (request: Request): [Request, Promise<Response>] => {
+  const url = new URL(request.url);
+  url.host = "0.0.0.0";
+  url.port = "3000";
+  const proxyRequest = new Request(url, request);
+  return [proxyRequest, fetch(proxyRequest)];
+};
 
-  constructor(fragments: [string, string][]) {
+const fetchFragment = async (id: string) => {
+  const src = fragmentIdToSrc(id);
+  const res = await fetch(src);
+  return res.text();
+};
+
+class PiercingHandler {
+  private readonly fragments: FragmentMap;
+  public fragmentIds: Set<string>;
+
+  constructor(fragments: FragmentMap) {
     this.fragments = fragments;
+    this.fragmentIds = new Set();
   }
 
   async element(element: Element) {
     const src = element.getAttribute("src");
     const suspend = element.getAttribute("suspend") === "true";
-    if (!src) throw new Error();
+    if (!src) return;
+    const fragmentId = srcToFragmentId(src);
+    this.fragmentIds.add(fragmentId);
 
-    const fragmentId = getFragmentId(src);
-    const fragment = Object.fromEntries(this.fragments)[fragmentId];
-    !suspend && element.setInnerContent(fragment, { html: true });
+    const fragment = this.fragments.get(fragmentId);
+    if (!fragment || suspend) return;
+
+    element.setInnerContent(fragment, { html: true });
   }
 }
 
-class BodyHandler {
-  private readonly fragments: [string, string][];
+class HeadHandler {
+  private readonly fragments: FragmentMap;
 
-  constructor(fragments: [string, string][]) {
+  constructor(fragments: FragmentMap) {
     this.fragments = fragments;
   }
 
@@ -99,6 +145,10 @@ class BodyHandler {
   }
 }
 
-const createFragmentRequest = (url: string) => {
-  return new Request(url);
+const isSetEqual = (set1: Set<string>, set2: Set<string>) => {
+  if (set1.size !== set2.size) return false;
+  for (let item of set1) {
+    if (!set2.has(item)) return false;
+  }
+  return true;
 };
