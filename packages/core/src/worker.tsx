@@ -30,13 +30,26 @@ const createStream = () => {
   return { writer, readable, stream };
 };
 
-const handleAssets = (request: Request, env: Env, ctx: ExecutionContext) => {
-  return getAssetFromKV(
+const handleAssets = async (
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+) => {
+  const response = await getAssetFromKV(
     { request, waitUntil: (promise) => ctx.waitUntil(promise) },
     { ASSET_NAMESPACE: env.__STATIC_CONTENT, ASSET_MANIFEST }
   ).catch((e) => {
     console.error(e);
     return new Response("An unexpected error occurred", { status: 500 });
+  });
+  return new Response(response.body, {
+    headers: {
+      ...Object.fromEntries(response.headers.entries()),
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
   });
 };
 
@@ -67,6 +80,10 @@ export default {
     return new Response(readable, {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true",
       },
     });
   },
