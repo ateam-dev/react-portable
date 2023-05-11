@@ -46,7 +46,7 @@ export class ReactPortable extends HTMLElement {
       throw new Error(
         "The react portable component has been applied without `src`"
       );
-    this.fragmentId = getFragmentId(src);
+    this.fragmentId = srcToFragmentId(src);
 
     let template = this.getTemplate();
 
@@ -109,8 +109,12 @@ export class ReactPortable extends HTMLElement {
   }
 }
 
-export const getFragmentId = (text: string) => {
+export const srcToFragmentId = (text: string): string => {
   return btoa(text);
+};
+
+export const fragmentIdToSrc = (text: string): string => {
+  return atob(text);
 };
 
 declare global {
