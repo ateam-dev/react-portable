@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 # react-portable
-_rp-build
+.rp
 bin

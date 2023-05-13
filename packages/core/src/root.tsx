@@ -1,5 +1,7 @@
-import QR from "./entry";
+import { QwikCityProvider, RouterOutlet } from "@builder.io/qwik-city";
 import { component$ } from "@builder.io/qwik";
-export default component$(({ _props }: { _props: Record<string, unknown> }) => (
-  <QR _props={_props} />
+export default component$(() => (
+  <QwikCityProvider>
+    <RouterOutlet />
+  </QwikCityProvider>
 ));

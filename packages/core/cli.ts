@@ -4,42 +4,41 @@ import * as path from "path";
 import * as wrangler from "wrangler";
 import * as vite from "vite";
 import { qwikVite } from "@builder.io/qwik/optimizer";
+import { qwikCity } from "@builder.io/qwik-city/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { qwikReact } from "@builder.io/qwik-react/vite";
 import { program } from "commander";
 import { PluginOption } from "vite";
-import { UnstableDevWorker } from "wrangler";
+import { globSync } from "glob";
+import fsx from "fs-extra";
 
-const reactEntryFile = "entry.js";
-const clientEntryFile = "root.js";
-const clientOutDir = "client";
-const ssrEntryFile = "worker.js";
-const ssrOutDir = "server";
-const distDir = "_rp-build";
+const clientOutDir = path.resolve(process.cwd(), ".rp/client");
+const serverOutDir = path.resolve(process.cwd(), ".rp/server");
+const tmpDir = path.resolve(process.cwd(), ".rp/tmp");
 
-const vitePlugins = (entry: string, srcDir: string): PluginOption[] => [
+const vitePlugins = (): PluginOption[] => [
   {
     enforce: "pre",
     name: "react-portable-vite",
-    resolveId(id: string) {
-      if (id === "react-portable:virtual") {
-        return path.resolve(process.cwd(), entry);
+    transform(code: string, id: string) {
+      if (
+        !id.includes("/.rp/") &&
+        (id.endsWith(".tsx") || id.endsWith(".jsx"))
+      ) {
+        return `/** @jsxImportSource react */\n${code}`;
       }
     },
-    transform(code: string, id: string) {
-      if (id.endsWith(".tsx") || id.endsWith(".jsx"))
-        return `/** @jsxImportSource react */\n${code}`;
-    },
   },
+  qwikCity({
+    routesDir: path.resolve(tmpDir, "routes"),
+  }),
   qwikVite({
-    srcDir,
+    srcDir: tmpDir,
     client: {
-      input: path.resolve(srcDir, clientEntryFile),
-      outDir: path.resolve(srcDir, clientOutDir),
+      outDir: clientOutDir,
     },
     ssr: {
-      input: path.resolve(srcDir, ssrEntryFile),
-      outDir: path.resolve(srcDir, ssrOutDir),
+      outDir: serverOutDir,
     },
   }),
   // FIXME
@@ -47,94 +46,78 @@ const vitePlugins = (entry: string, srcDir: string): PluginOption[] => [
   qwikReact(),
 ];
 
-// TODO: これプロジェクトルートにしたいなー
-const createOutputDir = (dir: string) => {
-  if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
-  fs.mkdirSync(dir, { recursive: true });
+const prepareProject = async (routesDir: string) => {
+  if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true });
+  const pathToSrc = path.resolve(__dirname, "../src");
 
-  fs.cpSync(
-    path.resolve(__dirname, "../dist", reactEntryFile),
-    path.resolve(dir, reactEntryFile)
-  );
-  fs.cpSync(
-    path.resolve(__dirname, "../dist", clientEntryFile),
-    path.resolve(dir, clientEntryFile)
-  );
-  fs.cpSync(
-    path.resolve(__dirname, "../dist", ssrEntryFile),
-    path.resolve(dir, ssrEntryFile)
+  await Promise.all(
+    ["root.tsx", "entry.ssr.tsx", "workers.ts", "hono.ts"].map((file) =>
+      fsx.promises.cp(path.resolve(pathToSrc, file), path.resolve(tmpDir, file))
+    )
   );
 
-  process.on("exit", () => {
-    fs.rmSync(path.resolve(dir, reactEntryFile), { force: true });
-    fs.rmSync(path.resolve(dir, clientEntryFile), { force: true });
-    fs.rmSync(path.resolve(dir, ssrEntryFile), { force: true });
-  });
+  const routeFileTemplate = fsx.readFileSync(
+    path.resolve(pathToSrc, "routes/index.tsx"),
+    "utf8"
+  );
+  await Promise.all(
+    globSync(`${routesDir}/**/index.@(ts|tsx|js|jsx)`, {
+      absolute: true,
+    }).map((file) => {
+      return fsx.outputFile(
+        path.resolve(
+          path.dirname(
+            path.resolve(tmpDir, "routes", path.relative(routesDir, file))
+          ),
+          "index.tsx"
+        ),
+        routeFileTemplate.replace("react-portable:virtual", file)
+      );
+    })
+  );
 };
 
-let worker: UnstableDevWorker;
 const launchDevWorker = async (
-  workerEntry: string,
-  bucketDir: string,
-  option: { port?: number; liveReload?: boolean } = {}
+  option: { port?: number; liveReload?: boolean; local?: boolean } = {}
 ) => {
-  if (worker) await worker.stop();
-
-  worker = await wrangler.unstable_dev(workerEntry, {
-    site: bucketDir,
-    local: true,
-    port: option.port ?? worker?.port,
-    experimental: {
-      liveReload: option.liveReload,
-    },
-  });
+  const worker = await wrangler.unstable_dev(
+    path.resolve(serverOutDir, "workers.mjs"),
+    {
+      site: path.relative(process.cwd(), clientOutDir),
+      local: option.local ?? true,
+      port: option.port,
+      experimental: {
+        liveReload: option.liveReload ?? false,
+      },
+    }
+  );
 
   console.log("🧩 Listening on", `http://${worker.address}:${worker.port}`);
 };
 
-const buildClient = async (
-  entry: string,
-  outDir: string,
-  option: { isDev?: boolean; additionalPlugins?: PluginOption[] } = {}
-) => {
+const serveSSR = async (option: { port?: number } = {}) => {
+  const server = await vite.createServer({
+    plugins: vitePlugins(),
+    mode: "ssr",
+  });
+  await server.listen(option.port);
+  server.printUrls();
+};
+
+const buildClient = async () => {
   return vite.build({
-    plugins: [
-      ...vitePlugins(entry, outDir),
-      ...(option.additionalPlugins ?? []),
-    ],
-    build: {
-      watch: option.isDev
-        ? {
-            include: new RegExp(path.dirname(entry)),
-            exclude: new RegExp(outDir),
-          }
-        : undefined,
-    },
+    plugins: vitePlugins(),
   });
 };
 
-const buildSSR = async (
-  entry: string,
-  outDir: string,
-  option: { isDev?: boolean; additionalPlugins?: PluginOption[] } = {}
-) => {
+const buildWorker = async () => {
   return vite.build({
-    plugins: [
-      ...vitePlugins(entry, outDir),
-      ...(option.additionalPlugins ?? []),
-    ],
-    ssr: { target: "webworker", noExternal: true },
+    plugins: vitePlugins(),
     build: {
-      rollupOptions: {
-        external: "__STATIC_CONTENT_MANIFEST",
-      },
       ssr: true,
-      watch: option.isDev
-        ? {
-            include: new RegExp(path.dirname(entry)),
-            exclude: new RegExp(outDir),
-          }
-        : undefined,
+      rollupOptions: {
+        input: [path.resolve(tmpDir, "workers.ts"), "@qwik-city-plan"],
+      },
     },
   });
 };
@@ -142,73 +125,45 @@ const buildSSR = async (
 program.version("0.0.1");
 
 program
-  .command("dev <entry>")
+  .command("dev <src>")
   .description("開発モード")
   .option("-p, --port <number>", "使用するポート")
-  .action(async (entry: string, { port }: { port?: number }) => {
-    const ourDir = path.join(path.dirname(entry), distDir);
-    createOutputDir(ourDir);
-    const workerEntry = path.join(ourDir, ssrOutDir, ssrEntryFile);
-    const bucketDir = path.relative(
-      process.cwd(),
-      path.resolve(ourDir, clientOutDir)
-    );
-    // 一回 manifest を先に作るために、client をプロダクションビルドする
-    await buildClient(entry, ourDir).catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
-    // manifest 作成後に watch モードで、クライアントとSSRのビルドを立ち上げる
-    buildClient(entry, ourDir, { isDev: true }).catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
-    buildSSR(entry, ourDir, {
-      isDev: true,
-      additionalPlugins: [
-        {
-          name: "start-dev-worker",
-          writeBundle: () =>
-            launchDevWorker(workerEntry, bucketDir, { port, liveReload: true }),
-        },
-      ],
-    }).catch((e) => {
+  .action(async (src: string, { port }: { port?: number }) => {
+    // TODO: srcを監視して、ディレクトリ構造が変わったら再構築したい
+    await prepareProject(src);
+
+    await serveSSR({ port }).catch((e) => {
       console.error(e);
       process.exit(1);
     });
   });
 
 program
-  .command("build <entry>")
+  .command("build <src>")
   .description("ビルドモード")
-  .action(async (entry: string) => {
-    const ourDir = path.join(path.dirname(entry), distDir);
-    createOutputDir(ourDir);
-    await buildClient(entry, ourDir).catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
-    await buildSSR(entry, ourDir).catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
+  .action(async (src: string) => {
+    await prepareProject(src);
+    await buildClient();
+    await buildWorker();
   });
 
 program
-  .command("start <entry>")
+  .command("start <src>")
   .description("スタートモード")
   .option("-p, --port <number>", "使用するポート")
-  .action((entry, { port }: { port?: number }) => {
-    const outDir = path.join(path.dirname(entry), distDir);
-    const workerEntry = path.join(outDir, ssrOutDir, ssrEntryFile);
-    const bucketDir = path.relative(
-      process.cwd(),
-      path.resolve(outDir, clientOutDir)
-    );
-    launchDevWorker(workerEntry, bucketDir, { port }).catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
+  .action(async (src: string, { port }: { port?: number }) => {
+    await launchDevWorker({ port });
+  });
+
+program
+  .command("preview <src>")
+  .description("プレビューモード(workerモード)")
+  .option("-p, --port <number>", "使用するポート")
+  .action(async (src: string, { port }: { port?: number }) => {
+    await prepareProject(src);
+    await buildClient();
+    await buildWorker();
+    await launchDevWorker({ port });
   });
 
 program
