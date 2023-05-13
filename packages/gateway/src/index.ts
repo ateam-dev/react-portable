@@ -35,7 +35,7 @@ export default {
 
     const fragmentsPromise = Promise.all(
       Array.from(await fragmentIds.pull()).map(async (id) => {
-        const fragmentRes = await fetchFragment(id);
+        const fragmentRes = await fetchFragment(id, proxyRequest);
         if (fragmentRes.ok) fragments.set(id, await fragmentRes.text());
       })
     );
@@ -125,10 +125,10 @@ const getFragmentRemoteUrl = (unknownUrl: string | URL) => {
   return url;
 };
 
-const fetchFragment = async (id: string) => {
+const fetchFragment = async (id: string, request: Request) => {
   const src = fragmentIdToSrc(id);
   if (!src.includes("/_fragments/")) return new Response("", { status: 400 });
-  return await fetch(getFragmentRemoteUrl(src));
+  return fetch(getFragmentRemoteUrl(src), request);
 };
 
 class PiercingHandler {
