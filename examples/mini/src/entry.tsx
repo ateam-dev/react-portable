@@ -9,7 +9,7 @@ const Entry: FC<{ n?: number }> = ({ n }) => {
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
         onClick={increment}
       >
-        +1
+        + 1
       </Button>
       <span className="ml-3 text-xl text-green-500">{counter}</span>
     </div>
