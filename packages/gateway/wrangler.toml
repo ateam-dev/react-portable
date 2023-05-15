@@ -5,3 +5,7 @@ compatibility_date = "2023-05-10"
 kv_namespaces = [
     { binding = "FRAGMENTS_LIST", id = "yyyyyyyyyyyyyyyy", preview_id = "xxxxxxxxxxxxxxxxx" }
 ]
+
+[vars]
+ORIGIN = "https://0.0.0.0"
+FRAGMENT_REMOTE_MAPPING = '{"code":"https://0.0.0.0"}'

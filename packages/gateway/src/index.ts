@@ -1,70 +1,92 @@
 import {
-  fragmentIdToSrc,
+  parseFragmentId as _parseFragmentId,
   reactPortableInlineScript,
-  srcToFragmentId,
+  createFragmentId,
 } from "react-portable-client";
+import { Hono } from "hono";
+import { logger } from "hono/logger";
 
-export interface Env {
-  // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-  // MY_KV_NAMESPACE: KVNamespace;
-  //
-  // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-  // MY_DURABLE_OBJECT: DurableObjectNamespace;
-  //
-  // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-  // MY_BUCKET: R2Bucket;
-  //
-  // Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
-  // MY_SERVICE: Fetcher;
+type Env = {
+  ORIGIN: string;
+  FRAGMENT_REMOTE_MAPPING: string;
   FRAGMENTS_LIST: KVNamespace;
-}
+};
 
 type FragmentMap = Map<string, string>;
 
-export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext
-  ): Promise<Response> {
-    const [proxyRequest, proxyPromise] = proxy(request);
+const app = new Hono<{ Bindings: Env }>();
 
-    const fragments: FragmentMap = new Map();
+app.all("*", logger());
 
-    const fragmentIds = fragmentIdsStore(proxyRequest.url, env);
+app.get("/_fragments/:code/*", async (c) => {
+  const code = c.req.param().code;
+  const [, proxyPromise] = fragmentProxy(c.req.raw, code, c.env);
+  const response = await proxyPromise;
 
-    const fragmentsPromise = Promise.all(
-      Array.from(await fragmentIds.pull()).map(async (id) => {
-        const fragmentRes = await fetchFragment(id, proxyRequest);
-        if (fragmentRes.ok) fragments.set(id, await fragmentRes.text());
-      })
-    );
+  if (!response.headers.get("content-type")?.includes("text/html"))
+    return response;
 
-    const [response] = await Promise.all([proxyPromise, fragmentsPromise]);
+  const gateway = c.req.headers.get("x-react-portable-gateway");
+  const rewriter = new HTMLRewriter().on(
+    "react-portable-fragment",
+    new FragmentHandler({ code, gateway })
+  );
 
-    // アセットへのリクエストはスルー
-    if (!response.headers.get("content-type")?.includes("text/html"))
-      return response;
+  // TODO: Proxyモード無しでアクセスしてきたときにCORSのレスポンスを返す
+  // TODO: handle cache control
+  return rewriter.transform(response);
+});
 
-    const piercingHandler = new PiercingHandler(fragments);
-    const rewriter = new HTMLRewriter()
-      .on("head", new HeadHandler(fragments))
-      .on("react-portable", piercingHandler);
+app.all("*", async (c) => {
+  const [proxyRequest, proxyPromise] = originProxy(c.req.raw, c.env);
 
-    const piercedResponse = rewriter.transform(response);
-    const copied = piercedResponse.clone();
+  const fragments: FragmentMap = new Map();
+  const fragmentIds = fragmentIdsStore(proxyRequest.url, c.env);
 
-    ctx.waitUntil(
-      (async () => {
-        // HTMLRewriterが完了するのを待つ必要がある
-        await copied.text();
-        return fragmentIds.push(piercingHandler.fragmentIds);
-      })()
-    );
+  const fragmentsPromise = Promise.all(
+    Array.from(await fragmentIds.pull()).map(async (id) => {
+      try {
+        // TODO: Handel cache control for fragment
+        const fragmentRes = await fetchFragment(id, proxyRequest, c.env);
+        const { gateway, code } = parseFragmentId(id);
+        const rewriter = new HTMLRewriter().on(
+          "react-portable-fragment",
+          new FragmentHandler({ code, gateway })
+        );
+        if (fragmentRes.ok)
+          fragments.set(id, await rewriter.transform(fragmentRes).text());
+      } catch (e) {
+        console.error(e);
+      }
+    })
+  );
 
-    return piercedResponse;
-  },
-};
+  const [response] = await Promise.all([proxyPromise, fragmentsPromise]);
+
+  // アセットへのリクエストはスルー
+  if (!response.headers.get("content-type")?.includes("text/html"))
+    return response;
+
+  const piercingHandler = new PiercingHandler(fragments);
+  const rewriter = new HTMLRewriter()
+    .on("head", new HeadHandler(fragments))
+    .on("react-portable", piercingHandler);
+
+  const piercedResponse = rewriter.transform(response);
+  const copied = piercedResponse.clone();
+
+  c.executionCtx.waitUntil(
+    (async () => {
+      // HTMLRewriterが完了するのを待つ必要がある
+      await copied.text();
+      return fragmentIds.push(piercingHandler.fragmentIds);
+    })()
+  );
+
+  return piercedResponse;
+});
+
+export default app;
 
 const fragmentIdsStore = (key: string, env: Env) => {
   let fragmentIds: Set<string> = new Set();
@@ -90,45 +112,53 @@ const fragmentIdsStore = (key: string, env: Env) => {
   return { push, pull };
 };
 
-const proxy = (request: Request): [Request, Promise<Response>] => {
-  let url = new URL(request.url);
-  const type = url.pathname.startsWith("/_fragments/") ? "fragment" : "origin";
-
-  if (type === "origin") {
-    // TODO: Varsから読み取る
-    url.host = "0.0.0.0:3000";
-  }
-  if (type === "fragment") {
-    url = getFragmentRemoteUrl(url);
-  }
+const originProxy = (
+  request: Request,
+  env: Env
+): [Request, Promise<Response>] => {
+  const url = new URL(request.url);
+  url.host = new URL(env.ORIGIN).host;
 
   const proxyRequest = new Request(url, request);
   return [proxyRequest, fetch(proxyRequest)];
 };
 
-const getFragmentRemoteUrl = (unknownUrl: string | URL) => {
-  let url: URL;
-  try {
-    url = new URL(unknownUrl);
-  } catch (_) {
-    url = new URL(`http://0.0.0.0${unknownUrl}`);
-  }
+const fragmentProxy = (
+  request: Request,
+  code: string,
+  env: Env
+): [Request, Promise<Response>] => {
+  const url = new URL(request.url);
+  const fetchRemote: string | undefined = JSON.parse(
+    env.FRAGMENT_REMOTE_MAPPING
+  )[code];
+  if (!fetchRemote) throw new Response(null, { status: 404 });
 
-  const match = url.pathname.match(/^\/_fragments\/([^\/]*)\//);
-  const code = match?.[1];
+  const remote = new URL(fetchRemote);
 
-  if (code) {
-    // TODO: Varsから読み取る
-    url.host = "0.0.0.0:3001";
-    url.protocol = "http:";
-  }
-  return url;
+  url.host = remote.host;
+  url.protocol = remote.protocol;
+  url.pathname = url.pathname.replace(`/_fragments/${code}`, "");
+
+  const proxyRequest = new Request(url, request);
+  return [proxyRequest, fetch(proxyRequest)];
 };
 
-const fetchFragment = async (id: string, request: Request) => {
-  const src = fragmentIdToSrc(id);
-  if (!src.includes("/_fragments/")) return new Response("", { status: 400 });
-  return fetch(getFragmentRemoteUrl(src), request);
+const parseFragmentId = (id: string) => {
+  const { entry, gateway } = _parseFragmentId(id);
+  const [, code, path] = entry.match(/^([^:]+):(.+)$/) ?? [];
+  if (!code || !path) throw new Error(`invalid entry ${entry}`);
+
+  return { entry, gateway, code, path };
+};
+
+const fetchFragment = async (id: string, request: Request, env: Env) => {
+  const { code, path } = parseFragmentId(id);
+  const fetchRemote: string | undefined = JSON.parse(
+    env.FRAGMENT_REMOTE_MAPPING
+  )[code];
+  if (!fetchRemote) return new Response(null, { status: 404 });
+  return fetch(new URL(`${fetchRemote}${path}`), request);
 };
 
 class PiercingHandler {
@@ -141,10 +171,11 @@ class PiercingHandler {
   }
 
   async element(element: Element) {
-    const src = element.getAttribute("src");
+    const entry = element.getAttribute("entry");
+    const gateway = element.getAttribute("gateway");
     const suspend = element.getAttribute("suspend") === "true";
-    if (!src) return;
-    const fragmentId = srcToFragmentId(src);
+    if (!entry) return;
+    const fragmentId = createFragmentId(entry, gateway);
     this.fragmentIds.add(fragmentId);
 
     const fragment = this.fragments.get(fragmentId);
@@ -169,6 +200,23 @@ class HeadHandler {
         html: true,
       });
     }
+  }
+}
+
+// <react-portable-fragment /> の q:base を書き換える
+class FragmentHandler {
+  private gateway?: string | null;
+  private code: string;
+  constructor({ code, gateway }: { code: string; gateway?: string | null }) {
+    this.gateway = gateway;
+    this.code = code;
+  }
+  element(element: Element) {
+    const originalBasePath = element.getAttribute("q:base");
+    element.setAttribute(
+      "q:base",
+      `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
+    );
   }
 }
 
