@@ -39,14 +39,15 @@ export class ReactPortable extends HTMLElement {
   }
 
   private async render() {
-    const src = this.getAttribute("src");
+    const entry = this.getAttribute("entry");
+    const gateway = this.getAttribute("gateway");
     const suspend = this.getAttribute("suspend") === "true";
 
-    if (!src)
+    if (!entry)
       throw new Error(
-        "The react portable component has been applied without `src`"
+        "The react portable component has been applied without `entry`"
       );
-    this.fragmentId = srcToFragmentId(src);
+    this.fragmentId = createFragmentId(entry, gateway);
 
     let template = this.getTemplate();
 
@@ -57,7 +58,7 @@ export class ReactPortable extends HTMLElement {
       template.id = this.fragmentId;
 
       await this.streamFragmentIntoOutlet(
-        await this.fetchFragmentStream(src),
+        await this.fetchFragmentStream(entry, gateway),
         // @ts-ignore
         template.content
       );
@@ -84,12 +85,22 @@ export class ReactPortable extends HTMLElement {
     }
   }
 
-  private async fetchFragmentStream(url: string) {
-    const response = (await singletonFetch(url, new Request(url))).clone();
+  private async fetchFragmentStream(entry: string, gateway?: string | null) {
+    const { code, path } = parseEntry(entry);
+    const request = new Request(`${gateway ?? ""}/_fragments/${code}${path}`, {
+      headers: gateway
+        ? {
+            "x-react-portable-gateway": gateway,
+          }
+        : {},
+    });
+    const response = (await singletonFetch(request.url, request)).clone();
     if (!response.body) {
       throw new Error(
         "An empty response has been provided when fetching" +
-          ` the fragment with id ${this.fragmentId}`
+          ` the fragment with id ${this.fragmentId} (entry: ${
+            parseFragmentId(this.fragmentId).entry
+          })`
       );
     }
     return response.body;
@@ -109,12 +120,27 @@ export class ReactPortable extends HTMLElement {
   }
 }
 
-export const srcToFragmentId = (text: string): string => {
-  return btoa(text);
+export const createFragmentId = (
+  entry: string,
+  gateway?: string | null
+): string => {
+  return btoa(JSON.stringify({ entry, gateway: gateway ?? null }));
 };
 
-export const fragmentIdToSrc = (text: string): string => {
-  return atob(text);
+export const parseFragmentId = (
+  text: string
+): { entry: string; gateway: string | null } => {
+  return JSON.parse(atob(text));
+};
+
+const parseEntry = (text: string): { code: string; path: string } => {
+  const [, code, path] = text.match(/^([^:]+):(.+)$/) ?? [];
+  if (!code || !path)
+    throw new Error(
+      "The react portable component has been applied with wrong format `entry`"
+    );
+
+  return { code, path };
 };
 
 declare global {
@@ -124,7 +150,8 @@ declare global {
     }
 
     type ReactPortableAttributes = {
-      src: string;
+      gateway?: string;
+      entry: string;
       suspend?: string;
     } & Partial<
       ReactPortable &
