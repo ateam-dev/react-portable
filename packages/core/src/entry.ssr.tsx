@@ -11,7 +11,5 @@ export default function (opts: RenderToStreamOptions) {
     ...opts,
     containerTagName: "react-portable-fragment",
     qwikLoader: { include: "always" },
-    // FIXME
-    base: "/_fragments/mini/build",
   });
 }
