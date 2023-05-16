@@ -2,7 +2,8 @@ import WritableDOM from "writable-dom";
 import type { DOMAttributes } from "react";
 
 export const registerReactPortable = () => {
-  window.customElements.define("react-portable", ReactPortable);
+  if (typeof window !== "undefined")
+    window.customElements.define("react-portable", ReactPortable);
 };
 
 const promiseStore = new Map<string, Promise<Response>>();
@@ -18,6 +19,11 @@ const singletonFetch = async (key: string, req: Request) => {
 
   return promise;
 };
+
+if (typeof globalThis.HTMLElement === "undefined") {
+  // @ts-ignore
+  globalThis.HTMLElement = class {};
+}
 
 export class ReactPortable extends HTMLElement {
   private fragmentId = "";
