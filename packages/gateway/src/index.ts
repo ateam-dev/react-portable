@@ -100,7 +100,8 @@ app.all("*", async (c) => {
   const piercingHandler = new PiercingHandler(fragments);
   const rewriter = new HTMLRewriter()
     .on("head", new HeadHandler(fragments))
-    .on("react-portable", piercingHandler);
+    .on("react-portable", piercingHandler)
+    .on("script#react-portable-script", new InlineScript());
 
   const piercedResponse = rewriter.transform(response);
   const copied = piercedResponse.clone();
@@ -223,13 +224,17 @@ class HeadHandler {
   }
 
   element(element: Element) {
-    element.append(reactPortableInlineScript, { html: true });
-
     for (const [fragmentId, fragment] of this.fragments) {
       element.append(`<template id="${fragmentId}">${fragment}</template>`, {
         html: true,
       });
     }
+  }
+}
+
+class InlineScript {
+  element(element: Element) {
+    element.setInnerContent(reactPortableInlineScript, { html: true });
   }
 }
 
