@@ -254,7 +254,7 @@ const swr = async (
 ) => {
   const { value: cache, metadata } = await env.CACHE.getWithMetadata<{
     hash: string;
-    staleAt: number;
+    staleAt: string;
     headers: Record<string, string>;
   }>(request.url, "arrayBuffer");
 
@@ -262,10 +262,7 @@ const swr = async (
     (async () => {
       const response = (await responsePromise).clone();
 
-      if (!isCacheable(request, response) || !response.body) {
-        if (cache) await env.CACHE.delete(request.url);
-        return;
-      }
+      if (!isCacheable(request, response) || !response.body) return;
 
       const hash = response.headers.get("x-react-portable-hash");
       const [staleAt, expirationTtl] = getCacheTimes(response);
@@ -273,7 +270,7 @@ const swr = async (
         await env.CACHE.put(request.url, response.body, {
           metadata: {
             hash,
-            staleAt,
+            staleAt: staleAt.toISOString(),
             headers: Object.fromEntries(response.headers.entries()),
           },
           expirationTtl,
@@ -285,9 +282,7 @@ const swr = async (
     return new Response(cache, {
       headers: {
         ...metadata.headers,
-        "x-react-portable-cache": `staleAt: ${new Date(
-          metadata.staleAt
-        ).toISOString()}`,
+        "x-react-portable-cache": `staleAt: ${metadata.staleAt}`,
       },
     });
   return responsePromise;
@@ -314,10 +309,9 @@ const isCacheable = (request: Request, response: Response) => {
   );
 };
 
-const isStale = (expire?: number) => {
-  if (!expire) return true;
-  const expireAt = new Date(expire);
-  return expireAt < new Date();
+const isStale = (expireAt?: string) => {
+  if (!expireAt) return true;
+  return new Date(expireAt) < new Date();
 };
 
 const getDirectiveValue = (
@@ -328,25 +322,21 @@ const getDirectiveValue = (
   return directive ? parseInt(directive.split("=")[1]!) : null;
 };
 
-const getCacheTimes = (response: Response): [number, number] => {
+const getCacheTimes = (response: Response): [Date, number] => {
   const cacheControl = response.headers.get("Cache-Control");
 
-  if (!cacheControl) return [0, 0];
+  if (!cacheControl) return [new Date(0), 0];
 
   const directives = cacheControl
     .split(",")
     .map((directive) => directive.trim());
 
-  const sMaxAge = getDirectiveValue(directives, "s-maxage");
-  const staleWhileRevalidate = getDirectiveValue(
-    directives,
-    "stale-while-revalidate"
-  );
-
-  if (sMaxAge === null || staleWhileRevalidate === null) return [0, 0];
+  const sMaxAge = getDirectiveValue(directives, "s-maxage") ?? 0;
+  const staleWhileRevalidate =
+    getDirectiveValue(directives, "stale-while-revalidate") ?? 0;
 
   const now = new Date();
-  const staleAt = new Date(now.getTime() + sMaxAge * 1000).getTime();
+  const staleAt = new Date(now.getTime() + sMaxAge * 1000);
   const forbiddenTTL = sMaxAge + staleWhileRevalidate;
 
   return [staleAt, forbiddenTTL];
