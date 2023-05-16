@@ -3,7 +3,8 @@ main = "src/index.ts"
 compatibility_date = "2023-05-10"
 
 kv_namespaces = [
-    { binding = "FRAGMENTS_LIST", id = "yyyyyyyyyyyyyyyy", preview_id = "xxxxxxxxxxxxxxxxx" }
+    { binding = "FRAGMENTS_LIST", id = "yyyyyyyyyyyyyyyy", preview_id = "xxxxxxxxxxxxxxxxx" },
+    { binding = "CACHE", id = "yyyyyyyyyyyyyyyy", preview_id = "xxxxxxxxxxxxxxxxx" }
 ]
 
 [vars]

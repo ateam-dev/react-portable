@@ -5,12 +5,14 @@ import {
 } from "react-portable-client";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
+import { ExecutionContext } from "hono/dist/types/context";
 
 type Env = {
   ORIGIN: string;
   FRAGMENT_REMOTE_MAPPING: string;
   ALLOW_ORIGINS: string;
   FRAGMENTS_LIST: KVNamespace;
+  CACHE: KVNamespace;
 };
 
 type FragmentMap = Map<string, string>;
@@ -21,17 +23,16 @@ app.all("*", logger());
 
 app.get("/_fragments/:code/*", async (c) => {
   const code = c.req.param().code;
-  const [, proxyPromise] = fragmentProxy(c.req.raw, code, c.env);
-  let response = await proxyPromise;
+  const [proxyRequest, proxyPromise] = fragmentProxy(c.req.raw, code, c.env);
+  let response = await swr(proxyRequest, proxyPromise, c.env, c.executionCtx);
 
-  const newHeaders = new Headers(response.headers);
-  newHeaders.set("Access-Control-Allow-Origin", c.env.ALLOW_ORIGINS);
-  newHeaders.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
-  newHeaders.set("Access-Control-Allow-Headers", "Content-Type, Accept");
+  const headers = new Headers(response.headers);
+  headers.set("Access-Control-Allow-Origin", c.env.ALLOW_ORIGINS);
+  headers.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Accept");
   response = new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders,
+    ...response,
+    headers,
   });
 
   if (!response.headers.get("content-type")?.includes("text/html"))
@@ -43,21 +44,25 @@ app.get("/_fragments/:code/*", async (c) => {
     new FragmentHandler({ code, gateway })
   );
 
-  // TODO: handle cache control
   return rewriter.transform(response);
 });
 
 app.all("*", async (c) => {
   const [proxyRequest, proxyPromise] = originProxy(c.req.raw, c.env);
 
-  const fragments: FragmentMap = new Map();
   const fragmentIds = fragmentIdsStore(proxyRequest.url, c.env);
 
-  const fragmentsPromise = Promise.all(
-    Array.from(await fragmentIds.pull()).map(async (id) => {
-      try {
-        // TODO: Handel cache control for fragment
-        const fragmentRes = await fetchFragment(id, proxyRequest, c.env);
+  const fragmentsPromise = new Promise<FragmentMap>(async (resolve) => {
+    const fragments: FragmentMap = new Map();
+    const ids = Array.from(await fragmentIds.pull());
+    await Promise.allSettled(
+      ids.map(async (id) => {
+        const fragmentRes = await swr(
+          proxyRequest,
+          fetchFragment(id, proxyRequest, c.env),
+          c.env,
+          c.executionCtx
+        );
         const { gateway, code } = parseFragmentId(id);
         const rewriter = new HTMLRewriter().on(
           "react-portable-fragment",
@@ -65,13 +70,16 @@ app.all("*", async (c) => {
         );
         if (fragmentRes.ok)
           fragments.set(id, await rewriter.transform(fragmentRes).text());
-      } catch (e) {
-        console.error(e);
-      }
-    })
-  );
+      })
+    );
 
-  const [response] = await Promise.all([proxyPromise, fragmentsPromise]);
+    resolve(fragments);
+  });
+
+  const [response, fragments] = await Promise.all([
+    proxyPromise,
+    fragmentsPromise,
+  ]);
 
   // アセットへのリクエストはスルー
   if (!response.headers.get("content-type")?.includes("text/html"))
@@ -236,4 +244,108 @@ const isSetEqual = (set1: Set<string>, set2: Set<string>) => {
     if (!set2.has(item)) return false;
   }
   return true;
+};
+
+const swr = async (
+  request: Request,
+  responsePromise: Promise<Response>,
+  env: Env,
+  ctx: ExecutionContext
+) => {
+  const { value: cache, metadata } = await env.CACHE.getWithMetadata<{
+    hash: string;
+    staleAt: number;
+    headers: Record<string, string>;
+  }>(request.url, "arrayBuffer");
+
+  ctx.waitUntil(
+    (async () => {
+      const response = (await responsePromise).clone();
+
+      const hash = response.headers.get("x-react-portal-hash");
+
+      if (
+        !isCacheable(request, response) ||
+        (!isStale(metadata?.staleAt) && metadata?.hash === hash) ||
+        !response.body
+      )
+        return;
+
+      const [staleAt, expiration] = getCacheTimes(response) ?? [];
+
+      const headers: Record<string, string> = {};
+      response.headers.forEach((value, key) => (headers[key] = value));
+
+      await env.CACHE.put(request.url, response.body, {
+        metadata: {
+          hash,
+          staleAt,
+          headers,
+        },
+        expiration,
+      });
+    })()
+  );
+
+  if (cache && metadata?.headers)
+    return new Response(cache, { headers: metadata.headers });
+  return responsePromise;
+};
+
+const isCacheable = (request: Request, response: Response) => {
+  const contentType = response.headers.get("Content-Type");
+  if (!contentType || !contentType.includes("text/html")) return false;
+
+  // https://vercel.com/docs/concepts/edge-network/caching#cacheable-response-criteria
+  if (!["GET", "HEAD"].includes(request.method)) return false;
+  if (request.headers.has("Range")) return false;
+  if (request.headers.has("Authorization")) return false;
+  if (![200, 404, 301, 308].includes(response.status)) return false;
+  const contentLength = Number(response.headers.get("Content-Length"));
+  if (Number.isNaN(contentLength) || contentLength / 1024 ** 2 > 10)
+    return false;
+  if (response.headers.has("set-cookie")) return false;
+  const cacheControl = response.headers.get("Cache-Control") ?? "";
+  return !(
+    cacheControl.includes("private") ||
+    cacheControl.includes("no-cache") ||
+    cacheControl.includes("no-store")
+  );
+};
+
+const isStale = (expire?: number) => {
+  if (!expire) return true;
+  const expireAt = new Date(expire);
+  return expireAt < new Date();
+};
+
+const getDirectiveValue = (
+  directives: string[],
+  name: string
+): number | null => {
+  const directive = directives.find((d) => d.startsWith(`${name}=`));
+  return directive ? parseInt(directive.split("=")[1]!) : null;
+};
+
+const getCacheTimes = (response: Response) => {
+  const cacheControl = response.headers.get("Cache-Control");
+
+  if (!cacheControl) return null;
+
+  const directives = cacheControl
+    .split(",")
+    .map((directive) => directive.trim());
+
+  const sMaxAge = getDirectiveValue(directives, "s-maxage");
+  const staleWhileRevalidate = getDirectiveValue(
+    directives,
+    "stale-while-revalidate"
+  );
+
+  if (sMaxAge === null || staleWhileRevalidate === null) return null;
+
+  const staleAt = new Date(new Date().getTime() + sMaxAge * 1000);
+  const forbiddenAt = new Date(staleAt.getTime() + staleWhileRevalidate * 1000);
+
+  return [staleAt.getTime(), forbiddenAt.getTime()];
 };
