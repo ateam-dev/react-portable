@@ -4,9 +4,11 @@
   "bin": {
     "react-portable": "./bin/cli.js"
   },
+  "types": "./types/index.d.ts",
   "files": [
     "src",
-    "bin"
+    "bin",
+    "types"
   ],
   "private": true,
   "scripts": {
