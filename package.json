@@ -6,6 +6,9 @@
   "repository": "git@github.com:aiji42/react-portable.git",
   "author": "Aiji Ueijima <aiji42@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "yarn workspace @react-portable/core build && yarn workspace @react-portable/client build"
+  },
   "workspaces": {
     "packages": ["packages/*", "examples/*"]
   },

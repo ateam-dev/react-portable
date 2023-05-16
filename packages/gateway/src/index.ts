@@ -2,7 +2,7 @@ import {
   parseFragmentId as _parseFragmentId,
   reactPortableInlineScript,
   createFragmentId,
-} from "react-portable-client";
+} from "@react-portable/client";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { ExecutionContext } from "hono/dist/types/context";

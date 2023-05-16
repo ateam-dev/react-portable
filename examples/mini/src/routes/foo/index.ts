@@ -1,7 +1,7 @@
 import Entry from "../../entry";
 export default Entry;
 import "../../global.css";
-import { Loader, Strategy } from "react-portable-core";
+import { Loader, Strategy } from "@react-portable/core";
 
 export const loader: Loader = (request: Request) => {
   const url = new URL(request.url);
