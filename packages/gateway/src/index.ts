@@ -9,6 +9,7 @@ import { logger } from "hono/logger";
 type Env = {
   ORIGIN: string;
   FRAGMENT_REMOTE_MAPPING: string;
+  ALLOW_ORIGINS: string;
   FRAGMENTS_LIST: KVNamespace;
 };
 
@@ -21,7 +22,17 @@ app.all("*", logger());
 app.get("/_fragments/:code/*", async (c) => {
   const code = c.req.param().code;
   const [, proxyPromise] = fragmentProxy(c.req.raw, code, c.env);
-  const response = await proxyPromise;
+  let response = await proxyPromise;
+
+  const newHeaders = new Headers(response.headers);
+  newHeaders.set("Access-Control-Allow-Origin", c.env.ALLOW_ORIGINS);
+  newHeaders.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  newHeaders.set("Access-Control-Allow-Headers", "Content-Type, Accept");
+  response = new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders,
+  });
 
   if (!response.headers.get("content-type")?.includes("text/html"))
     return response;
@@ -32,7 +43,6 @@ app.get("/_fragments/:code/*", async (c) => {
     new FragmentHandler({ code, gateway })
   );
 
-  // TODO: Proxyモード無しでアクセスしてきたときにCORSのレスポンスを返す
   // TODO: handle cache control
   return rewriter.transform(response);
 });
