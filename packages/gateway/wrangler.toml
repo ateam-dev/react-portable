@@ -9,5 +9,5 @@ kv_namespaces = [
 
 [vars]
 ORIGIN = "https://0.0.0.0"
-FRAGMENT_REMOTE_MAPPING = '{"code":"https://0.0.0.0"}'
+FRAGMENT_CONFIGS = '{"mini":{"origin":"http://0.0.0.0:3001","assetPath":""}}'
 ALLOW_ORIGINS = "http://0.0.0.0:3000, http://0.0.0.0:3001"

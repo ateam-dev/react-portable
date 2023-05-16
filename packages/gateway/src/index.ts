@@ -9,11 +9,16 @@ import { ExecutionContext } from "hono/dist/types/context";
 
 type Env = {
   ORIGIN: string;
-  FRAGMENT_REMOTE_MAPPING: string;
+  FRAGMENT_CONFIGS: string;
   ALLOW_ORIGINS: string;
   FRAGMENTS_LIST: KVNamespace;
   CACHE: KVNamespace;
 };
+
+type FragmentConfigs = Record<
+  string,
+  { origin: string; assetPath: string | null }
+>;
 
 type FragmentMap = Map<string, string>;
 
@@ -22,8 +27,13 @@ const app = new Hono<{ Bindings: Env }>();
 app.all("*", logger());
 
 app.get("/_fragments/:code/*", async (c) => {
+  const fragmentConfigs = parseFragmentConfigs(c.env);
   const code = c.req.param().code;
-  const [proxyRequest, proxyPromise] = fragmentProxy(c.req.raw, code, c.env);
+  const [proxyRequest, proxyPromise] = fragmentProxy(
+    c.req.raw,
+    code,
+    fragmentConfigs
+  );
   let response = await swr(proxyRequest, proxyPromise, c.env, c.executionCtx);
 
   const headers = new Headers(response.headers);
@@ -39,15 +49,17 @@ app.get("/_fragments/:code/*", async (c) => {
     return response;
 
   const gateway = c.req.headers.get("x-react-portable-gateway");
+  const assetPath = fragmentConfigs[code]?.assetPath;
   const rewriter = new HTMLRewriter().on(
     "react-portable-fragment",
-    new FragmentHandler({ code, gateway })
+    new FragmentHandler({ code, gateway, assetPath })
   );
 
   return rewriter.transform(response);
 });
 
 app.all("*", async (c) => {
+  const fragmentConfigs = parseFragmentConfigs(c.env);
   const [proxyRequest, proxyPromise] = originProxy(c.req.raw, c.env);
 
   const fragmentIds = fragmentIdsStore(proxyRequest.url, c.env);
@@ -59,7 +71,7 @@ app.all("*", async (c) => {
       ids.map(async (id) => {
         const fragmentRes = await swr(
           proxyRequest,
-          fetchFragment(id, proxyRequest, c.env),
+          fetchFragment(id, proxyRequest, fragmentConfigs),
           c.env,
           c.executionCtx
         );
@@ -144,15 +156,13 @@ const originProxy = (
 const fragmentProxy = (
   request: Request,
   code: string,
-  env: Env
+  fragmentConfigs: FragmentConfigs
 ): [Request, Promise<Response>] => {
   const url = new URL(request.url);
-  const fetchRemote: string | undefined = JSON.parse(
-    env.FRAGMENT_REMOTE_MAPPING
-  )[code];
-  if (!fetchRemote) throw new Response(null, { status: 404 });
+  const config = fragmentConfigs[code];
+  if (!config) throw new Response(null, { status: 404 });
 
-  const remote = new URL(fetchRemote);
+  const remote = new URL(config.origin);
 
   url.host = remote.host;
   url.protocol = remote.protocol;
@@ -170,13 +180,15 @@ const parseFragmentId = (id: string) => {
   return { entry, gateway, code, path };
 };
 
-const fetchFragment = async (id: string, request: Request, env: Env) => {
+const fetchFragment = async (
+  id: string,
+  request: Request,
+  fragmentConfigs: FragmentConfigs
+) => {
   const { code, path } = parseFragmentId(id);
-  const fetchRemote: string | undefined = JSON.parse(
-    env.FRAGMENT_REMOTE_MAPPING
-  )[code];
-  if (!fetchRemote) return new Response(null, { status: 404 });
-  return fetch(new URL(`${fetchRemote}${path}`), request);
+  const config = fragmentConfigs[code];
+  if (!config) return new Response(null, { status: 404 });
+  return fetch(new URL(`${config.origin}${path}`), request);
 };
 
 class PiercingHandler {
@@ -224,16 +236,29 @@ class HeadHandler {
 // <react-portable-fragment /> の q:base を書き換える
 class FragmentHandler {
   private gateway?: string | null;
+  private assetPath?: string | null;
   private code: string;
-  constructor({ code, gateway }: { code: string; gateway?: string | null }) {
+  constructor({
+    code,
+    gateway,
+    assetPath,
+  }: {
+    code: string;
+    gateway?: string | null;
+    assetPath?: string | null;
+  }) {
     this.gateway = gateway;
     this.code = code;
+    this.assetPath = assetPath;
   }
   element(element: Element) {
-    const originalBasePath = element.getAttribute("q:base");
+    const originalBasePath =
+      element.getAttribute("q:base")?.replace(/^(?!\/)/, "/") ?? "";
     element.setAttribute(
       "q:base",
-      `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
+      this.assetPath
+        ? `${this.assetPath}${originalBasePath}`
+        : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
     );
   }
 }
@@ -340,4 +365,8 @@ const getCacheTimes = (response: Response): [Date, number] => {
   const forbiddenTTL = sMaxAge + staleWhileRevalidate;
 
   return [staleAt, forbiddenTTL];
+};
+
+const parseFragmentConfigs = (e: Env): FragmentConfigs => {
+  return JSON.parse(e.FRAGMENT_CONFIGS);
 };
