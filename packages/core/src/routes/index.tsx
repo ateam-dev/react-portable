@@ -3,7 +3,20 @@ import { component$ } from "@builder.io/qwik";
 import { RequestHandler, routeLoader$ } from "@builder.io/qwik-city";
 // @ts-ignore
 import * as Entry from "react-portable:virtual";
-const QR = qwikify$(Entry.default, Entry.strategy?.activate);
+import { QwikifyOptions } from "@builder.io/qwik-react/lib/types/react/types";
+const qwikifyOption = (
+  Entry.strategy?.hydrate === "onUse"
+    ? {
+        eagerness: "hover",
+        event: "focusin",
+      }
+    : Entry.strategy?.hydrate === "onIdle"
+    ? {
+        eagerness: "idle",
+      }
+    : undefined
+) as QwikifyOptions;
+const QR = qwikify$(Entry.default, qwikifyOption);
 const getProps = routeLoader$(({ request }) => {
   return Entry.loader?.(request) ?? {};
 });
