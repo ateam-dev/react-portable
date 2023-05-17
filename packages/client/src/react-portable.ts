@@ -2,7 +2,10 @@ import WritableDOM from "writable-dom";
 import type { DOMAttributes } from "react";
 
 export const registerReactPortable = () => {
-  if (typeof window !== "undefined")
+  if (
+    typeof window !== "undefined" &&
+    !window.customElements.get("react-portable")
+  )
     window.customElements.define("react-portable", ReactPortable);
 };
 
@@ -47,7 +50,10 @@ export class ReactPortable extends HTMLElement {
   private async render() {
     const entry = this.getAttribute("entry");
     const gateway = this.getAttribute("gateway");
-    const suspend = this.getAttribute("suspend") === "true";
+    const pierced = this.getAttribute("pierced") !== null;
+
+    // Gatewayで挿入済みなので何もしない
+    if (pierced) return;
 
     if (!entry)
       throw new Error(
@@ -77,10 +83,8 @@ export class ReactPortable extends HTMLElement {
     if (template) {
       // @ts-ignore
       const clone = template.content.cloneNode(true);
-      if (!suspend) {
-        this.innerHTML = "";
-        this.appendChild(clone);
-      }
+      this.innerHTML = "";
+      this.appendChild(clone);
     }
 
     if (!template) {
@@ -93,13 +97,8 @@ export class ReactPortable extends HTMLElement {
 
   private async fetchFragmentStream(entry: string, gateway?: string | null) {
     const { code, path } = parseEntry(entry);
-    const request = new Request(`${gateway ?? ""}/_fragments/${code}${path}`, {
-      headers: gateway
-        ? {
-            "x-react-portable-gateway": gateway,
-          }
-        : {},
-    });
+    const request = new Request(`${gateway ?? ""}/_fragments/${code}${path}`);
+    if (gateway) request.headers.set("x-react-portable-gateway", gateway);
     const response = (await singletonFetch(request.url, request)).clone();
     if (!response.body) {
       throw new Error(
@@ -158,7 +157,6 @@ declare global {
     type ReactPortableAttributes = {
       gateway?: string;
       entry: string;
-      suspend?: string;
     } & Partial<
       ReactPortable &
         DOMAttributes<ReactPortable> & {
