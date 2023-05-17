@@ -14,7 +14,5 @@ export const strategy: Strategy = {
   cache: {
     revalidate: 0,
   },
-  activate: {
-    eagerness: "visible",
-  },
+  hydrate: "onIdle",
 };

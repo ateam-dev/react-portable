@@ -14,8 +14,5 @@ export const strategy: Strategy = {
   cache: {
     revalidate: 0,
   },
-  activate: {
-    eagerness: "hover",
-    event: ["focusin"],
-  },
+  hydrate: "onUse",
 };
