@@ -1,24 +1,37 @@
-import { useEffect, useReducer } from "react";
+/// <reference types="@react-portable/client" />
+import { useEffect, useReducer, useRef, useId } from "react";
+import { registerReactPortable } from "@react-portable/client";
 
 export const ReactPortable = ({
   entry,
-  force,
   gateway,
 }: {
   entry: string;
-  force?: boolean;
   gateway?: string;
 }) => {
-  const [isMounted, mounted] = useReducer(() => true, false);
-  useEffect(() => {
-    mounted();
-  }, []);
-  if (force) return <react-portable gateway={gateway} entry={entry} />;
+  const isMounted = useMounted();
+  const id = useId();
+  const ref = useRef("");
+  if (!isMounted && typeof window !== "undefined") {
+    ref.current = document.getElementById(id)?.innerText ?? "";
+    registerReactPortable();
+  }
+
   return (
     <react-portable
       gateway={gateway}
       entry={entry}
-      suspend={String(!isMounted)}
+      id={id}
+      dangerouslySetInnerHTML={{ __html: ref.current }}
     />
   );
+};
+
+const useMounted = () => {
+  const [isMounted, mounted] = useReducer(() => true, false);
+  useEffect(() => {
+    mounted();
+  }, []);
+
+  return isMounted;
 };
