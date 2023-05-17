@@ -26,6 +26,12 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.all("*", logger());
 
+app.options("*", (c) => {
+  return new Response("", {
+    headers: getCorsHeader(c.req.headers.get("Origin"), c.env.ALLOW_ORIGINS),
+  });
+});
+
 app.get("/_fragments/:code/*", async (c) => {
   const fragmentConfigs = parseFragmentConfigs(c.env);
   const code = c.req.param().code;
@@ -36,13 +42,13 @@ app.get("/_fragments/:code/*", async (c) => {
   );
   let response = await swr(proxyRequest, proxyPromise, c.env, c.executionCtx);
 
-  const headers = new Headers(response.headers);
-  headers.set("Access-Control-Allow-Origin", c.env.ALLOW_ORIGINS);
-  headers.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
-  headers.set("Access-Control-Allow-Headers", "Content-Type, Accept");
   response = new Response(response.body, {
     ...response,
-    headers,
+    headers: getCorsHeader(
+      c.req.headers.get("Origin"),
+      c.env.ALLOW_ORIGINS,
+      new Headers(response.headers)
+    ),
   });
 
   if (!response.headers.get("content-type")?.includes("text/html"))
@@ -118,6 +124,25 @@ app.all("*", async (c) => {
 });
 
 export default app;
+
+const getCorsHeader = (
+  origin: string | null,
+  allowOrigins: string,
+  baseHeaders?: Headers
+) => {
+  const headers = baseHeaders ?? new Headers();
+  if (allowOrigins === "*") {
+    headers.set("Access-Control-Allow-Origin", allowOrigins);
+  } else if (origin && allowOrigins.includes(origin)) {
+    headers.set("Access-Control-Allow-Origin", origin);
+  }
+  headers.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Accept, x-react-portable-gateway"
+  );
+  return headers;
+};
 
 const fragmentIdsStore = (key: string, env: Env) => {
   let fragmentIds: Set<string> = new Set();
@@ -204,15 +229,15 @@ class PiercingHandler {
   async element(element: Element) {
     const entry = element.getAttribute("entry");
     const gateway = element.getAttribute("gateway");
-    const suspend = element.getAttribute("suspend") === "true";
     if (!entry) return;
     const fragmentId = createFragmentId(entry, gateway);
     this.fragmentIds.add(fragmentId);
 
     const fragment = this.fragments.get(fragmentId);
-    if (!fragment || suspend) return;
+    if (!fragment) return;
 
     element.setInnerContent(fragment, { html: true });
+    element.setAttribute("pierced", "");
   }
 }
 
