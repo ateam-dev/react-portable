@@ -1,13 +1,11 @@
 import { Hono } from "hono";
-import { logger } from "hono/logger";
 import {
   FragmentBaseReplacer,
   FragmentTemplatesAppender,
-  InlineScriptInjector,
   ReactPortablePiercer,
 } from "./libs/htmlRewriters";
 import { corsHeader } from "./libs/cors";
-import { FragmentIdListStore, prepareStore } from "./libs/store";
+import { createIdListStore, prepareStore } from "./libs/store";
 import { prepareSwr, swr } from "./libs/swr";
 import { CUSTOM_HEADER_KEY_GATEWAY } from "./libs/constants";
 import {
@@ -25,8 +23,6 @@ type Env = {
 };
 
 const app = new Hono<{ Bindings: Env }>();
-
-app.all("*", logger());
 
 app.options("*", (c) => {
   return new Response("", {
@@ -72,10 +68,10 @@ app.all("*", async (c) => {
   url.host = new URL(c.env.ORIGIN).host;
   const proxyRequest = new Request(url, c.req.raw);
 
-  const fragmentIdStore = new FragmentIdListStore(proxyRequest.url);
+  const fragmentIdStore = createIdListStore(proxyRequest.url);
 
-  const fragmentsFetch = fragmentIdStore.load().then(({ fragmentIds }) =>
-    getFragments(fragmentIds, async (request) => {
+  const fragmentsFetch = fragmentIdStore.load().then((store) =>
+    getFragments(store.ids, async (request) => {
       const { revalidate, response } = await swr(request);
       c.executionCtx.waitUntil(revalidate());
       return response;
@@ -92,11 +88,9 @@ app.all("*", async (c) => {
 
   const piercer = new ReactPortablePiercer(fragments);
   const templatesAppender = new FragmentTemplatesAppender(fragments);
-  const scriptInjector = new InlineScriptInjector();
   const rewriter = new HTMLRewriter()
     .on(piercer.selector, piercer)
-    .on(templatesAppender.selector, templatesAppender)
-    .on(scriptInjector.selector, scriptInjector);
+    .on(templatesAppender.selector, templatesAppender);
 
   const piercedResponse = rewriter.transform(response);
   const copied = piercedResponse.clone();

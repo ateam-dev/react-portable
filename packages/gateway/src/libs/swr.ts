@@ -1,7 +1,11 @@
-import { CUSTOM_HEADER_KEY_HASH } from "./constants";
+import {
+  CUSTOM_HEADER_KEY_CACHE_STATUS,
+  cacheStatus,
+  CUSTOM_HEADER_KEY_STALE_AT,
+} from "./constants";
 
 type MetaData = {
-  hash: string;
+  etag: string | null;
   staleAt: string;
   headers: Record<string, string>;
 };
@@ -17,37 +21,62 @@ export const swr = async (request: Request) => {
     "arrayBuffer"
   );
 
-  const promise = fetch(request);
+  if (cache) {
+    const response = new Response(cache, {
+      headers: {
+        ...(metadata?.headers ?? {}),
+        ...(metadata?.staleAt
+          ? {
+              [CUSTOM_HEADER_KEY_CACHE_STATUS]: isStale(metadata.staleAt)
+                ? cacheStatus.stale
+                : cacheStatus.fresh,
+              [CUSTOM_HEADER_KEY_STALE_AT]: metadata.staleAt,
+            }
+          : {}),
+      },
+    });
+    const revalidate = createRevalidate(request, response, metadata?.etag);
 
-  const revalidate = async () => {
-    const response = await promise;
+    return { response, revalidate };
+  }
 
-    if (!isCacheable(request, response) || !response.body) return;
+  const response = await fetch(request);
+  const store = createStore(request, response);
 
-    const hash = response.headers.get(CUSTOM_HEADER_KEY_HASH);
-    const [staleAt, expirationTtl] = getCacheTimes(response);
-    if (isStale(metadata?.staleAt) || metadata?.hash !== hash)
-      await kv.put(request.url, response.body, {
-        metadata: {
-          hash,
-          staleAt: staleAt.toISOString(),
-          headers: Object.fromEntries(response.headers.entries()),
-        },
-        expirationTtl,
-      });
+  return { response, revalidate: store };
+};
+
+const createRevalidate =
+  (request: Request, cache: Response, etag?: string | null) => async () => {
+    const isCacheFresh =
+      cache.headers.get(CUSTOM_HEADER_KEY_CACHE_STATUS) === cacheStatus.fresh;
+
+    // Even if the cache is fresh, check for origin modifications
+    const response = await fetch(request, {
+      headers: {
+        ...request.headers,
+        ...(isCacheFresh && etag ? { "If-None-Match": etag } : {}),
+      },
+    });
+
+    if (response.status === 304) return;
+
+    return createStore(request, response)();
   };
 
-  const response =
-    cache && metadata?.headers
-      ? new Response(cache, {
-          headers: {
-            ...metadata.headers,
-            "x-react-portable-cache": `staleAt: ${metadata.staleAt}`,
-          },
-        })
-      : await promise;
+const createStore = (request: Request, response: Response) => async () => {
+  if (!isCacheable(request, response) || !response.body) return;
 
-  return { response: response.clone(), revalidate };
+  const [staleAt, expirationTtl] = getCacheTimes(response);
+  const metadata: MetaData = {
+    etag: response.headers.get("Etag"),
+    staleAt: staleAt.toISOString(),
+    headers: Object.fromEntries(response.headers.entries()),
+  };
+  await kv.put(request.url, response.clone().body as ReadableStream, {
+    metadata,
+    expirationTtl,
+  });
 };
 
 const isCacheable = (request: Request, response: Response) => {

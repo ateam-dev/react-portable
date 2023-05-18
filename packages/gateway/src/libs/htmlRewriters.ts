@@ -44,14 +44,6 @@ export class FragmentTemplatesAppender {
   }
 }
 
-export class InlineScriptInjector {
-  public readonly selector = "script#react-portable-script";
-
-  element(element: Element) {
-    element.setInnerContent(reactPortableInlineScript, { html: true });
-  }
-}
-
 export class FragmentBaseReplacer {
   public readonly selector = "react-portable-fragment";
 
@@ -67,7 +59,7 @@ export class FragmentBaseReplacer {
     element.setAttribute(
       "q:base",
       this.assetPath
-        ? `${this.assetPath}${originalBasePath}`
+        ? `${this.assetPath.replace(/\/$/, "")}${originalBasePath}`
         : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
     );
   }

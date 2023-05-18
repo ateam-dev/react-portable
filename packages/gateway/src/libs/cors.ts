@@ -6,7 +6,7 @@ export const corsHeader = (
   baseHeaders?: Headers
 ) => {
   const headers = baseHeaders ?? new Headers();
-  if (allowOrigins === "*") {
+  if (!allowOrigins.includes(",")) {
     headers.set("Access-Control-Allow-Origin", allowOrigins);
   } else if (origin && allowOrigins.includes(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);

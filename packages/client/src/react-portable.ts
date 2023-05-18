@@ -98,7 +98,7 @@ export class ReactPortable extends HTMLElement {
   private async fetchFragmentStream(entry: string, gateway?: string | null) {
     const { code, path } = parseEntry(entry);
     const request = new Request(`${gateway ?? ""}/_fragments/${code}${path}`);
-    if (gateway) request.headers.set("x-react-portable-gateway", gateway);
+    if (gateway) request.headers.set("X-React-Portable-Gateway", gateway);
     const response = (await singletonFetch(request.url, request)).clone();
     if (!response.body) {
       throw new Error(

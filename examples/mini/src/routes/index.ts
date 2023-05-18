@@ -11,8 +11,6 @@ export const loader: Loader = (request: Request) => {
 };
 
 export const strategy: Strategy = {
-  cache: {
-    revalidate: 0,
-  },
+  revalidate: 60,
   hydrate: "onUse",
 };

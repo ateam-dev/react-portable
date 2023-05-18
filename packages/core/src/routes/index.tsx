@@ -3,19 +3,33 @@ import { component$ } from "@builder.io/qwik";
 import { RequestHandler, routeLoader$ } from "@builder.io/qwik-city";
 // @ts-ignore
 import * as Entry from "react-portable:virtual";
-import { QwikifyOptions } from "@builder.io/qwik-react/lib/types/react/types";
-const qwikifyOption = (
-  Entry.strategy?.hydrate === "onUse"
-    ? {
+
+export type Strategy = {
+  revalidate?: false | 0 | number;
+  hydrate?: "onUse" | "onIdle" | "disable";
+};
+
+export type Loader = (
+  r: Request
+) => Record<string, unknown> | Promise<Record<string, unknown>>;
+
+const { hydrate, revalidate = 0 }: Strategy = Entry.strategy ?? {};
+
+const qwikifyOption =
+  hydrate === "onUse"
+    ? ({
         eagerness: "hover",
         event: "focusin",
-      }
-    : Entry.strategy?.hydrate === "onIdle"
-    ? {
+      } as const)
+    : hydrate === "onIdle"
+    ? ({
         eagerness: "idle",
-      }
-    : undefined
-) as QwikifyOptions;
+        event: undefined,
+      } as const)
+    : {
+        eagerness: undefined,
+        event: undefined,
+      };
 const QR = qwikify$(Entry.default, qwikifyOption);
 const getProps = routeLoader$(({ request }) => {
   return Entry.loader?.(request) ?? {};
@@ -25,7 +39,6 @@ export default component$(() => {
   return <QR {...props} />;
 });
 
-const { revalidate = 0, hash } = Entry.strategy?.cache ?? {};
 export const onGet: RequestHandler = async (requestEvent) => {
   requestEvent.headers.set(
     "Cache-Control",
@@ -37,5 +50,4 @@ export const onGet: RequestHandler = async (requestEvent) => {
           3600 * 24 * 365
         }`
   );
-  if (hash) requestEvent.headers.set("x-react-portable-hash", hash);
 };

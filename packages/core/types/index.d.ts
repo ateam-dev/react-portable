@@ -1,10 +1,5 @@
-export type CacheStrategy = {
-  revalidate?: false | 0 | number;
-  hash?: string;
-};
-
 export type Strategy = {
-  cache?: CacheStrategy;
+  revalidate?: false | 0 | number;
   hydrate?: "onUse" | "onIdle" | "disable";
 };
 

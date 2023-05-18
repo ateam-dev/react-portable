@@ -3,41 +3,47 @@ export const prepareStore = (_kv: KVNamespace) => {
   kv = _kv;
 };
 
-export class FragmentIdListStore {
-  private currentFragmentIds: Set<string> = new Set();
-  private originalFragmentIds: Set<string> = new Set();
-  constructor(private readonly key: string) {}
+type IdListStore = {
+  ids: string[];
+  load: () => Promise<IdListStore>;
+  save: () => Promise<void>;
+  update: (ids: string[] | Set<string>) => IdListStore;
+};
 
-  get fragmentIds() {
-    return Array.from(this.currentFragmentIds);
-  }
+export const createIdListStore = (key: string): IdListStore => {
+  let currentIds: Set<string> = new Set();
+  let originalIds: Set<string> = new Set();
 
-  public async load() {
-    if (this.originalFragmentIds.size > 0) return this;
+  const idListStore: IdListStore = {
+    get ids() {
+      return Array.from(currentIds);
+    },
 
-    this.originalFragmentIds = this.currentFragmentIds = new Set(
-      await kv.get<Array<string>>(this.key, {
-        type: "json",
-      })
-    );
+    load: async () => {
+      originalIds = currentIds = new Set(
+        await kv.get<Array<string>>(key, {
+          type: "json",
+        })
+      );
 
-    return this;
-  }
+      return idListStore;
+    },
 
-  public async save() {
-    if (
-      isSetEqual(this.originalFragmentIds ?? new Set(), this.currentFragmentIds)
-    )
-      return;
+    save: async () => {
+      if (isSetEqual(originalIds, currentIds)) return;
 
-    await kv.put(this.key, JSON.stringify(this.fragmentIds));
-  }
+      await kv.put(key, JSON.stringify(Array.from(currentIds)));
+      originalIds = currentIds;
+    },
 
-  public update(ids: Set<string> | Array<string>) {
-    this.currentFragmentIds = new Set(ids);
-    return this;
-  }
-}
+    update: (ids: string[] | Set<string>) => {
+      currentIds = new Set(ids);
+      return idListStore;
+    },
+  };
+
+  return idListStore;
+};
 
 const isSetEqual = (set1: Set<string>, set2: Set<string>) => {
   if (set1.size !== set2.size) return false;
