@@ -17,9 +17,9 @@
   },
   "devDependencies": {
     "@builder.io/qwik-react": "^0.5.0",
-    "@cloudflare/workers-types": "^4.20230419.0",
+    "@cloudflare/workers-types": "^4.20230511.0",
     "@types/fs-extra": "^11.0.1",
-    "@types/node": "^20.1.1",
+    "@types/node": "^20.2.0",
     "fs-extra": "^11.1.1",
     "typescript": "5.0.4"
   },
@@ -29,17 +29,17 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
+    "@builder.io/qwik": "^1.1.4",
+    "@builder.io/qwik-city": "^1.1.4",
     "@cloudflare/kv-asset-handler": "^0.3.0",
-    "@builder.io/qwik": "^1.1.0",
-    "@builder.io/qwik-city": "^1.1.1",
     "@hono/qwik-city": "^0.0.2",
     "commander": "^10.0.1",
     "fs-extra": "^11.1.1",
-    "glob": "^10.2.3",
+    "glob": "^10.2.5",
     "hono": "^3.1.8",
-    "vite": "^4.3.5",
+    "vite": "^4.3.7",
     "vite-tsconfig-paths": "4.2.0",
-    "wrangler": "^2.19.0"
+    "wrangler": "^3.0.0"
   },
   "engines": {
     "node": ">=15.0.0"

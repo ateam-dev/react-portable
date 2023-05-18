@@ -78,17 +78,17 @@ const prepareProject = async (routesDir: string) => {
 };
 
 const launchDevWorker = async (
-  option: { port?: number; liveReload?: boolean; local?: boolean } = {}
+  option: { port?: number; liveReload?: boolean } = {}
 ) => {
   const worker = await wrangler.unstable_dev(
     path.resolve(serverOutDir, "workers.mjs"),
     {
       site: path.relative(process.cwd(), clientOutDir),
-      local: option.local ?? true,
       port: option.port,
       experimental: {
         liveReload: option.liveReload ?? false,
       },
+      logLevel: "log",
     }
   );
 
@@ -128,11 +128,11 @@ program
   .command("dev <src>")
   .description("開発モード")
   .option("-p, --port <number>", "使用するポート")
-  .action(async (src: string, { port }: { port?: number }) => {
+  .action(async (src: string, { port }: { port?: string }) => {
     // TODO: srcを監視して、ディレクトリ構造が変わったら再構築したい
     await prepareProject(src);
 
-    await serveSSR({ port }).catch((e) => {
+    await serveSSR({ port: port ? Number(port) : undefined }).catch((e) => {
       console.error(e);
       process.exit(1);
     });
@@ -151,19 +151,19 @@ program
   .command("start <src>")
   .description("スタートモード")
   .option("-p, --port <number>", "使用するポート")
-  .action(async (src: string, { port }: { port?: number }) => {
-    await launchDevWorker({ port });
+  .action(async (src: string, { port }: { port?: string }) => {
+    await launchDevWorker({ port: port ? Number(port) : undefined });
   });
 
 program
   .command("preview <src>")
   .description("プレビューモード(workerモード)")
   .option("-p, --port <number>", "使用するポート")
-  .action(async (src: string, { port }: { port?: number }) => {
+  .action(async (src: string, { port }: { port?: string }) => {
     await prepareProject(src);
     await buildClient();
     await buildWorker();
-    await launchDevWorker({ port });
+    await launchDevWorker({ port: port ? Number(port) : undefined });
   });
 
 program

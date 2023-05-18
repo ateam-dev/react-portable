@@ -5,13 +5,15 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build:inline": "vite build -c ./vite.inline.config.ts",
     "build": "npm run build:inline; npx vite build"
   },
   "devDependencies": {
-    "vite": "^4.3.5",
+    "vite": "^4.3.7",
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
