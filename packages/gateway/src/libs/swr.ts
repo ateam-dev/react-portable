@@ -10,12 +10,17 @@ type MetaData = {
   headers: Record<string, string>;
 };
 
+type Revalidate = (f: typeof fetch) => Promise<void>;
+
 let kv: KVNamespace;
 export const prepareSwr = (_kv: KVNamespace) => {
   kv = _kv;
 };
 
-export const swr = async (request: Request) => {
+export const swr = async (
+  request: Request,
+  _fetch: typeof fetch
+): Promise<{ response: Response; revalidate: Revalidate }> => {
   const { metadata, value: cache } = await kv.getWithMetadata<MetaData>(
     request.url,
     "arrayBuffer"
@@ -40,43 +45,52 @@ export const swr = async (request: Request) => {
     return { response, revalidate };
   }
 
-  const response = await fetch(request);
+  const response = await _fetch(request);
   const store = createStore(request, response);
 
   return { response, revalidate: store };
 };
 
-const createRevalidate =
-  (request: Request, cache: Response, etag?: string | null) => async () => {
-    const isCacheFresh =
-      cache.headers.get(CUSTOM_HEADER_KEY_CACHE_STATUS) === cacheStatus.fresh;
+const createRevalidate = (
+  request: Request,
+  cache: Response,
+  etag?: string | null
+): Revalidate => {
+  const isCacheFresh =
+    cache.headers.get(CUSTOM_HEADER_KEY_CACHE_STATUS) === cacheStatus.fresh;
 
+  return async (_fetch: typeof fetch) => {
     // Even if the cache is fresh, check for origin modifications
-    const response = await fetch(request, {
-      headers: {
+    const response = await _fetch(request, {
+      headers: new Headers({
         ...request.headers,
         ...(isCacheFresh && etag ? { "If-None-Match": etag } : {}),
-      },
+      }),
     });
 
     if (response.status === 304) return;
 
     return createStore(request, response)();
   };
+};
 
-const createStore = (request: Request, response: Response) => async () => {
-  if (!isCacheable(request, response) || !response.body) return;
+const createStore = (request: Request, response: Response) => {
+  if (!isCacheable(request, response) || !response.body) return async () => {};
 
-  const [staleAt, expirationTtl] = getCacheTimes(response);
+  const { staleAt, expirationTtl } = getCacheTimes(response);
   const metadata: MetaData = {
     etag: response.headers.get("Etag"),
     staleAt: staleAt.toISOString(),
     headers: Object.fromEntries(response.headers.entries()),
   };
-  await kv.put(request.url, response.clone().body as ReadableStream, {
-    metadata,
-    expirationTtl,
-  });
+  const cloned = response.clone();
+
+  return async () =>
+    kv.put(request.url, cloned.body as ReadableStream, {
+      metadata,
+      // KV expirationTtl must be above 60s
+      expirationTtl: Math.max(60, expirationTtl),
+    });
 };
 
 const isCacheable = (request: Request, response: Response) => {
@@ -91,8 +105,9 @@ const isCacheable = (request: Request, response: Response) => {
   const contentLength = Number(response.headers.get("Content-Length"));
   if (Number.isNaN(contentLength) || contentLength / 1024 ** 2 > 10)
     return false;
-  if (response.headers.has("set-cookie")) return false;
-  const cacheControl = response.headers.get("Cache-Control") ?? "";
+  if (response.headers.has("Set-Cookie")) return false;
+  const cacheControl = response.headers.get("Cache-Control");
+  if (!cacheControl) return false;
   return !(
     cacheControl.includes("private") ||
     cacheControl.includes("no-cache") ||
@@ -100,35 +115,34 @@ const isCacheable = (request: Request, response: Response) => {
   );
 };
 
-const isStale = (expireAt?: string) => {
-  if (!expireAt) return true;
+const isStale = (expireAt: string) => {
   return new Date(expireAt) < new Date();
 };
 
-const getDirectiveValue = (
-  directives: string[],
-  name: string
-): number | null => {
+const getDirectiveValue = (directives: string[], name: string): number => {
   const directive = directives.find((d) => d.startsWith(`${name}=`));
-  return directive ? parseInt(directive.split("=")[1]!) : null;
+  return directive ? parseInt(directive.split("=")[1]!) : 0;
 };
 
-const getCacheTimes = (response: Response): [Date, number] => {
-  const cacheControl = response.headers.get("Cache-Control");
-
-  if (!cacheControl) return [new Date(0), 0];
+const getCacheTimes = (
+  response: Response
+): { staleAt: Date; expirationTtl: number } => {
+  // Cache-Control is definitely present since it passes isCacheable
+  const cacheControl = response.headers.get("Cache-Control")!;
 
   const directives = cacheControl
     .split(",")
     .map((directive) => directive.trim());
 
-  const sMaxAge = getDirectiveValue(directives, "s-maxage") ?? 0;
-  const staleWhileRevalidate =
-    getDirectiveValue(directives, "stale-while-revalidate") ?? 0;
+  const sMaxAge = Math.max(getDirectiveValue(directives, "s-maxage"), 0);
+  const staleWhileRevalidate = getDirectiveValue(
+    directives,
+    "stale-while-revalidate"
+  );
 
   const now = new Date();
   const staleAt = new Date(now.getTime() + sMaxAge * 1000);
-  const forbiddenTTL = sMaxAge + staleWhileRevalidate;
+  const expirationTtl = sMaxAge > 0 ? sMaxAge + staleWhileRevalidate : 0;
 
-  return [staleAt, forbiddenTTL];
+  return { staleAt, expirationTtl };
 };

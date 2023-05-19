@@ -13,7 +13,7 @@ export const prepareFragmentConfigs = (configString: string) => {
   fragmentConfigs = JSON.parse(configString);
 };
 
-export const getFragments = async (
+export const getFragmentsForPiercing = async (
   ids: string[],
   handleRequest: (request: Request) => Promise<Response>
 ) => {
@@ -21,9 +21,14 @@ export const getFragments = async (
 
   await Promise.allSettled(
     ids.map(async (id) => {
-      const { gateway, code, path } = parseFragmentId(id);
+      const { code, path } = parseFragmentId(id);
       const response = await handleRequest(fragmentRequest(code, path));
-      const baseReplacer = new FragmentBaseReplacer(code, gateway);
+      const config = getFragmentConfig(code);
+      const baseReplacer = new FragmentBaseReplacer(
+        code,
+        null,
+        config.assetPath
+      );
       const rewriter = new HTMLRewriter().on(
         baseReplacer.selector,
         baseReplacer

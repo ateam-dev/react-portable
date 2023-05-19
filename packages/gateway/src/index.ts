@@ -10,7 +10,7 @@ import { prepareSwr, swr } from "./libs/swr";
 import { CUSTOM_HEADER_KEY_GATEWAY } from "./libs/constants";
 import {
   getFragmentConfig,
-  getFragments,
+  getFragmentsForPiercing,
   prepareFragmentConfigs,
 } from "./libs/fragments";
 
@@ -40,8 +40,8 @@ app.all("*", (c, next) => {
 app.get("/_fragments/:code/*", async (c) => {
   const code = c.req.param().code;
   const proxyRequest = fragmentProxy(c.req.raw, code);
-  const { response: _response, revalidate } = await swr(proxyRequest);
-  c.executionCtx.waitUntil(revalidate());
+  const { response: _response, revalidate } = await swr(proxyRequest, fetch);
+  c.executionCtx.waitUntil(revalidate(fetch));
 
   const response = new Response(_response.body, {
     ..._response,
@@ -71,9 +71,9 @@ app.all("*", async (c) => {
   const fragmentIdStore = createIdListStore(proxyRequest.url);
 
   const fragmentsFetch = fragmentIdStore.load().then((store) =>
-    getFragments(store.ids, async (request) => {
-      const { revalidate, response } = await swr(request);
-      c.executionCtx.waitUntil(revalidate());
+    getFragmentsForPiercing(store.ids, async (request) => {
+      const { revalidate, response } = await swr(request, fetch);
+      c.executionCtx.waitUntil(revalidate(fetch));
       return response;
     })
   );

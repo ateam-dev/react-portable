@@ -2,9 +2,11 @@
   "name": "gateway",
   "version": "0.0.0",
   "private": true,
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "wrangler dev"
+    "start": "wrangler dev",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@react-portable/client": "*",
@@ -12,8 +14,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230511.0",
+    "@vitest/coverage-c8": "^0.31.1",
     "typescript": "^5.0.4",
     "vitest": "^0.31.1",
+    "vitest-environment-miniflare": "^2.14.0",
     "wrangler": "^3.0.0"
   }
 }
