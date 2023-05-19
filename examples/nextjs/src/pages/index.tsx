@@ -34,7 +34,7 @@ export default function Home() {
         </div>
       </div>
 
-      <ReactPortable entry="mini:/?n=-300" />
+      <ReactPortable gateway="http://127.0.0.1:8787" entry="mini:/?n=-300" />
       <ReactPortable
         gateway="http://127.0.0.1:8787"
         entry="mini:/foo/?n=-300"
