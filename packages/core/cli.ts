@@ -57,7 +57,7 @@ const prepareProject = async (routesDir: string) => {
   );
 
   const routeFileTemplate = fsx.readFileSync(
-    path.resolve(pathToSrc, "routes/index.tsx"),
+    path.resolve(pathToSrc, "index.tsx"),
     "utf8"
   );
   await Promise.all(

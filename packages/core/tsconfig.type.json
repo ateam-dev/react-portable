@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.qwik.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "types"
+  },
+  "include": [
+    "src/index.tsx"
+  ]
+}
