@@ -87,6 +87,7 @@ const launchDevWorker = async (
       port: option.port,
       experimental: {
         liveReload: option.liveReload ?? false,
+        disableExperimentalWarning: true,
       },
       logLevel: "log",
     }
