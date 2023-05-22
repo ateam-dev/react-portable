@@ -117,5 +117,15 @@ describe("htmlRewriters", () => {
         '<react-portable-fragment q:base="https://asset.com/asset/build/">this is fragment component</react-portable-fragment>'
       );
     });
+
+    test("react-portable-fragment does not have q:base", async () => {
+      const replacer = new FragmentBaseReplacer("code1");
+      const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+      const response = new Response(
+        "<react-portable-fragment>this is fragment component</react-portable-fragment>"
+      );
+
+      await expect(rewriter.transform(response).text()).rejects.toThrowError();
+    });
   });
 });

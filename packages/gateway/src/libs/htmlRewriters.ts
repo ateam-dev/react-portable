@@ -54,8 +54,15 @@ export class FragmentBaseReplacer {
   ) {}
 
   element(element: Element) {
-    const originalBasePath =
-      element.getAttribute("q:base")?.replace(/^(?!\/)/, "/") ?? "";
+    const originalBasePath = element
+      .getAttribute("q:base")
+      ?.replace(/^(?!\/)/, "/");
+
+    if (!originalBasePath)
+      throw new Error(
+        `react-portable-fragment has no q:base (code: ${this.code})`
+      );
+
     element.setAttribute(
       "q:base",
       this.assetPath

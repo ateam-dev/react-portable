@@ -64,9 +64,7 @@ app.get("/_fragments/:code/*", async (c) => {
 });
 
 app.all("*", async (c) => {
-  const url = new URL(c.req.url);
-  url.host = new URL(c.env.ORIGIN).host;
-  const proxyRequest = new Request(url, c.req.raw);
+  const proxyRequest = originProxy(c.req.raw, c.env.ORIGIN);
 
   const fragmentIdStore = createIdListStore(proxyRequest.url);
 
@@ -107,6 +105,14 @@ app.all("*", async (c) => {
 });
 
 export default app;
+
+const originProxy = (request: Request, origin: string): Request => {
+  const url = new URL(request.url);
+  url.host = new URL(origin).host;
+  url.protocol = new URL(origin).protocol;
+
+  return new Request(url, request);
+};
 
 const fragmentProxy = (request: Request, code: string): Request => {
   const url = new URL(request.url);
