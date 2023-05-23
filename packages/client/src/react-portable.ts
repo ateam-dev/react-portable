@@ -3,24 +3,36 @@ import type { DOMAttributes } from "react";
 
 export const registerReactPortable = () => {
   if (
-    typeof window !== "undefined" &&
-    !window.customElements.get("react-portable")
+    typeof window === "undefined" ||
+    window.customElements.get("react-portable")
   )
-    window.customElements.define("react-portable", ReactPortable);
+    return;
+
+  restoreGatewayCache();
+  window.customElements.define("react-portable", ReactPortable);
 };
 
-const promiseStore = new Map<string, Promise<Response>>();
+const promiseStore = new Map<string, Promise<Response> | Response>();
 
-const singletonFetch = async (key: string, req: Request) => {
-  if (promiseStore.has(key)) return promiseStore.get(key)!;
+const restoreGatewayCache = () => {
+  const templates = document.querySelectorAll<HTMLTemplateElement>(
+    `.${CLASS_NAME_FOR_GATEWAY_CACHE}`
+  );
 
-  const promise = fetch(req).finally(() => {
-    promiseStore.delete(key);
+  Array.from(templates).forEach((template) => {
+    promiseStore.set(template.id, new Response(template.innerHTML));
   });
+};
+
+const fetcher = async (req: Request, key: string) => {
+  const cache = promiseStore.get(key);
+  if (cache) return (await cache).clone();
+
+  const promise = fetch(req);
 
   promiseStore.set(key, promise);
 
-  return promise;
+  return (await promise).clone();
 };
 
 if (typeof globalThis.HTMLElement === "undefined") {
@@ -35,14 +47,6 @@ export class ReactPortable extends HTMLElement {
     super();
   }
 
-  static get observedAttributes() {
-    return ["suspend"];
-  }
-
-  async attributeChangedCallback(name: string) {
-    if (name === "suspend") await this.render();
-  }
-
   async connectedCallback() {
     await this.render();
   }
@@ -52,7 +56,6 @@ export class ReactPortable extends HTMLElement {
     const gateway = this.getAttribute("gateway");
     const pierced = this.getAttribute("pierced") !== null;
 
-    // Gatewayで挿入済みなので何もしない
     if (pierced) return;
 
     if (!entry)
@@ -61,67 +64,34 @@ export class ReactPortable extends HTMLElement {
       );
     this.fragmentId = createFragmentId(entry, gateway);
 
-    let template = this.getTemplate();
-
-    if (!template) {
-      // 何らかの原因でGatewayでpiercingできなかった時(Next.jsのナビゲートみたいにハードドキュメントロードされていないケース)
-      // 直接フラグメントのDOMをfetchして取ってきて埋め込む
-      template = document.createElement("template");
-      template.id = this.fragmentId;
-
-      await this.streamFragmentIntoOutlet(
-        await this.fetchFragmentStream(entry, gateway),
-        // @ts-ignore
-        template.content
-      );
-
-      // 同一のfragmentIdを持つコンポーネントが、同時に処理されている可能性があるので、
-      // <head>内への登録が重複しないようにする
-      if (!this.getTemplate()) document.head.appendChild(template);
-    }
-
-    if (template) {
-      // @ts-ignore
-      const clone = template.content.cloneNode(true);
-      this.innerHTML = "";
-      this.appendChild(clone);
-    }
-
-    if (!template) {
+    const fragment = await this.fetchFragmentStream();
+    if (!fragment.body || !fragment.ok) {
       throw new Error(
-        `The fragment with id "${this.fragmentId}" is not present and` +
-          " it could not be fetched"
+        `Failed to retrieve fragment (entry: ${entry}, gateway: ${
+          gateway ?? "-"
+        })`
       );
     }
+    await this.piercing(fragment.body);
   }
 
-  private async fetchFragmentStream(entry: string, gateway?: string | null) {
+  private async fetchFragmentStream() {
+    const { entry, gateway } = parseFragmentId(this.fragmentId);
     const { code, path } = parseEntry(entry);
-    const request = new Request(`${gateway ?? ""}/_fragments/${code}${path}`);
-    if (gateway) request.headers.set("X-React-Portable-Gateway", gateway);
-    const response = (await singletonFetch(request.url, request)).clone();
-    if (!response.body) {
-      throw new Error(
-        "An empty response has been provided when fetching" +
-          ` the fragment with id ${this.fragmentId} (entry: ${
-            parseFragmentId(this.fragmentId).entry
-          })`
-      );
-    }
-    return response.body;
+
+    const url = `${gateway ?? ""}/_fragments/${code}${path}`;
+    const request = new Request(url);
+    if (gateway) request.headers.set(CUSTOM_HEADER_KEY_GATEWAY, gateway);
+
+    return fetcher(request, this.fragmentId);
   }
 
-  private async streamFragmentIntoOutlet(
-    fragmentStream: ReadableStream,
-    entrypoint: HTMLElement
-  ) {
+  private async piercing(fragmentStream: ReadableStream) {
     await fragmentStream
       .pipeThrough(new TextDecoderStream())
-      .pipeTo(new WritableDOM(entrypoint));
-  }
+      .pipeTo(new WritableDOM(this));
 
-  private getTemplate() {
-    return document.getElementById(this.fragmentId);
+    this.setAttribute("pierced", "");
   }
 }
 
@@ -137,6 +107,9 @@ export const parseFragmentId = (
 ): { entry: string; gateway: string | null } => {
   return JSON.parse(atob(text));
 };
+
+export const CUSTOM_HEADER_KEY_GATEWAY = "X-React-Portable-Gateway";
+export const CLASS_NAME_FOR_GATEWAY_CACHE = "react-portable-gateway-cache";
 
 const parseEntry = (text: string): { code: string; path: string } => {
   const [, code, path] = text.match(/^([^:]+):(.+)$/) ?? [];

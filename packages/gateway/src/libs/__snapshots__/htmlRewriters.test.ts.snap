@@ -5,7 +5,7 @@ exports[`htmlRewriters > FragmentTemplatesAppender > fulfilled fragmentIdsMap 1`
 <html>
   <head>
     <title>dummy page title</title>
-  <template id=\\"eyJlbnRyeSI6ImYxOi9jb21wb25lbnQxIiwiZ2F0ZXdheSI6Imh0dHBzOi8vZ3cxLmNvbSJ9\\"><react-portable-fragment>this is component1</react-portable-fragment></template><template id=\\"eyJlbnRyeSI6ImYyOi9jb21wb25lbnQyIiwiZ2F0ZXdheSI6bnVsbH0=\\"><react-portable-fragment>this is component2</react-portable-fragment></template><template id=\\"eyJlbnRyeSI6ImYzOi9jb21wb25lbnQzIiwiZ2F0ZXdheSI6bnVsbH0=\\"><react-portable-fragment>this is component3</react-portable-fragment></template></head>
+  <template id=\\"eyJlbnRyeSI6ImYxOi9jb21wb25lbnQxIiwiZ2F0ZXdheSI6Imh0dHBzOi8vZ3cxLmNvbSJ9\\" class=\\"react-portable-gateway-cache\\" ><react-portable-fragment>this is component1</react-portable-fragment></template><template id=\\"eyJlbnRyeSI6ImYyOi9jb21wb25lbnQyIiwiZ2F0ZXdheSI6bnVsbH0=\\" class=\\"react-portable-gateway-cache\\" ><react-portable-fragment>this is component2</react-portable-fragment></template><template id=\\"eyJlbnRyeSI6ImYzOi9jb21wb25lbnQzIiwiZ2F0ZXdheSI6bnVsbH0=\\" class=\\"react-portable-gateway-cache\\" ><react-portable-fragment>this is component3</react-portable-fragment></template></head>
   <body>
     <h1>dummy page</h1>
     <react-portable entry=\\"f1:/component1\\" gateway=\\"https://gw1.com\\"></react-portable>

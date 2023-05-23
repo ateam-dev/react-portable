@@ -1,6 +1,6 @@
 import {
+  CLASS_NAME_FOR_GATEWAY_CACHE,
   createFragmentId,
-  reactPortableInlineScript,
 } from "@react-portable/client";
 
 type FragmentMap = Map<string, string>;
@@ -37,9 +37,12 @@ export class FragmentTemplatesAppender {
 
   element(element: Element) {
     for (const [fragmentId, fragment] of this.fragments) {
-      element.append(`<template id="${fragmentId}">${fragment}</template>`, {
-        html: true,
-      });
+      element.append(
+        `<template id="${fragmentId}" class="${CLASS_NAME_FOR_GATEWAY_CACHE}" >${fragment}</template>`,
+        {
+          html: true,
+        }
+      );
     }
   }
 }
