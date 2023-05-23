@@ -8,7 +8,6 @@ export const registerReactPortable = () => {
   )
     return;
 
-  restoreGatewayCache();
   window.customElements.define("react-portable", ReactPortable);
 };
 
@@ -42,13 +41,22 @@ if (typeof globalThis.HTMLElement === "undefined") {
 
 export class ReactPortable extends HTMLElement {
   private fragmentId = "";
+  public pierced = false;
+  public failed = false;
 
   constructor() {
+    restoreGatewayCache();
     super();
   }
 
   async connectedCallback() {
-    await this.render();
+    try {
+      await this.render();
+      this.pierced = true;
+    } catch (e) {
+      console.error(e);
+      this.failed = true;
+    }
   }
 
   private async render() {
@@ -79,7 +87,9 @@ export class ReactPortable extends HTMLElement {
     const { entry, gateway } = parseFragmentId(this.fragmentId);
     const { code, path } = parseEntry(entry);
 
-    const url = `${gateway ?? ""}/_fragments/${code}${path}`;
+    const url = `${
+      gateway ?? window.location.origin
+    }/_fragments/${code}${path}`;
     const request = new Request(url);
     if (gateway) request.headers.set(CUSTOM_HEADER_KEY_GATEWAY, gateway);
 
