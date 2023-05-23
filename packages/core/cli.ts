@@ -9,8 +9,8 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { qwikReact } from "@builder.io/qwik-react/vite";
 import { program } from "commander";
 import { PluginOption } from "vite";
-import { globSync } from "glob";
 import fsx from "fs-extra";
+import chokidar from "chokidar";
 
 const clientOutDir = path.resolve(process.cwd(), ".rp/client");
 const serverOutDir = path.resolve(process.cwd(), ".rp/server");
@@ -55,26 +55,39 @@ const prepareProject = async (routesDir: string) => {
       fsx.promises.cp(path.resolve(pathToSrc, file), path.resolve(tmpDir, file))
     )
   );
+};
 
+const syncRoutes = async (src: string, once: boolean = false) => {
+  const pathToSrc = path.resolve(__dirname, "../src");
   const routeFileTemplate = fsx.readFileSync(
     path.resolve(pathToSrc, "index.tsx"),
     "utf8"
   );
-  await Promise.all(
-    globSync(`${routesDir}/**/index.@(ts|tsx|js|jsx)`, {
-      absolute: true,
-    }).map((file) => {
-      return fsx.outputFile(
-        path.resolve(
-          path.dirname(
-            path.resolve(tmpDir, "routes", path.relative(routesDir, file))
-          ),
-          "index.tsx"
-        ),
-        routeFileTemplate.replace("react-portable:virtual", file)
-      );
-    })
-  );
+
+  const watcher = chokidar.watch(`${src}/**/*.rp.@(ts|tsx|js|jsx)`, {
+    persistent: !once,
+    ignoreInitial: false,
+    followSymlinks: true,
+    depth: 99,
+  });
+
+  watcher.on("unlink", (filePath) => {
+    const name = filePath.match(/([^/]+?)\.rp\.[jt]sx?$/)![1];
+
+    fsx.rmSync(path.resolve(tmpDir, "routes", ...name.split("."), "index.tsx"));
+  });
+
+  watcher.on("add", (filePath) => {
+    const absolutePath = path.resolve(process.cwd(), filePath);
+    const name = filePath.match(/([^/]+?)\.rp\.[jt]sx?$/)![1];
+
+    fsx.outputFile(
+      path.resolve(tmpDir, "routes", ...name.split("."), "index.tsx"),
+      routeFileTemplate.replace("react-portable:virtual", absolutePath)
+    );
+  });
+
+  return new Promise((r) => watcher.on("ready", r));
 };
 
 const launchDevWorker = async (
@@ -130,8 +143,8 @@ program
   .description("開発モード")
   .option("-p, --port <number>", "使用するポート")
   .action(async (src: string, { port }: { port?: string }) => {
-    // TODO: srcを監視して、ディレクトリ構造が変わったら再構築したい
     await prepareProject(src);
+    await syncRoutes(src);
 
     await serveSSR({ port: port ? Number(port) : undefined }).catch((e) => {
       console.error(e);
@@ -144,6 +157,7 @@ program
   .description("ビルドモード")
   .action(async (src: string) => {
     await prepareProject(src);
+    await syncRoutes(src, true);
     await buildClient();
     await buildWorker();
   });
@@ -162,6 +176,7 @@ program
   .option("-p, --port <number>", "使用するポート")
   .action(async (src: string, { port }: { port?: string }) => {
     await prepareProject(src);
+    await syncRoutes(src, true);
     await buildClient();
     await buildWorker();
     await launchDevWorker({ port: port ? Number(port) : undefined });

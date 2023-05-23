@@ -39,7 +39,7 @@ export default component$(() => {
   return <QR {...props} />;
 });
 
-export const onGet: RequestHandler = async (requestEvent) => {
+export const onRequest: RequestHandler = async (requestEvent) => {
   requestEvent.headers.set(
     "Cache-Control",
     revalidate === false

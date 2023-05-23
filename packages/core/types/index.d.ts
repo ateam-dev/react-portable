@@ -6,4 +6,4 @@ export type Strategy = {
 export type Loader = (r: Request) => Record<string, unknown> | Promise<Record<string, unknown>>;
 declare const _default: import("@builder.io/qwik").Component<{}>;
 export default _default;
-export declare const onGet: RequestHandler;
+export declare const onRequest: RequestHandler;
