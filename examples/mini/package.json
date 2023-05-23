@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "react-portable dev ./src/routes -p 3001",
-    "build": "react-portable build ./src/routes",
-    "start": "react-portable start ./src/routes",
-    "preview": "react-portable preview ./src/routes -p 3001"
+    "dev": "react-portable dev ./src -p 3001",
+    "build": "react-portable build ./src",
+    "start": "react-portable start ./src",
+    "preview": "react-portable preview ./src -p 3001"
   },
   "dependencies": {
     "@builder.io/qwik-react": "0.5.0",
