@@ -31,6 +31,7 @@ const vitePlugins = (): PluginOption[] => [
   },
   qwikCity({
     routesDir: path.resolve(tmpDir, "routes"),
+    trailingSlash: false,
   }),
   qwikVite({
     srcDir: tmpDir,
