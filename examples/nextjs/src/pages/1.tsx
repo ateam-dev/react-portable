@@ -10,13 +10,10 @@ export default function Home() {
       className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
     >
       <Link href="/2">go to page #2</Link>
+      <ReactPortable gateway="http://127.0.0.1:8787" entry="mini:/on-idle/60" />
       <ReactPortable
         gateway="http://127.0.0.1:8787"
-        entry="mini:/on-idle/60/"
-      />
-      <ReactPortable
-        gateway="http://127.0.0.1:8787"
-        entry="mini:/on-idle/60/?n=200"
+        entry="mini:/on-idle/60?n=200"
       />
     </main>
   );
