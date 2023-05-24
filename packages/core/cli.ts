@@ -131,10 +131,11 @@ const buildClient = async () => {
   });
 };
 
-const buildWorker = async () => {
+const buildWorker = async (seamless = false) => {
   return vite.build({
     plugins: vitePlugins(),
     build: {
+      emptyOutDir: !seamless,
       ssr: true,
       rollupOptions: {
         input: [workerFilePath, "@qwik-city-plan"],
@@ -170,15 +171,27 @@ program
 program
   .command("build <src>")
   .description("build scripts for react portable")
-  .option("--watch", "watch mode")
-  .action(async (src: string, { watch }: { watch?: true }) => {
+  .action(async (src: string) => {
     await prepareProject();
-    await syncRoutes(src, !watch);
-
+    await syncRoutes(src, true);
     await buildClient();
     await buildWorker();
+  });
 
-    if (watch) {
+program
+  .command("watch <src>")
+  .description("watch mode")
+  .option(
+    "--preBuilt",
+    "skip out-directory reset and initial build if already pre-built"
+  )
+  .action(
+    async (src: string, { preBuilt }: { watch?: true; preBuilt?: true }) => {
+      if (!preBuilt) await prepareProject();
+      await syncRoutes(src);
+      if (!preBuilt) await buildClient();
+      if (!preBuilt) await buildWorker();
+
       const watcher = chokidar.watch(`${src}/**/*`, {
         persistent: true,
         ignoreInitial: true,
@@ -186,10 +199,10 @@ program
       });
       watcher.on("all", async () => {
         await buildClient();
-        await buildWorker();
+        await buildWorker(true);
       });
     }
-  });
+  );
 
 program.parse(process.argv);
 
