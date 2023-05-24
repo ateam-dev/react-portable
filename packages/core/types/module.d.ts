@@ -11,9 +11,9 @@ declare module "react-portable:virtual" {
     hydrate?: "onUse" | "onIdle" | "disable";
   };
 
-  export type Loader = (
+  export type Loader<T extends Record = Record> = (
     r: Request
-  ) => Record<string, unknown> | Promise<Record<string, unknown>>;
+  ) => T | Promise<T>;
 
   const Component: FC;
   export const strategy: Strategy | undefined;
