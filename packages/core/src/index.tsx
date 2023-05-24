@@ -1,19 +1,9 @@
 import { qwikify$ } from "@builder.io/qwik-react";
 import { component$ } from "@builder.io/qwik";
 import { RequestHandler, routeLoader$ } from "@builder.io/qwik-city";
-// @ts-ignore
 import * as Entry from "react-portable:virtual";
 
-export type Strategy = {
-  revalidate?: false | 0 | number;
-  hydrate?: "onUse" | "onIdle" | "disable";
-};
-
-export type Loader = (
-  r: Request
-) => Record<string, unknown> | Promise<Record<string, unknown>>;
-
-const { hydrate, revalidate = 0 }: Strategy = Entry.strategy ?? {};
+const { hydrate, revalidate = 0 } = Entry.strategy ?? {};
 
 const qwikifyOption =
   hydrate === "onUse"

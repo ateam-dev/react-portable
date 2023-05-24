@@ -13,10 +13,8 @@
   "private": true,
   "scripts": {
     "build:cli": "tsc -p tsconfig.cli.json",
-    "build:type": "tsc -p tsconfig.type.json",
     "build": "run-p build:*",
     "watch:cli": "tsc -p tsconfig.cli.json --watch",
-    "watch:qwik": "tsc -p tsconfig.type.json --watch",
     "watch": "run-p watch:*",
     "dev": "run-p watch:*"
   },

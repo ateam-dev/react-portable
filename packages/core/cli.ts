@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import * as fs from "fs";
 import * as path from "path";
-import * as wrangler from "wrangler";
 import * as vite from "vite";
 import { qwikVite } from "@builder.io/qwik/optimizer";
 import { qwikCity } from "@builder.io/qwik-city/vite";
@@ -12,9 +11,14 @@ import { PluginOption } from "vite";
 import fsx from "fs-extra";
 import chokidar from "chokidar";
 
-const clientOutDir = path.resolve(process.cwd(), ".rp/client");
-const serverOutDir = path.resolve(process.cwd(), ".rp/server");
-const tmpDir = path.resolve(process.cwd(), ".rp/tmp");
+// TODO: react-portable.config.js
+const projectRoot = process.cwd();
+const clientOutDir = path.resolve(projectRoot, ".rp/client");
+const serverOutDir = path.resolve(projectRoot, ".rp/server");
+const tmpDir = path.resolve(projectRoot, ".rp/tmp");
+const entryFile = path.resolve(tmpDir, "entry.ssr.tsx");
+const workerFilePath = path.resolve(projectRoot, "worker.ts");
+const baseModuleDir = path.resolve(__dirname, "../src");
 
 const vitePlugins = (): PluginOption[] => [
   {
@@ -27,6 +31,13 @@ const vitePlugins = (): PluginOption[] => [
       ) {
         return `/** @jsxImportSource react */\n${code}`;
       }
+    },
+  },
+  {
+    enforce: "pre",
+    name: "react-portable-worker",
+    resolveId: (source) => {
+      if (source === "@entry") return entryFile;
     },
   },
   qwikCity({
@@ -47,21 +58,35 @@ const vitePlugins = (): PluginOption[] => [
   qwikReact(),
 ];
 
-const prepareProject = async (routesDir: string) => {
-  if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true });
-  const pathToSrc = path.resolve(__dirname, "../src");
-
+const initProject = async () => {
   await Promise.all(
-    ["root.tsx", "entry.ssr.tsx", "workers.ts", "hono.ts"].map((file) =>
-      fsx.promises.cp(path.resolve(pathToSrc, file), path.resolve(tmpDir, file))
+    ["worker.ts", "wrangler.toml"].map(async (file) => {
+      // FIXME check existing
+      await fsx.promises.cp(
+        path.resolve(baseModuleDir, file),
+        path.resolve(projectRoot, file)
+      );
+      console.log(`🧩 Placed ${file}`);
+    })
+  );
+  // TODO: update package.json (scripts)
+};
+
+const prepareProject = async () => {
+  if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true });
+  await Promise.all(
+    ["root.tsx", "entry.ssr.tsx"].map((file) =>
+      fsx.promises.cp(
+        path.resolve(baseModuleDir, file),
+        path.resolve(tmpDir, file)
+      )
     )
   );
 };
 
 const syncRoutes = async (src: string, once: boolean = false) => {
-  const pathToSrc = path.resolve(__dirname, "../src");
   const routeFileTemplate = fsx.readFileSync(
-    path.resolve(pathToSrc, "index.tsx"),
+    path.resolve(baseModuleDir, "index.tsx"),
     "utf8"
   );
 
@@ -91,25 +116,6 @@ const syncRoutes = async (src: string, once: boolean = false) => {
   return new Promise((r) => watcher.on("ready", r));
 };
 
-const launchDevWorker = async (
-  option: { port?: number; liveReload?: boolean } = {}
-) => {
-  const worker = await wrangler.unstable_dev(
-    path.resolve(serverOutDir, "workers.mjs"),
-    {
-      site: path.relative(process.cwd(), clientOutDir),
-      port: option.port,
-      experimental: {
-        liveReload: option.liveReload ?? false,
-        disableExperimentalWarning: true,
-      },
-      logLevel: "log",
-    }
-  );
-
-  console.log("🧩 Listening on", `http://${worker.address}:${worker.port}`);
-};
-
 const serveSSR = async (option: { port?: number } = {}) => {
   const server = await vite.createServer({
     plugins: vitePlugins(),
@@ -131,7 +137,7 @@ const buildWorker = async () => {
     build: {
       ssr: true,
       rollupOptions: {
-        input: [path.resolve(tmpDir, "workers.ts"), "@qwik-city-plan"],
+        input: [workerFilePath, "@qwik-city-plan"],
       },
     },
   });
@@ -140,11 +146,19 @@ const buildWorker = async () => {
 program.version("0.0.1");
 
 program
+  .command("init")
+  .description("initialize project")
+  .action(async () => {
+    await initProject();
+    console.log("🎒Completed initializing react portable project");
+  });
+
+program
   .command("dev <src>")
-  .description("開発モード")
-  .option("-p, --port <number>", "使用するポート")
+  .description("launch a server for development")
+  .option("-p, --port <number>", "port number")
   .action(async (src: string, { port }: { port?: string }) => {
-    await prepareProject(src);
+    await prepareProject();
     await syncRoutes(src);
 
     await serveSSR({ port: port ? Number(port) : undefined }).catch((e) => {
@@ -155,39 +169,26 @@ program
 
 program
   .command("build <src>")
-  .description("ビルドモード")
-  .action(async (src: string) => {
-    await prepareProject(src);
-    await syncRoutes(src, true);
+  .description("build scripts for react portable")
+  .option("--watch", "watch mode")
+  .action(async (src: string, { watch }: { watch?: true }) => {
+    await prepareProject();
+    await syncRoutes(src, !watch);
+
     await buildClient();
     await buildWorker();
-  });
 
-program
-  .command("start <src>")
-  .description("スタートモード")
-  .option("-p, --port <number>", "使用するポート")
-  .action(async (src: string, { port }: { port?: string }) => {
-    await launchDevWorker({ port: port ? Number(port) : undefined });
-  });
-
-program
-  .command("preview <src>")
-  .description("プレビューモード(workerモード)")
-  .option("-p, --port <number>", "使用するポート")
-  .action(async (src: string, { port }: { port?: string }) => {
-    await prepareProject(src);
-    await syncRoutes(src, true);
-    await buildClient();
-    await buildWorker();
-    await launchDevWorker({ port: port ? Number(port) : undefined });
-  });
-
-program
-  .command("deploy <entry>")
-  .description("デプロイモード")
-  .action((entry) => {
-    // TODO
+    if (watch) {
+      const watcher = chokidar.watch(`${src}/**/*`, {
+        persistent: true,
+        ignoreInitial: true,
+        depth: 99,
+      });
+      watcher.on("all", async () => {
+        await buildClient();
+        await buildWorker();
+      });
+    }
   });
 
 program.parse(process.argv);
