@@ -53,7 +53,6 @@ const vitePlugins = (): PluginOption[] => [
       outDir: serverOutDir,
     },
   }),
-  // FIXME
   tsconfigPaths(),
   qwikReact(),
 ];
