@@ -11,26 +11,48 @@ import { PluginOption } from "vite";
 import fsx from "fs-extra";
 import chokidar from "chokidar";
 import { glob } from "glob";
+import { Config } from "./types";
 
-// TODO: react-portable.config.js
+// FIXME: projectRoot
 const projectRoot = process.cwd();
-const clientOutDir = path.resolve(projectRoot, ".rp/client");
-const serverOutDir = path.resolve(projectRoot, ".rp/server");
-const tmpDir = path.resolve(projectRoot, ".rp/tmp");
-const entryFile = path.resolve(tmpDir, "entry.ssr.tsx");
-const workerFilePath = path.resolve(projectRoot, "worker.ts");
 const baseModuleDir = path.resolve(__dirname, "../src");
+let srcDir: string;
+let clientOutDir: string;
+let serverOutDir: string;
+let tmpDir: string;
+let entryFile: string;
+let workerFilePath: string;
 
-const vitePlugins = (src: string): PluginOption[] => [
+const loadConfig = () => {
+  const config: Config = require(path.resolve(
+    process.cwd(),
+    "react-portable.config.js"
+  ));
+
+  srcDir = config.src;
+  tmpDir = config.tmpDir ?? path.resolve(projectRoot, ".rp/tmp");
+  clientOutDir =
+    config.outDirs?.client ?? path.resolve(projectRoot, ".rp/client");
+  serverOutDir =
+    config.outDirs?.server ?? path.resolve(projectRoot, ".rp/server");
+  workerFilePath =
+    config.workerScript ?? path.resolve(projectRoot, "worker.ts");
+  entryFile = path.resolve(tmpDir, "entry.ssr.tsx");
+};
+
+const vitePlugins = (): PluginOption[] => [
   {
     enforce: "pre",
     name: "react-portable-vite",
     resolveId: async (source) => {
       if (source.startsWith("react-portable:virtual:")) {
         const name = source.replace("react-portable:virtual:", "");
-        const [target] = await glob(`${src}/**/${name}.rp.@(ts|tsx|js|jsx)`, {
-          absolute: true,
-        });
+        const [target] = await glob(
+          `${srcDir}/**/${name}.rp.@(ts|tsx|js|jsx)`,
+          {
+            absolute: true,
+          }
+        );
         return target;
       }
     },
@@ -69,14 +91,16 @@ const vitePlugins = (src: string): PluginOption[] => [
 
 const initProject = async () => {
   await Promise.all(
-    ["worker.ts", "wrangler.toml"].map(async (file) => {
-      // FIXME: check existing
-      await fsx.promises.cp(
-        path.resolve(baseModuleDir, file),
-        path.resolve(projectRoot, file)
-      );
-      console.log(`🧩 Placed ${file}`);
-    })
+    ["react-portable.config.js", "worker.ts", "wrangler.toml"].map(
+      async (file) => {
+        // FIXME: check existing
+        await fsx.promises.cp(
+          path.resolve(baseModuleDir, file),
+          path.resolve(projectRoot, file)
+        );
+        console.log(`🧩 Placed ${file}`);
+      }
+    )
   );
 };
 
@@ -92,13 +116,13 @@ const prepareProject = async () => {
   );
 };
 
-const syncRoutes = async (src: string, once: boolean = false) => {
+const syncRoutes = async (once: boolean = false) => {
   const routeFileTemplate = fsx.readFileSync(
     path.resolve(baseModuleDir, "index.tsx"),
     "utf8"
   );
 
-  const watcher = chokidar.watch(`${src}/**/*.rp.@(ts|tsx|js|jsx)`, {
+  const watcher = chokidar.watch(`${srcDir}/**/*.rp.@(ts|tsx|js|jsx)`, {
     persistent: !once,
     ignoreInitial: false,
     followSymlinks: true,
@@ -126,24 +150,24 @@ const syncRoutes = async (src: string, once: boolean = false) => {
   return new Promise((r) => watcher.on("ready", r));
 };
 
-const serveSSR = async (srcDir: string, option: { port?: number } = {}) => {
+const serveSSR = async (option: { port?: number } = {}) => {
   const server = await vite.createServer({
-    plugins: vitePlugins(srcDir),
+    plugins: vitePlugins(),
     mode: "ssr",
   });
   await server.listen(option.port);
   server.printUrls();
 };
 
-const buildClient = async (srcDir: string) => {
+const buildClient = async () => {
   return vite.build({
-    plugins: vitePlugins(srcDir),
+    plugins: vitePlugins(),
   });
 };
 
-const buildWorker = async (srcDir: string, seamless = false) => {
+const buildWorker = async (seamless = false) => {
   return vite.build({
-    plugins: vitePlugins(srcDir),
+    plugins: vitePlugins(),
     build: {
       emptyOutDir: !seamless,
       ssr: true,
@@ -165,56 +189,55 @@ program
   });
 
 program
-  .command("dev <src>")
+  .command("dev")
   .description("launch a server for development")
   .option("-p, --port <number>", "port number")
-  .action(async (src: string, { port }: { port?: string }) => {
+  .action(async ({ port }: { port?: string }) => {
+    loadConfig();
     await prepareProject();
-    await syncRoutes(src);
+    await syncRoutes();
 
-    await serveSSR(src, { port: port ? Number(port) : undefined }).catch(
-      (e) => {
-        console.error(e);
-        process.exit(1);
-      }
-    );
+    await serveSSR({ port: port ? Number(port) : undefined }).catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
   });
 
 program
-  .command("build <src>")
+  .command("build")
   .description("build scripts for react portable")
-  .action(async (src: string) => {
+  .action(async () => {
+    loadConfig();
     await prepareProject();
-    await syncRoutes(src, true);
-    await buildClient(src);
-    await buildWorker(src);
+    await syncRoutes(true);
+    await buildClient();
+    await buildWorker();
   });
 
 program
-  .command("watch <src>")
+  .command("watch")
   .description("watch mode")
   .option(
     "--preBuilt",
     "skip out-directory reset and initial build if already pre-built"
   )
-  .action(
-    async (src: string, { preBuilt }: { watch?: true; preBuilt?: true }) => {
-      if (!preBuilt) await prepareProject();
-      await syncRoutes(src);
-      if (!preBuilt) await buildClient(src);
-      if (!preBuilt) await buildWorker(src);
+  .action(async ({ preBuilt }: { watch?: true; preBuilt?: true }) => {
+    loadConfig();
+    if (!preBuilt) await prepareProject();
+    await syncRoutes();
+    if (!preBuilt) await buildClient();
+    if (!preBuilt) await buildWorker();
 
-      const watcher = chokidar.watch(`${src}/**/*`, {
-        persistent: true,
-        ignoreInitial: true,
-        depth: 99,
-      });
-      watcher.on("all", async () => {
-        await buildClient(src);
-        await buildWorker(src, true);
-      });
-    }
-  );
+    const watcher = chokidar.watch(`${srcDir}/**/*`, {
+      persistent: true,
+      ignoreInitial: true,
+      depth: 99,
+    });
+    watcher.on("all", async () => {
+      await buildClient();
+      await buildWorker(true);
+    });
+  });
 
 program.parse(process.argv);
 

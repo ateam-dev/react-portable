@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "react-portable dev ./src -p 3001",
-    "build": "react-portable build ./src",
+    "dev": "react-portable dev -p 3001",
+    "build": "react-portable build",
     "start": "wrangler dev --port 3001",
-    "preview:build": "react-portable watch --preBuilt ./src",
+    "preview:build": "react-portable watch --preBuilt",
     "preview:worker": "wrangler dev --port 3001",
     "preview": "yarn build && run-p preview:*"
   },
