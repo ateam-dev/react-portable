@@ -39,6 +39,7 @@
     "chokidar": "^3.5.3",
     "commander": "^10.0.1",
     "fs-extra": "^11.1.1",
+    "glob": "^10.2.6",
     "hono": "^3.1.8",
     "vite": "^4.3.7",
     "vite-tsconfig-paths": "4.2.0",
