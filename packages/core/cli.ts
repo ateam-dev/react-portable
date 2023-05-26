@@ -117,6 +117,7 @@ const prepareProject = async () => {
 };
 
 const syncRoutes = async (once: boolean = false) => {
+  let counter = 0;
   const routeFileTemplate = fsx.readFileSync(
     path.resolve(baseModuleDir, "index.tsx"),
     "utf8"
@@ -140,11 +141,12 @@ const syncRoutes = async (once: boolean = false) => {
 
     fsx.outputFile(
       path.resolve(tmpDir, "routes", ...name.split("."), "index.tsx"),
-      routeFileTemplate.replace(
-        "react-portable:virtual",
-        `react-portable:virtual:${name}`
-      )
+      routeFileTemplate
+        .replace("react-portable:virtual", `react-portable:virtual:${name}`)
+        // MEMO: creating qwikify components with the same name will result in duplicate module preloads
+        .replace(/QComponent/g, `QComponent${counter}`)
     );
+    counter++;
   });
 
   return new Promise((r) => watcher.on("ready", r));

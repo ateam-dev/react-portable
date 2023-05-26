@@ -20,13 +20,13 @@ const qwikifyOption =
         eagerness: undefined,
         event: undefined,
       };
-const QR = qwikify$(Entry.default, qwikifyOption);
+const QComponent = qwikify$(Entry.default, qwikifyOption);
 const getProps = routeLoader$(({ request }) => {
   return Entry.loader?.(request) ?? {};
 });
 export default component$(() => {
   const props = getProps().value;
-  return <QR {...props} />;
+  return <QComponent {...props} />;
 });
 
 export const onRequest: RequestHandler = async (requestEvent) => {
