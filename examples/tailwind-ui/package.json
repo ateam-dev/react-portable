@@ -1,5 +1,5 @@
 {
-  "name": "examples-mini",
+  "name": "examples-tailwind-ui",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -12,12 +12,15 @@
   },
   "dependencies": {
     "@builder.io/qwik-react": "0.5.0",
+    "@headlessui/react": "^1.7.14",
+    "@heroicons/react": "^2.0.18",
     "@react-portable/core": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.6",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
     "autoprefixer": "^10.4.14",
     "npm-run-all": "^4.1.5",
