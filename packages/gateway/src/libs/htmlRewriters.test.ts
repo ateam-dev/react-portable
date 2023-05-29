@@ -81,51 +81,107 @@ describe("htmlRewriters", () => {
   });
 
   describe("FragmentBaseReplacer", () => {
-    let response: Response;
-    beforeEach(() => {
-      response = new Response(
-        '<react-portable-fragment q:base="/build/">this is fragment component</react-portable-fragment>'
-      );
+    describe("react-portable-fragment q:base", () => {
+      let response: Response;
+      beforeEach(() => {
+        response = new Response(
+          '<react-portable-fragment q:base="/build/">this is fragment component</react-portable-fragment>'
+        );
+      });
+      test("no gateway, no assetPath", async () => {
+        const replacer = new FragmentBaseReplacer("code1");
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+
+        expect(await rewriter.transform(response).text()).toBe(
+          '<react-portable-fragment q:base="/_fragments/code1/build/">this is fragment component</react-portable-fragment>'
+        );
+      });
+
+      test("having gateway", async () => {
+        const replacer = new FragmentBaseReplacer("code2", "https://gw.com");
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+
+        expect(await rewriter.transform(response).text()).toBe(
+          '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/">this is fragment component</react-portable-fragment>'
+        );
+      });
+
+      test("having assetPath", async () => {
+        const replacer = new FragmentBaseReplacer(
+          "code2",
+          "https://gw.com",
+          "https://asset.com/asset/"
+        );
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+
+        expect(await rewriter.transform(response).text()).toBe(
+          '<react-portable-fragment q:base="https://asset.com/asset/build/">this is fragment component</react-portable-fragment>'
+        );
+      });
+
+      test("react-portable-fragment does not have q:base", async () => {
+        const replacer = new FragmentBaseReplacer("code1");
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+        const response = new Response(
+          "<react-portable-fragment>this is fragment component</react-portable-fragment>"
+        );
+
+        await expect(
+          rewriter.transform(response).text()
+        ).rejects.toThrowError();
+      });
     });
-    test("no gateway, no assetPath", async () => {
-      const replacer = new FragmentBaseReplacer("code1");
-      const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
-      expect(await rewriter.transform(response).text()).toBe(
-        '<react-portable-fragment q:base="/_fragments/code1/build/">this is fragment component</react-portable-fragment>'
-      );
-    });
+    describe("react-portable-fragment > link[rel=stylesheet]", () => {
+      let response: Response;
+      beforeEach(() => {
+        response = new Response(
+          '<react-portable-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component</react-portable-fragment>'
+        );
+      });
 
-    test("having gateway", async () => {
-      const replacer = new FragmentBaseReplacer("code2", "https://gw.com");
-      const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+      test("no gateway, no assetPath", async () => {
+        const replacer = new FragmentBaseReplacer("code1");
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
-      expect(await rewriter.transform(response).text()).toBe(
-        '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/">this is fragment component</react-portable-fragment>'
-      );
-    });
+        expect(await rewriter.transform(response).text()).toBe(
+          '<react-portable-fragment q:base="/_fragments/code1/build/"><link rel="stylesheet" href="/_fragments/code1/build/style.css">this is fragment component</react-portable-fragment>'
+        );
+      });
 
-    test("having assetPath", async () => {
-      const replacer = new FragmentBaseReplacer(
-        "code2",
-        "https://gw.com",
-        "https://asset.com/asset/"
-      );
-      const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+      test("having gateway", async () => {
+        const replacer = new FragmentBaseReplacer("code2", "https://gw.com");
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
-      expect(await rewriter.transform(response).text()).toBe(
-        '<react-portable-fragment q:base="https://asset.com/asset/build/">this is fragment component</react-portable-fragment>'
-      );
-    });
+        expect(await rewriter.transform(response).text()).toBe(
+          '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/"><link rel="stylesheet" href="https://gw.com/_fragments/code2/build/style.css">this is fragment component</react-portable-fragment>'
+        );
+      });
 
-    test("react-portable-fragment does not have q:base", async () => {
-      const replacer = new FragmentBaseReplacer("code1");
-      const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-      const response = new Response(
-        "<react-portable-fragment>this is fragment component</react-portable-fragment>"
-      );
+      test("having assetPath", async () => {
+        const replacer = new FragmentBaseReplacer(
+          "code2",
+          "https://gw.com",
+          "https://asset.com/asset/"
+        );
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
-      await expect(rewriter.transform(response).text()).rejects.toThrowError();
+        expect(await rewriter.transform(response).text()).toBe(
+          '<react-portable-fragment q:base="https://asset.com/asset/build/"><link rel="stylesheet" href="https://asset.com/asset/build/style.css">this is fragment component</react-portable-fragment>'
+        );
+      });
+
+      test("react-portable-fragment does not have q:base", async () => {
+        const replacer = new FragmentBaseReplacer("code1");
+        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+        const response = new Response(
+          `<react-portable-fragment q:base="/build/"><link rel="stylesheet">this is fragment component</react-portable-fragment>`
+        );
+
+        await expect(
+          rewriter.transform(response).text()
+        ).rejects.toThrowError();
+      });
     });
   });
 });

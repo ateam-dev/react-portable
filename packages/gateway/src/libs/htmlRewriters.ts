@@ -48,7 +48,7 @@ export class FragmentTemplatesAppender {
 }
 
 export class FragmentBaseReplacer {
-  public readonly selector = "react-portable-fragment";
+  public readonly selector = `react-portable-fragment,react-portable-fragment>link[rel="stylesheet"]`;
 
   constructor(
     private code: string,
@@ -57,17 +57,21 @@ export class FragmentBaseReplacer {
   ) {}
 
   element(element: Element) {
+    const attributeName = element.tagName === "link" ? "href" : "q:base";
+
     const originalBasePath = element
-      .getAttribute("q:base")
+      .getAttribute(attributeName)
       ?.replace(/^(?!\/)/, "/");
 
     if (!originalBasePath)
       throw new Error(
-        `react-portable-fragment has no q:base (code: ${this.code})`
+        element.tagName === "link"
+          ? `react-portable-fragment > link has no href (code: ${this.code})`
+          : `react-portable-fragment has no q:base (code: ${this.code})`
       );
 
     element.setAttribute(
-      "q:base",
+      attributeName,
       this.assetPath
         ? `${this.assetPath.replace(/\/$/, "")}${originalBasePath}`
         : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
