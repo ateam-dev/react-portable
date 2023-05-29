@@ -1,5 +1,4 @@
-import { Inter } from "next/font/google";
-import { ReactPortable } from "@/components/ReactPortable";
+import { ReactPortable } from "@react-portable/client";
 
 export default function Home() {
   return (

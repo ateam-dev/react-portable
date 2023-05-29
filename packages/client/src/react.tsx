@@ -1,6 +1,5 @@
-/// <reference types="@react-portable/client" />
 import { useEffect, useReducer, useRef, useId } from "react";
-import { registerReactPortable } from "@react-portable/client";
+import { registerReactPortable } from "./react-portable";
 
 export const ReactPortable = ({
   entry,
