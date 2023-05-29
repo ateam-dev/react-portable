@@ -1,26 +1,25 @@
 import { Inter } from "next/font/google";
 import { ReactPortable } from "@/components/ReactPortable";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function Home() {
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <ReactPortable gateway="http://127.0.0.1:8787" entry="mini:/?n=-300" />
+    <>
       <ReactPortable
         gateway="http://127.0.0.1:8787"
-        entry="mini:/foo/?n=-300"
+        entry="tailwind-ui:/header"
       />
-      <ReactPortable
-        gateway="http://127.0.0.1:8787"
-        entry="mini:/foo/?n=-300"
-      />
-      <ReactPortable
-        gateway="http://127.0.0.1:8787"
-        entry="mini:/foo/?n=-300"
-      />
-    </main>
+      <main className="min-h-screen mt-2">
+        <ReactPortable
+          gateway="http://127.0.0.1:8787"
+          entry="tailwind-ui:/ec/hero"
+        />
+        <div className="mt-1">
+          <ReactPortable
+            gateway="http://127.0.0.1:8787"
+            entry="tailwind-ui:/ec/products"
+          />
+        </div>
+      </main>
+    </>
   );
 }
