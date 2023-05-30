@@ -17,7 +17,8 @@
     "preview": "vite preview --port 3003",
     "dev": "run-p watch preview",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@vitest/coverage-c8": "^0.31.1",

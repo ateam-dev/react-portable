@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "build": "vite build",
-    "build:watch": "vite build --watch"
+    "build:watch": "vite build --watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@react-portable/client": "*",

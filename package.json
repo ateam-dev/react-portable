@@ -11,7 +11,8 @@
     "build:watch": "turbo run build:watch --filter=@react-portable/*",
     "start": "turbo run start --filter=examples-*",
     "test": "turbo run test",
-    "test:coverage": "turbo run test:coverage"
+    "test:coverage": "turbo run test:coverage",
+    "typecheck": "turbo run typecheck"
   },
   "workspaces": {
     "packages": [
