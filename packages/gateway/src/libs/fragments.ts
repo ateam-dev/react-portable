@@ -2,15 +2,15 @@ import { FragmentBaseReplacer } from "./htmlRewriters";
 import { parseFragmentId as _parseFragmentId } from "@react-portable/client";
 
 type FragmentMap = Map<string, string>;
-type FragmentConfigs = Record<
+export type FragmentConfigs = Record<
   string,
   { origin: string; assetPath: string | null }
 >;
 
 let fragmentConfigs: FragmentConfigs;
 
-export const prepareFragmentConfigs = (configString: string) => {
-  fragmentConfigs = JSON.parse(configString);
+export const prepareFragmentConfigs = (config: FragmentConfigs) => {
+  fragmentConfigs = config;
 };
 
 export const getFragmentsForPiercing = async (

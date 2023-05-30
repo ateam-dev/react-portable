@@ -34,7 +34,7 @@ const fetchMock = vi.fn().mockImplementation(async (request: Request) => {
 describe("fragments", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    prepareFragmentConfigs(JSON.stringify(fragmentConfigs));
+    prepareFragmentConfigs(fragmentConfigs);
   });
   describe("getFragmentsForPiercing", () => {
     test("normal id (not included gateway and not has assetPath on fragment remote)", async () => {

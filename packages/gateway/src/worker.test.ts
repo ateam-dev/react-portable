@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
-import workers from "./index";
+import workers, { Env } from "./worker";
 import * as swr from "./libs/swr";
 import { parse } from "node-html-parser";
 
-const bindings = getMiniflareBindings();
+const bindings: Env = getMiniflareBindings();
 
 vi.mock("./libs/swr");
 
@@ -120,7 +120,8 @@ describe("OPTION(preflight) request", () => {
   test("Returns a response with CORS headers attached", async () => {
     const res = await workers.fetch(
       new Request("http://localhost", { method: "OPTIONS" }),
-      bindings
+      bindings,
+      new ExecutionContext()
     );
 
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");

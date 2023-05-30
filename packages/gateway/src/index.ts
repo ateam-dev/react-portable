@@ -9,32 +9,21 @@ import { createIdListStore, prepareStore } from "./libs/store";
 import { prepareSwr, swr } from "./libs/swr";
 import { CUSTOM_HEADER_KEY_GATEWAY } from "./libs/constants";
 import {
+  FragmentConfigs,
   getFragmentConfig,
   getFragmentsForPiercing,
   prepareFragmentConfigs,
 } from "./libs/fragments";
 
-type Env = {
-  ORIGIN: string;
-  FRAGMENT_CONFIGS: string;
-  ALLOW_ORIGINS: string;
-  FRAGMENTS_LIST: KVNamespace;
-  CACHE: KVNamespace;
-};
+const app = new Hono();
 
-const app = new Hono<{ Bindings: Env }>();
+let origin: string;
+let allowOrigins: string;
 
 app.options("*", (c) => {
   return new Response("", {
-    headers: corsHeader(c.req.headers.get("Origin"), c.env.ALLOW_ORIGINS),
+    headers: corsHeader(c.req.headers.get("Origin"), allowOrigins),
   });
-});
-
-app.all("*", (c, next) => {
-  prepareSwr(c.env.CACHE);
-  prepareStore(c.env.FRAGMENTS_LIST);
-  prepareFragmentConfigs(c.env.FRAGMENT_CONFIGS);
-  return next();
 });
 
 app.get("/_fragments/:code/*", async (c) => {
@@ -47,7 +36,7 @@ app.get("/_fragments/:code/*", async (c) => {
     ..._response,
     headers: corsHeader(
       c.req.headers.get("Origin"),
-      c.env.ALLOW_ORIGINS,
+      allowOrigins,
       new Headers(_response.headers)
     ),
   });
@@ -64,7 +53,7 @@ app.get("/_fragments/:code/*", async (c) => {
 });
 
 app.all("*", async (c) => {
-  const proxyRequest = originProxy(c.req.raw, c.env.ORIGIN);
+  const proxyRequest = originProxy(c.req.raw, origin);
 
   const fragmentIdStore = createIdListStore(proxyRequest.url);
 
@@ -104,8 +93,6 @@ app.all("*", async (c) => {
   return piercedResponse;
 });
 
-export default app;
-
 const originProxy = (request: Request, origin: string): Request => {
   const url = new URL(request.url);
   url.host = new URL(origin).host;
@@ -125,4 +112,20 @@ const fragmentProxy = (request: Request, code: string): Request => {
   url.pathname = url.pathname.replace(`/_fragments/${code}`, "");
 
   return new Request(url, request);
+};
+
+export const gateway = (config: {
+  origin: string;
+  fragmentConfigs: FragmentConfigs;
+  allowOrigins: string;
+  fragmentListKVNameSpace: KVNamespace;
+  fragmentCacheKVNameSpace: KVNamespace;
+}) => {
+  prepareSwr(config.fragmentCacheKVNameSpace);
+  prepareStore(config.fragmentListKVNameSpace);
+  prepareFragmentConfigs(config.fragmentConfigs);
+  origin = config.origin;
+  allowOrigins = config.allowOrigins;
+
+  return app.fetch;
 };
