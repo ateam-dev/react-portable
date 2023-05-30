@@ -10,8 +10,8 @@
     "start": "wrangler dev",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "build:watch": "vite build --watch"
   },
   "dependencies": {
     "@react-portable/client": "*",

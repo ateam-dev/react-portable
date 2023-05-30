@@ -7,14 +7,21 @@
   "author": "Aiji Ueijima <aiji42@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn workspace @react-portable/core build && yarn workspace @react-portable/client build",
-    "test": "yarn workspace @react-portable/client test && yarn workspace gateway test"
+    "build": "turbo run build --filter=@react-portable/*",
+    "build:watch": "turbo run build:watch --filter=@react-portable/*",
+    "start": "turbo run start --filter=examples-*",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage"
   },
   "workspaces": {
-    "packages": ["packages/*", "examples/*"]
+    "packages": [
+      "packages/*",
+      "examples/*"
+    ]
   },
   "devDependencies": {
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "turbo": "^1.9.9"
   },
   "private": true
 }
