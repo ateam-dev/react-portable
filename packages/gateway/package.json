@@ -1,11 +1,13 @@
 {
   "name": "@react-portable/gateway",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "wrangler dev",
     "test": "vitest run",
