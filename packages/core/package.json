@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/core",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "bin": {
     "react-portable": "./bin/cli.js"
   },
