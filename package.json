@@ -12,7 +12,8 @@
     "start": "turbo run start --filter=examples-*",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "release": "turbo run build&& changeset version && changeset publish"
   },
   "workspaces": {
     "packages": [
@@ -21,6 +22,8 @@
     ]
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.26.1",
     "prettier": "^2.8.8",
     "turbo": "^1.9.9"
   },
