@@ -1,0 +1,26 @@
+name: 'Setup Node and dependencies'
+description: 'Set up Node.js and dependencies'
+
+inputs:
+  node-version:
+    description: 'Node.js version'
+    required: true
+    default: '18'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '${{ inputs.node-version }}'
+        cache: 'yarn'
+
+    - name: Install Dependencies
+      run: yarn install --frozen-lockfile
+      shell: bash
