@@ -13,7 +13,6 @@ import chokidar from "chokidar";
 import { glob } from "glob";
 import { Config } from "./types";
 
-// FIXME: projectRoot
 const projectRoot = process.cwd();
 const baseModuleDir = path.resolve(__dirname, "../src");
 let srcDir: string;
@@ -25,7 +24,7 @@ let workerFilePath: string;
 
 const loadConfig = () => {
   const config: Config = require(path.resolve(
-    process.cwd(),
+    projectRoot,
     "react-portable.config.js"
   ));
 
