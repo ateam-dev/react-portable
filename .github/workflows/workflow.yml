@@ -1,0 +1,42 @@
+name: Workflow
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-dependencies
+
+      - name: 🧊Type check
+        run: yarn typecheck
+
+      - name: 🧪Run Tests
+        run: yarn test
+
+  publish:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-dependencies
+
+      - name: 🏗Build
+        run: yarn build
+
+      - name: 🚀Publish
+        run: echo 'publish (dummy)'
