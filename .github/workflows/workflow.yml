@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: 🧪Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -47,6 +48,7 @@ jobs:
 #          flags: core
 
   build:
+    name: 🏗Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -61,6 +63,7 @@ jobs:
         run: yarn build
 
   publish:
+    name: 📦Release PR or 🚀Publish
     needs: [test, build]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -71,7 +74,7 @@ jobs:
       - name: Setup dependencies
         uses: ./.github/actions/setup-dependencies
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: 📦Create Release Pull Request or 🚀Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
