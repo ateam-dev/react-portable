@@ -1,5 +1,14 @@
 # @react-portable/gateway
 
+## 0.0.2
+
+### Patch Changes
+
+- [#3](https://github.com/ateam-dev/react-portable/pull/3) [`d073b81`](https://github.com/ateam-dev/react-portable/commit/d073b8196680285c85bf70a5484df4fda7c8dff3) Thanks [@aiji42](https://github.com/aiji42)! - first release!
+
+- Updated dependencies [[`d073b81`](https://github.com/ateam-dev/react-portable/commit/d073b8196680285c85bf70a5484df4fda7c8dff3)]:
+  - @react-portable/client@0.0.2
+
 ## 0.0.1
 
 ### Patch Changes
