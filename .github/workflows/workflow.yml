@@ -18,14 +18,50 @@ jobs:
       - name: Setup dependencies
         uses: ./.github/actions/setup-dependencies
 
-      - name: 🧊Type check
+      - name: 👮Code check
         run: yarn typecheck
 
       - name: 🧪Run Tests
-        run: yarn test
+        run: yarn test:coverage
+
+      - name: 📏Report coverage (gateway)
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          working-directory: ./packages/gateway
+          flags: gateway
+
+      - name: 📏Report coverage (client)
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          working-directory: ./packages/client
+          flags: client
+
+# TODO: core test
+#      - name: 📏Report coverage (core)
+#        uses: codecov/codecov-action@v3
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+#          working-directory: ./packages/core
+#          flags: core
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-dependencies
+
+      - name: 🏗 Build
+        run: yarn build
 
   publish:
-    needs: test
+    needs: [test, build]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
