@@ -10,7 +10,6 @@
     "bin",
     "types"
   ],
-  "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.cli.json && chmod a+x bin/cli.js",
     "build:watch": "tsc -p tsconfig.cli.json --watch",
