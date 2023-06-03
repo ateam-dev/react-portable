@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "lib": ["es2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "jsx": "react-jsx",
     "strict": true,
     "paths": {
