@@ -19,4 +19,4 @@ export const loader: Loader<ComponentProps<typeof Pokemon>> = async (
   };
 };
 
-export const strategy: Strategy = { revalidate: 60, hydrate: "onUse" };
+export const strategy: Strategy = { revalidate: 60, hydrate: "disable" };

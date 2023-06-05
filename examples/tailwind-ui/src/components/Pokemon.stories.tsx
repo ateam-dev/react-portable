@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { Pokemon } from "./Pokemon";
-import * as ReactPortable from "./pockemon.rp";
+import * as ReactPortable from "./pokemon.rp";
 import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {

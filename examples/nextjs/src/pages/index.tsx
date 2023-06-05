@@ -18,6 +18,10 @@ export default function Home() {
             entry="tailwind-ui:/ec/products"
           />
         </div>
+        <ReactPortable
+          gateway="http://127.0.0.1:8787"
+          entry="tailwind-ui:/pokemon?code=bulbasaur"
+        />
       </main>
     </>
   );
