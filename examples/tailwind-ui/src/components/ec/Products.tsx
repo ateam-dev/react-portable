@@ -1,4 +1,4 @@
-import QwikView, { Props } from "~/components/ec/QwikView";
+import QwikView, { Props } from "../../components/ec/QwikView";
 import { useState } from "react";
 
 const products_: Props["product"][] = [
@@ -124,7 +124,7 @@ export default function Example() {
           {products_.map((product) => (
             <div
               key={product.id}
-              className="group relative"
+              className="group relative cursor-pointer"
               onClick={() => setSelectProduct(product)}
             >
               <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
@@ -137,10 +137,8 @@ export default function Example() {
               <div className="mt-4 flex justify-between">
                 <div>
                   <h3 className="text-sm text-gray-700">
-                    <a href={product.href}>
-                      <span aria-hidden="true" className="absolute inset-0" />
-                      {product.name}
-                    </a>
+                    <span aria-hidden="true" className="absolute inset-0" />
+                    {product.name}
                   </h3>
                 </div>
                 <p className="text-sm font-medium text-gray-900">

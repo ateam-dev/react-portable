@@ -138,3 +138,7 @@ bin
 
 # turborepo
 .turbo
+
+#storybook
+storybook-static/
+build-storybook.log
