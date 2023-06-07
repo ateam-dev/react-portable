@@ -139,6 +139,9 @@ bin
 # turborepo
 .turbo
 
-#storybook
+# storybook
 storybook-static/
 build-storybook.log
+
+# vitepress
+cache
