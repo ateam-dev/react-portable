@@ -4,7 +4,7 @@ import {
   FragmentTemplatesAppender,
   ReactPortablePiercer,
 } from "./libs/htmlRewriters";
-import { corsHeader } from "./libs/cors";
+import { corsHeader, CorsSetting } from "./libs/cors";
 import { createIdListStore, prepareStore } from "./libs/store";
 import { prepareSwr, swr } from "./libs/swr";
 import { CUSTOM_HEADER_KEY_GATEWAY } from "./libs/constants";
@@ -17,12 +17,12 @@ import {
 
 const app = new Hono();
 
-let origin: string;
-let allowOrigins: string;
+let proxyOrigin: string | null = null;
+let corsSetting: CorsSetting;
 
 app.options("*", (c) => {
   return new Response("", {
-    headers: corsHeader(c.req.headers.get("Origin"), allowOrigins),
+    headers: corsHeader(c.req.headers.get("Origin"), corsSetting),
   });
 });
 
@@ -36,7 +36,7 @@ app.get("/_fragments/:code/*", async (c) => {
     ..._response,
     headers: corsHeader(
       c.req.headers.get("Origin"),
-      allowOrigins,
+      corsSetting,
       new Headers(_response.headers)
     ),
   });
@@ -53,7 +53,11 @@ app.get("/_fragments/:code/*", async (c) => {
 });
 
 app.all("*", async (c) => {
-  const proxyRequest = originProxy(c.req.raw, origin);
+  if (!proxyOrigin) {
+    c.status(500);
+    return c.json({ error: "This gateway is not configured for proxy mode." });
+  }
+  const proxyRequest = originProxy(c.req.raw, proxyOrigin);
 
   const fragmentIdStore = createIdListStore(proxyRequest.url);
 
@@ -105,7 +109,7 @@ const fragmentProxy = (request: Request, code: string): Request => {
   const url = new URL(request.url);
   const config = getFragmentConfig(code);
 
-  const remote = new URL(config.origin);
+  const remote = new URL(config.endpoint);
 
   url.host = remote.host;
   url.protocol = remote.protocol;
@@ -115,17 +119,16 @@ const fragmentProxy = (request: Request, code: string): Request => {
 };
 
 export const gateway = (config: {
-  origin: string;
-  fragmentConfigs: FragmentConfigs;
-  allowOrigins: string;
-  fragmentListKVNameSpace: KVNamespace;
-  fragmentCacheKVNameSpace: KVNamespace;
+  cds: FragmentConfigs;
+  proxy?: string;
+  cors?: CorsSetting;
+  kv: KVNamespace;
 }) => {
-  prepareSwr(config.fragmentCacheKVNameSpace);
-  prepareStore(config.fragmentListKVNameSpace);
-  prepareFragmentConfigs(config.fragmentConfigs);
-  origin = config.origin;
-  allowOrigins = config.allowOrigins;
+  prepareSwr(config.kv);
+  prepareStore(config.kv);
+  prepareFragmentConfigs(config.cds);
+  proxyOrigin = config.proxy ?? null;
+  corsSetting = config.cors ?? { origin: "*" };
 
   return app.fetch;
 };

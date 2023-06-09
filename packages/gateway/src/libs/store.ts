@@ -10,9 +10,11 @@ type IdListStore = {
   update: (ids: string[] | Set<string>) => IdListStore;
 };
 
-export const createIdListStore = (key: string): IdListStore => {
+export const createIdListStore = (url: string): IdListStore => {
   let currentIds: Set<string> = new Set();
   let originalIds: Set<string> = new Set();
+
+  const key = `ID_LIST:${url}`;
 
   const idListStore: IdListStore = {
     get ids() {

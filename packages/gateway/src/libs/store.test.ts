@@ -10,7 +10,7 @@ describe("store", function () {
   });
   describe("fragmentIdListStore", () => {
     beforeEach(async () => {
-      await TEST_KV.put("key1", JSON.stringify(["id1", "id2"]));
+      await TEST_KV.put("ID_LIST:key1", JSON.stringify(["id1", "id2"]));
     });
     test("load; not exist key in KV", async () => {
       const store = createIdListStore("not_exist_key");
@@ -47,17 +47,23 @@ describe("store", function () {
 
       await store.update(["id1", "id2", "id3"]).save();
       expect(mocked).toHaveBeenLastCalledWith(
-        "key1",
+        "ID_LIST:key1",
         JSON.stringify(["id1", "id2", "id3"])
       );
       expect(store.ids).toEqual(["id1", "id2", "id3"]);
 
       await store.update(["id1"]).save();
-      expect(mocked).toHaveBeenLastCalledWith("key1", JSON.stringify(["id1"]));
+      expect(mocked).toHaveBeenLastCalledWith(
+        "ID_LIST:key1",
+        JSON.stringify(["id1"])
+      );
       expect(store.ids).toEqual(["id1"]);
 
       await store.update(["id2"]).save();
-      expect(mocked).toHaveBeenLastCalledWith("key1", JSON.stringify(["id2"]));
+      expect(mocked).toHaveBeenLastCalledWith(
+        "ID_LIST:key1",
+        JSON.stringify(["id2"])
+      );
       expect(store.ids).toEqual(["id2"]);
     });
   });
