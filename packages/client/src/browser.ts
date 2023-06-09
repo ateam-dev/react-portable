@@ -1,3 +1,3 @@
-import { registerReactPortable } from "./index";
+import { registerReactPortable } from "./register";
 
 registerReactPortable();

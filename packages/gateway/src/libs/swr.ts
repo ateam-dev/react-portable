@@ -17,12 +17,16 @@ export const prepareSwr = (_kv: KVNamespace) => {
   kv = _kv;
 };
 
+const getKvKey = (url: string) => {
+  return `SWR:${url}`;
+};
+
 export const swr = async (
   request: Request,
   _fetch: typeof fetch
 ): Promise<{ response: Response; revalidate: Revalidate }> => {
   const { metadata, value: cache } = await kv.getWithMetadata<MetaData>(
-    request.url,
+    getKvKey(request.url),
     "arrayBuffer"
   );
 
@@ -86,7 +90,7 @@ const createStore = (request: Request, response: Response) => {
   const cloned = response.clone();
 
   return async () =>
-    kv.put(request.url, cloned.body as ReadableStream, {
+    kv.put(getKvKey(request.url), cloned.body as ReadableStream, {
       metadata,
       // KV expirationTtl must be above 60s
       expirationTtl: Math.max(60, expirationTtl),

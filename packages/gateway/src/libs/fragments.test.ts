@@ -1,10 +1,17 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { getFragmentsForPiercing, prepareFragmentConfigs } from "./fragments";
+import {
+  FragmentConfigs,
+  getFragmentsForPiercing,
+  prepareFragmentConfigs,
+} from "./fragments";
 import { createFragmentId } from "@react-portable/client";
 
-const fragmentConfigs = {
-  f1: { origin: "https://f1.com", assetPath: "" },
-  f2: { origin: "https://f2.com", assetPath: "https://assets.f2.com/statics" },
+const fragmentConfigs: FragmentConfigs = {
+  f1: { endpoint: "https://f1.com", assetPath: "" },
+  f2: {
+    endpoint: "https://f2.com",
+    assetPath: "https://assets.f2.com/statics",
+  },
 };
 
 const fragments = {

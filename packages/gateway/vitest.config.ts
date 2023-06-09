@@ -9,14 +9,14 @@ export default defineConfig({
         ORIGIN: "https://origin.com",
         ALLOW_ORIGINS: "*",
         FRAGMENT_CONFIGS: JSON.stringify({
-          f1: { origin: "https://f1.com", assetPath: "" },
+          f1: { endpoint: "https://f1.com", assetPath: "" },
           f2: {
-            origin: "https://f2.com",
+            endpoint: "https://f2.com",
             assetPath: "https://assets.f2.com/statics",
           },
         }),
       },
-      kvNamespaces: ["TEST_KV", "FRAGMENTS_LIST", "CACHE"],
+      kvNamespaces: ["TEST_KV", "CACHE"],
     },
   },
 });

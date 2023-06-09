@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import workers, { Env } from "./worker";
 import * as swr from "./libs/swr";
 import { parse } from "node-html-parser";
+import { gateway } from "./index";
 
 const bindings: Env = getMiniflareBindings();
 
@@ -261,7 +262,7 @@ describe("GET request to /_fragments/:code", () => {
 
 const kvIsolateDescribe = setupMiniflareIsolatedStorage();
 
-describe("Request to the origin", () => {
+describe("Request to the proxied origin", () => {
   let revalidateMock: Mock;
   let ctx: ExecutionContext;
   let mockedOrigin: ReturnType<typeof prepareOriginMock>;
@@ -275,6 +276,15 @@ describe("Request to the origin", () => {
     ctx = new ExecutionContext();
 
     mockedOrigin = prepareOriginMock();
+  });
+  test("Non proxy mode (standalone mode)", async () => {
+    const { CACHE } = getMiniflareBindings();
+    const res = await gateway({
+      kv: CACHE,
+      cds: {},
+    })(new Request("http://localhost/no-react-portable"), bindings, ctx);
+
+    expect(res.status).toBe(500);
   });
   test("If <react-portable> is not included, it responds as is", async () => {
     const res = await workers.fetch(
@@ -300,13 +310,13 @@ describe("Request to the origin", () => {
       "First request (when fragmentIdList is not in KV)",
       () => {
         test("Returns the response as is, and stores fragmentIdList in KV with untilWait", async () => {
-          const { FRAGMENTS_LIST } = getMiniflareBindings();
+          const { CACHE } = getMiniflareBindings();
           await workers.fetch(new Request("http://localhost/"), bindings, ctx);
 
           await getMiniflareWaitUntil(ctx);
 
-          const savedIdList = await FRAGMENTS_LIST.get(
-            "https://origin.com/",
+          const savedIdList = await CACHE.get(
+            "ID_LIST:https://origin.com/",
             "json"
           );
           expect(savedIdList.length).toBe(4);

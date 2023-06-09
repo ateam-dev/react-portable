@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "react-portable dev -p 3001",
     "build": "react-portable build",
     "start": "wrangler dev --port 3001",
     "preview:build": "react-portable watch --preBuilt",

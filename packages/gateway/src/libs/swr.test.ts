@@ -72,7 +72,7 @@ describe("swr", () => {
       await response.text();
       await revalidate(mockFetch);
       expect(kvSpy).toHaveBeenLastCalledWith(
-        request.url,
+        "SWR:https://example.com/",
         expect.any(ReadableStream),
         {
           expirationTtl: 3660,
@@ -96,7 +96,7 @@ describe("swr", () => {
       await response.text();
       await revalidate(mockFetch);
       expect(kvSpy).toHaveBeenLastCalledWith(
-        request.url,
+        "SWR:https://example.com/",
         expect.any(ReadableStream),
         {
           expirationTtl: 3660,
@@ -288,7 +288,7 @@ describe("swr", () => {
 
   describe("fresh cache exists in KV", () => {
     beforeEach(async () => {
-      await TEST_KV.put(originUrl, body, {
+      await TEST_KV.put(`SWR:${originUrl}`, body, {
         expirationTtl: 3660,
         metadata: {
           etag: "current-etag",
@@ -343,7 +343,7 @@ describe("swr", () => {
       ).toBe("current-etag");
 
       expect(kvSpy).toHaveBeenLastCalledWith(
-        request.url,
+        "SWR:https://example.com/",
         expect.any(ReadableStream),
         {
           expirationTtl: 3660,
@@ -365,7 +365,7 @@ describe("swr", () => {
 
   describe("stale cache exists in KV", () => {
     beforeEach(async () => {
-      await TEST_KV.put(originUrl, body, {
+      await TEST_KV.put(`SWR:${originUrl}`, body, {
         expirationTtl: 3660,
         metadata: {
           etag: "current-etag",
@@ -391,7 +391,7 @@ describe("swr", () => {
       );
 
       expect(kvSpy).toHaveBeenLastCalledWith(
-        request.url,
+        "SWR:https://example.com/",
         expect.any(ReadableStream),
         {
           expirationTtl: 3660,
@@ -408,7 +408,7 @@ describe("swr", () => {
   });
 
   test("not saved metadata on KV", async () => {
-    await TEST_KV.put(originUrl, body, {
+    await TEST_KV.put(`SWR:${originUrl}`, body, {
       expirationTtl: 3660,
     });
     vi.clearAllMocks();
@@ -424,7 +424,7 @@ describe("swr", () => {
     expect(mockFetch.mock.lastCall[1].headers.get("If-None-Match")).toBe(null);
 
     expect(kvSpy).toHaveBeenLastCalledWith(
-      request.url,
+      "SWR:https://example.com/",
       expect.any(ReadableStream),
       {
         expirationTtl: 3660,
@@ -440,7 +440,7 @@ describe("swr", () => {
   });
 
   test("etag is null on KV metadata", async () => {
-    await TEST_KV.put(originUrl, body, {
+    await TEST_KV.put(`SWR:${originUrl}`, body, {
       expirationTtl: 3660,
       metadata: {
         etag: null,
@@ -461,7 +461,7 @@ describe("swr", () => {
     expect(mockFetch.mock.lastCall[1].headers.get("If-None-Match")).toBe(null);
 
     expect(kvSpy).toHaveBeenLastCalledWith(
-      request.url,
+      "SWR:https://example.com/",
       expect.any(ReadableStream),
       {
         expirationTtl: 3660,
@@ -492,7 +492,7 @@ describe("swr", () => {
 
     // Cache at minimum ttl of KV (60s) but make it immediately stale
     expect(kvSpy).toHaveBeenLastCalledWith(
-      request.url,
+      "SWR:https://example.com/",
       expect.any(ReadableStream),
       {
         expirationTtl: 60,
@@ -526,7 +526,7 @@ describe("swr", () => {
 
     // Cache for s-maxage,
     expect(kvSpy).toHaveBeenLastCalledWith(
-      request.url,
+      "SWR:https://example.com/",
       expect.any(ReadableStream),
       {
         expirationTtl: 180,

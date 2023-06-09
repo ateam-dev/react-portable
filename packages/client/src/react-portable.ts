@@ -1,16 +1,6 @@
 import WritableDOM from "writable-dom";
 import type { DOMAttributes } from "react";
 
-export const registerReactPortable = () => {
-  if (
-    typeof window === "undefined" ||
-    window.customElements.get("react-portable")
-  )
-    return;
-
-  window.customElements.define("react-portable", ReactPortable);
-};
-
 const promiseStore = new Map<string, Promise<Response> | Response>();
 
 const restoreGatewayCache = () => {

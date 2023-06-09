@@ -1,14 +1,16 @@
 import { CUSTOM_HEADER_KEY_GATEWAY } from "./constants";
 
+export type CorsSetting = { origin: string[] | string };
+
 export const corsHeader = (
   origin: string | null,
-  allowOrigins: string,
+  setting: CorsSetting,
   baseHeaders?: Headers
 ) => {
   const headers = baseHeaders ?? new Headers();
-  if (!allowOrigins.includes(",")) {
-    headers.set("Access-Control-Allow-Origin", allowOrigins);
-  } else if (origin && allowOrigins.includes(origin)) {
+  if (typeof setting?.origin === "string") {
+    headers.set("Access-Control-Allow-Origin", setting.origin);
+  } else if (origin && setting?.origin.includes(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
   }
   headers.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");

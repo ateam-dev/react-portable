@@ -8,7 +8,6 @@
     "dist"
   ],
   "scripts": {
-    "start": "wrangler dev",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "build": "vite build",
@@ -25,7 +24,7 @@
     "node-html-parser": "^6.1.5",
     "typescript": "^5.0.4",
     "vite": "^4.3.9",
-    "vite-plugin-dts": "^2.3.0",
+    "vite-plugin-dts": "^1.7.3",
     "vitest": "^0.31.1",
     "vitest-environment-miniflare": "^2.14.0",
     "wrangler": "^3.0.1"

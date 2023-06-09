@@ -4,7 +4,7 @@ import { parseFragmentId as _parseFragmentId } from "@react-portable/client";
 type FragmentMap = Map<string, string>;
 export type FragmentConfigs = Record<
   string,
-  { origin: string; assetPath: string | null }
+  { endpoint: string; assetPath: string | null }
 >;
 
 let fragmentConfigs: FragmentConfigs;
@@ -51,7 +51,7 @@ const parseFragmentId = (id: string) => {
 
 const fragmentRequest = (code: string, path: string) => {
   const config = getFragmentConfig(code);
-  return new Request(`${config.origin}${path}`);
+  return new Request(`${config.endpoint}${path}`);
 };
 
 export const getFragmentConfig = (code: string) => {

@@ -8,7 +8,8 @@ import {
   test,
   vi,
 } from "vitest";
-import { createFragmentId, registerReactPortable } from "./react-portable";
+import { createFragmentId } from "./react-portable";
+import { registerReactPortable } from "./register";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { setTimeout } from "node:timers/promises";
