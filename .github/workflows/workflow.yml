@@ -102,6 +102,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          path: ../
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-dependencies
