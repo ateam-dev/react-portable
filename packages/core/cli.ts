@@ -151,15 +151,6 @@ const syncRoutes = async (once: boolean = false) => {
   return new Promise((r) => watcher.on("ready", r));
 };
 
-const serveSSR = async (option: { port?: number } = {}) => {
-  const server = await vite.createServer({
-    plugins: vitePlugins(),
-    mode: "ssr",
-  });
-  await server.listen(option.port);
-  server.printUrls();
-};
-
 const buildClient = async () => {
   return vite.build({
     plugins: vitePlugins(),
@@ -187,21 +178,6 @@ program
   .action(async () => {
     await initProject();
     console.log("🎒Completed initializing react portable project");
-  });
-
-program
-  .command("dev")
-  .description("launch a server for development")
-  .option("-p, --port <number>", "port number")
-  .action(async ({ port }: { port?: string }) => {
-    loadConfig();
-    await prepareProject();
-    await syncRoutes();
-
-    await serveSSR({ port: port ? Number(port) : undefined }).catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
   });
 
 program
