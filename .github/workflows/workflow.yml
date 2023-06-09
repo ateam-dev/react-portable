@@ -70,6 +70,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-dependencies
@@ -82,3 +84,35 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  deploy-doc:
+    name: 📘Deploy Documents
+    needs: publish
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup dependencies
+        uses: ../.github/actions/setup-dependencies
+
+      - name: 🏗Build
+        run: yarn docs:build
+      - uses: actions/configure-pages@v2
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: pages/.vitepress/dist
+
+      - name: 🚀Deploy
+        id: deployment
+        uses: actions/deploy-pages@v1
