@@ -9,7 +9,7 @@ inputs:
   working-directory:
     description: 'Working directory'
     required: true
-    default: '${{ GITHUB_WORKSPACE }}'
+    default: '${{ github.workspace }}'
 
 runs:
   using: "composite"
