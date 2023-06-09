@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useId } from "react";
-import { registerReactPortable } from "./react-portable";
+import { registerReactPortable } from "./register";
 
 export const ReactPortable = ({
   entry,
