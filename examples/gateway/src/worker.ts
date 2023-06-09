@@ -2,20 +2,18 @@ import { gateway } from "@react-portable/gateway";
 
 export type Env = {
   ORIGIN: string;
-  FRAGMENT_CONFIGS: string;
+  COMPONENT_DELIVERING_SYSTEMS: string;
   ALLOW_ORIGINS: string;
-  FRAGMENTS_LIST: KVNamespace;
-  CACHE: KVNamespace;
+  STORE: KVNamespace;
 };
 
 export default {
   fetch: (request: Request, env: Env, ctx: ExecutionContext) => {
     return gateway({
-      origin: env.ORIGIN,
-      fragmentConfigs: JSON.parse(env.FRAGMENT_CONFIGS),
-      allowOrigins: env.ALLOW_ORIGINS,
-      fragmentListKVNameSpace: env.FRAGMENTS_LIST,
-      fragmentCacheKVNameSpace: env.CACHE,
+      proxy: env.ORIGIN,
+      cds: JSON.parse(env.COMPONENT_DELIVERING_SYSTEMS),
+      cors: { origin: env.ALLOW_ORIGINS.split(",") },
+      kv: env.STORE,
     })(request, env, ctx);
   },
 };
