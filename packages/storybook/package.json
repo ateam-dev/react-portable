@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/storybook",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "exports": {
     ".": {
       "require": "./dist/index.js",
@@ -47,7 +47,7 @@
     "@storybook/preview-api": "^7.0.0",
     "@storybook/theming": "^7.0.0",
     "@storybook/types": "^7.0.0",
-    "@react-portable/core": "*",
+    "@react-portable/core": "0.1.0",
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
     "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
   },
