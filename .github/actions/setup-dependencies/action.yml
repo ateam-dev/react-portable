@@ -6,6 +6,10 @@ inputs:
     description: 'Node.js version'
     required: true
     default: '18'
+  working-directory:
+    description: 'Working directory'
+    required: true
+    default: '${{ github.workspace }}'
 
 runs:
   using: "composite"
@@ -17,5 +21,6 @@ runs:
         cache: 'yarn'
 
     - name: Install Dependencies
+      working-directory: '${{ inputs.working-directory }}'
       run: yarn install --frozen-lockfile
       shell: bash

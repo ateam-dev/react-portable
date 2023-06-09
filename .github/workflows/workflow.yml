@@ -96,23 +96,23 @@ jobs:
 #      name: github-pages
 #      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: docs
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-dependencies
+        with:
+          working-directory: docs
 
       - name: 🏗Build
+        working-directory: docs
         run: yarn docs:build
 #      - uses: actions/configure-pages@v2
 #      - uses: actions/upload-pages-artifact@v1
 #        with:
 #          path: docs/pages/.vitepress/dist
-#
+
 #      - name: 🚀Deploy
 #        id: deployment
 #        uses: actions/deploy-pages@v1
