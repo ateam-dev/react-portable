@@ -1,5 +1,16 @@
 # @react-portable/gateway
 
+## 0.1.0
+
+### Minor Changes
+
+- [#14](https://github.com/ateam-dev/react-portable/pull/14) [`e4eb42f`](https://github.com/ateam-dev/react-portable/commit/e4eb42f1df4fca90d312e5c93251d1a7ea95f1d4) Thanks [@aiji42](https://github.com/aiji42)! - simplify @react-portable/gateway configurations
+
+### Patch Changes
+
+- Updated dependencies [[`e4eb42f`](https://github.com/ateam-dev/react-portable/commit/e4eb42f1df4fca90d312e5c93251d1a7ea95f1d4)]:
+  - @react-portable/client@0.1.0
+
 ## 0.0.2
 
 ### Patch Changes
