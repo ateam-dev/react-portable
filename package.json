@@ -1,11 +1,9 @@
 {
   "name": "react-portable",
   "version": "0.0.0",
-  "description": "🎒ReactPortable: A lightweight, script-free library enabling React components to run seamlessly on any webpage, including those without frontend frameworks.",
-  "main": "index.js",
-  "repository": "git@github.com:aiji42/react-portable.git",
-  "author": "Aiji Ueijima <aiji42@gmail.com>",
-  "license": "MIT",
+  "description": "React Portable enhances the use of React components, enabling direct use across any website and allowing for immediate updates without the need for bundling.",
+  "repository": "git@github.com:ateam-dev/react-portable.git",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "turbo run build --filter=@react-portable/*",
     "build:watch": "turbo run build:watch --filter=@react-portable/*",
@@ -13,7 +11,8 @@
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "typecheck": "turbo run typecheck",
-    "release": "yarn build && changeset version && changeset publish"
+    "cp-readme": "for dir in ./packages/*/; do cp ./README.md \"$dir\"; done",
+    "release": "yarn build && yarn cp-readme && changeset version && changeset publish"
   },
   "workspaces": {
     "packages": [
