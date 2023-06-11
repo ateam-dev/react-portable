@@ -9,7 +9,7 @@ Following these guidelines helps to communicate that you respect the time of the
 This project is built with a yarn workspace. Here's how you can set it up on your local machine:
 
 1. Fork the project.
-2. Clone your fork (`git clone https://github.com/ateam_dev/react-portable.git`).
+2. Clone your fork.
 3. Install the dependencies with `yarn install`.
 
 ## Making Changes
