@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: "/react-portable/",
   title: "React Portable",
   description:
     "A lightweight, script-free library enabling React components to run seamlessly on any webpage, including those without frontend frameworks.",
