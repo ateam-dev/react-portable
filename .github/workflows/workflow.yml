@@ -89,12 +89,12 @@ jobs:
     name: 📘Deploy Documents
     needs: publish
     if: github.ref == 'refs/heads/main'
-#    permissions:
-#      pages: write
-#      id-token: write
-#    environment:
-#      name: github-pages
-#      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -108,11 +108,11 @@ jobs:
       - name: 🏗Build
         working-directory: docs
         run: yarn docs:build
-#      - uses: actions/configure-pages@v2
-#      - uses: actions/upload-pages-artifact@v1
-#        with:
-#          path: docs/pages/.vitepress/dist
+      - uses: actions/configure-pages@v2
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/pages/.vitepress/dist
 
-#      - name: 🚀Deploy
-#        id: deployment
-#        uses: actions/deploy-pages@v1
+      - name: 🚀Deploy
+        id: deployment
+        uses: actions/deploy-pages@v1
