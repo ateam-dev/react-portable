@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/ateam-dev/react-portable/branch/main/graph/badge.svg?token=W6B8SUAWID)](https://codecov.io/gh/ateam-dev/react-portable)
+[![Workflow](https://github.com/ateam-dev/react-portable/actions/workflows/workflow.yml/badge.svg)](https://github.com/ateam-dev/react-portable/actions/workflows/workflow.yml)
+
 # React Portable
 
 React Portable enhances the use of React components, enabling direct use across any website and allowing for immediate updates without the need for bundling.
