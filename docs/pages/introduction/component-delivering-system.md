@@ -156,6 +156,25 @@ export const strategy: Strategy = {
 }
 ```
 
+#### Styling
+
+##### Compliance with Vite's Default CSS
+Since React Portable uses Vite for building, it supports the styling methods officially adopted by Vite. This includes importing CSS files, using CSS Modules, etc.
+
+[CSS - Vite](https://vitejs.dev/guide/features.html#css)
+
+##### Tailwind
+React Portable also supports Tailwind. Follow the official [documentation for setup](https://tailwindcss.com/docs/guides/vite).
+
+You can apply styles by importing into your entry point file.
+
+```ts {1} 
+import './index.css'
+import { Component } from './your-comopnent'
+
+export default Component
+```
+
 ### Build & Launch Server
 
 #### Build
