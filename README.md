@@ -7,7 +7,7 @@ React Portable enhances the use of React components, enabling direct use across 
 
 ## Documentation
 
-The documentation can be found [here](https://example.com).
+The documentation can be found [here](https://ateam-dev.github.io/react-portable/).
 
 ## Contact
 
