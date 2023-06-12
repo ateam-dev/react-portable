@@ -175,6 +175,12 @@ import { Component } from './your-comopnent'
 export default Component
 ```
 
+#### Env Variables
+
+If you want to use environment variables, follow the rules for using environment variables in Vite.
+
+[Env - Vite](https://vitejs.dev/guide/env-and-mode.html#env-files)
+
 ### Build & Launch Server
 
 #### Build
