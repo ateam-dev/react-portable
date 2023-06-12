@@ -26,7 +26,7 @@
     "node-html-parser": "^6.1.5",
     "typescript": "^5.0.4",
     "vite": "^4.3.9",
-    "vite-plugin-dts": "^1.7.3",
+    "vite-plugin-dts": "^2.0.0",
     "vitest": "^0.32.0",
     "vitest-environment-miniflare": "^2.14.0",
     "wrangler": "^3.1.0"

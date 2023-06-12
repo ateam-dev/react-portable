@@ -27,7 +27,7 @@
     "msw": "^1.2.2",
     "npm-run-all": "^4.1.5",
     "vite": "^4.3.9",
-    "vite-plugin-dts": "^1.7.3",
+    "vite-plugin-dts": "^2.0.0",
     "vitest": "^0.32.0"
   },
   "dependencies": {
