@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.1.1
+
+### Patch Changes
+
+- [#17](https://github.com/ateam-dev/react-portable/pull/17) [`d953a9f`](https://github.com/ateam-dev/react-portable/commit/d953a9f4b9fb8e40a4f291af444e8a872ca7a5bf) Thanks [@aiji42](https://github.com/aiji42)! - bumpup
+
 ## 0.1.0
 
 ### Minor Changes
