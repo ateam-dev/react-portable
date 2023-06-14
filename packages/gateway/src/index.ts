@@ -33,7 +33,8 @@ app.get("/_fragments/:code/*", async (c) => {
   c.executionCtx.waitUntil(revalidate(fetch));
 
   const response = new Response(_response.body, {
-    ..._response,
+    status: _response.status,
+    statusText: _response.statusText,
     headers: corsHeader(
       c.req.headers.get("Origin"),
       corsSetting,
@@ -41,7 +42,10 @@ app.get("/_fragments/:code/*", async (c) => {
     ),
   });
 
-  if (!response.headers.get("content-type")?.includes("text/html"))
+  if (
+    !response.headers.get("content-type")?.includes("text/html") ||
+    !response.ok
+  )
     return response;
 
   const gateway = c.req.headers.get(CUSTOM_HEADER_KEY_GATEWAY);

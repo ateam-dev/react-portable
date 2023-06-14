@@ -1,7 +1,11 @@
 import { FragmentBaseReplacer } from "./htmlRewriters";
 import { parseFragmentId as _parseFragmentId } from "@react-portable/client";
 
-type FragmentMap = Map<string, string>;
+export type FragmentMap = Map<
+  string,
+  | { ok: true; body: string; status: number; statusText: string }
+  | { ok: false; body: null; status: number; statusText: string }
+>;
 export type FragmentConfigs = Record<
   string,
   { endpoint: string; assetPath: string | null }
@@ -23,6 +27,15 @@ export const getFragmentsForPiercing = async (
     ids.map(async (id) => {
       const { code, path } = parseFragmentId(id);
       const response = await handleRequest(fragmentRequest(code, path));
+      if (!response.ok) {
+        fragments.set(id, {
+          ok: false,
+          status: response.status,
+          statusText: response.statusText,
+          body: null,
+        });
+        return;
+      }
       const config = getFragmentConfig(code);
       const baseReplacer = new FragmentBaseReplacer(
         code,
@@ -33,8 +46,13 @@ export const getFragmentsForPiercing = async (
         baseReplacer.selector,
         baseReplacer
       );
-      if (response.ok)
-        fragments.set(id, await rewriter.transform(response).text());
+
+      fragments.set(id, {
+        ok: true,
+        body: await rewriter.transform(response).text(),
+        status: response.status,
+        statusText: response.statusText,
+      });
     })
   );
 

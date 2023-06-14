@@ -8,6 +8,8 @@ type MetaData = {
   etag: string | null;
   staleAt: string;
   headers: Record<string, string>;
+  status: number;
+  statusText: string;
 };
 
 type Revalidate = (f: typeof fetch) => Promise<void>;
@@ -32,6 +34,8 @@ export const swr = async (
 
   if (cache) {
     const response = new Response(cache, {
+      ...(metadata?.status ? { status: metadata.status } : {}),
+      ...(metadata?.statusText ? { statusText: metadata.statusText } : {}),
       headers: {
         ...(metadata?.headers ?? {}),
         ...(metadata?.staleAt
@@ -65,12 +69,9 @@ const createRevalidate = (
 
   return async (_fetch: typeof fetch) => {
     // Even if the cache is fresh, check for origin modifications
-    const response = await _fetch(request, {
-      headers: new Headers({
-        ...request.headers,
-        ...(isCacheFresh && etag ? { "If-None-Match": etag } : {}),
-      }),
-    });
+    const headers = new Headers(request.headers);
+    if (isCacheFresh && etag) headers.set("If-None-Match", etag);
+    const response = await _fetch(request, { headers });
 
     if (response.status === 304) return;
 
@@ -86,6 +87,8 @@ const createStore = (request: Request, response: Response) => {
     etag: response.headers.get("Etag"),
     staleAt: staleAt.toISOString(),
     headers: Object.fromEntries(response.headers.entries()),
+    status: response.status,
+    statusText: response.statusText,
   };
   const cloned = response.clone();
 

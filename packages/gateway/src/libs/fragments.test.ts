@@ -35,7 +35,7 @@ const fetchMock = vi.fn().mockImplementation(async (request: Request) => {
   if (request.url === "https://f2.com/component2")
     return new Response(fragments.f2.component2);
 
-  return new Response(null, { status: 404 });
+  return new Response(null, { status: 404, statusText: "not found" });
 });
 
 describe("fragments", () => {
@@ -50,10 +50,10 @@ describe("fragments", () => {
 
       const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
-      expect(fragments.get(id1)).toBe(
+      expect(fragments.get(id1)!.body).toEqual(
         `<react-portable-fragment q:base="/_fragments/f1/build/">f1:component1</react-portable-fragment>`
       );
-      expect(fragments.get(id2)).toBe(
+      expect(fragments.get(id2)!.body).toBe(
         `<react-portable-fragment q:base="/_fragments/f1/build/">f1:component2</react-portable-fragment>`
       );
 
@@ -68,10 +68,10 @@ describe("fragments", () => {
 
     const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
-    expect(fragments.get(id1)).toBe(
+    expect(fragments.get(id1)!.body).toBe(
       `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2:component1</react-portable-fragment>`
     );
-    expect(fragments.get(id2)).toBe(
+    expect(fragments.get(id2)!.body).toBe(
       `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2:component2</react-portable-fragment>`
     );
     expect(fetchMock.mock.calls[0][0].url).toBe("https://f2.com/component1");
@@ -84,10 +84,10 @@ describe("fragments", () => {
 
     const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
-    expect(fragments.get(id1)).toBe(
+    expect(fragments.get(id1)!.body).toBe(
       `<react-portable-fragment q:base="/_fragments/f1/build/">f1:component1</react-portable-fragment>`
     );
-    expect(fragments.get(id2)).toBe(
+    expect(fragments.get(id2)!.body).toBe(
       `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2:component1</react-portable-fragment>`
     );
     expect(fetchMock.mock.calls[0][0].url).toBe("https://f1.com/component1");
@@ -113,7 +113,19 @@ describe("fragments", () => {
 
     const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
-    expect(fragments.size).toBe(0);
+    expect(fragments.get(id1)).toEqual({
+      ok: false,
+      body: null,
+      status: 404,
+      statusText: "not found",
+    });
+    expect(fragments.get(id2)).toEqual({
+      ok: false,
+      body: null,
+      status: 404,
+      statusText: "not found",
+    });
+
     expect(fetchMock.mock.calls[0][0].url).toBe(
       "https://f1.com/not-exist-component"
     );

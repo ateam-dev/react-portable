@@ -345,22 +345,22 @@ describe("Request to the proxied origin", () => {
 
           // no gateway & remote server has no assetPath => default piercing
           expect(text).toMatch(
-            '<react-portable entry="f1:/component1" pierced=""><react-portable-fragment q:base="/_fragments/f1/build/">f1 component #1</react-portable-fragment></react-portable>'
+            '<react-portable entry="f1:/component1" pierced="succeed"><react-portable-fragment q:base="/_fragments/f1/build/">f1 component #1</react-portable-fragment></react-portable>'
           );
 
           // has gateway & remote server has no assetPath => default piercing (gateway is ignored)
           expect(text).toMatch(
-            '<react-portable entry="f1:/component2" gateway="https://gw1.com" pierced=""><react-portable-fragment q:base="/_fragments/f1/build/">f1 component #2</react-portable-fragment></react-portable>'
+            '<react-portable entry="f1:/component2" gateway="https://gw1.com" pierced="succeed"><react-portable-fragment q:base="/_fragments/f1/build/">f1 component #2</react-portable-fragment></react-portable>'
           );
 
           // no gateway & remote server has no assetPath => piercing with assetPath
           expect(text).toMatch(
-            '<react-portable entry="f2:/component1" pierced=""><react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</react-portable-fragment></react-portable>'
+            '<react-portable entry="f2:/component1" pierced="succeed"><react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</react-portable-fragment></react-portable>'
           );
 
           // has gateway & remote server has no assetPath => piercing with assetPath (gateway is ignored)
           expect(text).toMatch(
-            '<react-portable entry="f2:/component2" gateway="https://gw2.com" pierced=""><react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #2</react-portable-fragment></react-portable>'
+            '<react-portable entry="f2:/component2" gateway="https://gw2.com" pierced="succeed"><react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #2</react-portable-fragment></react-portable>'
           );
         });
         test("swr's revalidate is executed with untilWait", async () => {

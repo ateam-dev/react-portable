@@ -5,6 +5,7 @@ import {
 } from "./htmlRewriters";
 import { createFragmentId } from "@react-portable/client";
 import { beforeEach, describe, expect, test } from "vitest";
+import { FragmentMap } from "./fragments";
 
 const hostDummyResponseBody = `<!DOCTYPE html>
 <html>
@@ -18,22 +19,47 @@ const hostDummyResponseBody = `<!DOCTYPE html>
     <react-portable entry="f3:/component3">has inner text</react-portable>
     <react-portable>this is bad component (no entry attribute)</react-portable>
     <react-portablee entry="f3:/component3">this is bad component (typo)</react-portablee>
+    <react-portable entry="f4:/component4">this is bad component (response status is 404)</react-portable>
   </body>
 </html>
 `;
 
-const fragmentIdMapping = new Map([
+const fragmentIdMapping: FragmentMap = new Map([
   [
     createFragmentId("f1:/component1", "https://gw1.com"),
-    `<react-portable-fragment>this is component1</react-portable-fragment>`,
+    {
+      ok: true,
+      body: `<react-portable-fragment>this is component1</react-portable-fragment>`,
+      status: 200,
+      statusText: "OK",
+    },
   ],
   [
     createFragmentId("f2:/component2"),
-    `<react-portable-fragment>this is component2</react-portable-fragment>`,
+    {
+      ok: true,
+      body: `<react-portable-fragment>this is component2</react-portable-fragment>`,
+      status: 200,
+      statusText: "OK",
+    },
   ],
   [
     createFragmentId("f3:/component3"),
-    `<react-portable-fragment>this is component3</react-portable-fragment>`,
+    {
+      ok: true,
+      body: `<react-portable-fragment>this is component3</react-portable-fragment>`,
+      status: 200,
+      statusText: "OK",
+    },
+  ],
+  [
+    createFragmentId("f4:/component4"),
+    {
+      ok: false,
+      body: null,
+      status: 404,
+      statusText: "Not Found",
+    },
   ],
 ]);
 
