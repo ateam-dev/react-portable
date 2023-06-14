@@ -5,6 +5,9 @@ declare module "@entry" {
 
 declare module "react-portable:virtual" {
   import { FC } from "react";
+  import { RequestEventCommon } from "@builder.io/qwik-city/middleware/request-handler";
+
+  type ErrorResponse = ReturnType<RequestEventCommon["error"]>;
 
   export type Strategy = {
     revalidate?: false | 0 | number;
@@ -12,8 +15,9 @@ declare module "react-portable:virtual" {
   };
 
   export type Loader<T extends Record = Record> = (
-    r: Request
-  ) => T | Promise<T>;
+    r: Request,
+    ctx: { error: RequestEventCommon["error"] }
+  ) => T | ErrorResponse | Promise<T | ErrorResponse>;
 
   const Component: FC;
   export const strategy: Strategy | undefined;
