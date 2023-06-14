@@ -86,11 +86,33 @@ import { Component, ComponentProps } from './your-comopnent'
 
 export default Component
 
-export const loader: Loader<ComponentProps> = async (request: Request) => {
+export const loader: Loader<ComponentProps> = async (request) => {
   // ...data fetch from an API server
   return { ... } // ComponentProps
 }
 ```
+
+##### Error Handling
+
+When handling errors within `loader`, throw or return `ctx.error` with the appropriate status code and message as arguments.
+
+```ts
+import { Loader } from '@react-portable/core'
+import { Component, ComponentProps } from './your-comopnent'
+
+export default Component
+
+export const loader: Loader<ComponentProps> = async (request, ctx) => {
+  try {
+    // ...data fetch from an API server
+    return { ... } // ComponentProps
+  } catch (e) {
+    throw ctx.error(404, e.message)
+  }
+}
+```
+
+When embedding the component on a page through the Gateway, if the loader returns a status other than 2xx via ctx.error, the component will not be displayed. Instead, the error will be displayed in the browser's console.
 
 #### Strategy
 
@@ -125,7 +147,7 @@ import { Component, ComponentProps } from './your-comopnent'
 
 export default Component
 
-export const loader: Loader<ComponentProps> = async (request: Request) => {
+export const loader: Loader<ComponentProps> = async (request) => {
   // ...data fetch from an API server
   return { ... } // ComponentProps
 }

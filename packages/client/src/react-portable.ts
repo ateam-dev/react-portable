@@ -41,20 +41,31 @@ export class ReactPortable extends HTMLElement {
 
   async connectedCallback() {
     try {
-      await this.render();
+      if (this.prepare()) {
+        this.setAttribute("loading", "");
+        await this.render();
+      }
       this.pierced = true;
     } catch (e) {
       console.error(e);
       this.failed = true;
     }
+    this.removeAttribute("loading");
   }
 
-  private async render() {
+  private prepare() {
     const entry = this.getAttribute("entry");
     const gateway = this.getAttribute("gateway");
-    const pierced = this.getAttribute("pierced") !== null;
+    const pierced = this.getAttribute("pierced");
 
-    if (pierced) return;
+    if (pierced === "failed") {
+      throw new Error(
+        `Failed to retrieve fragment (entry: ${entry}, gateway: ${
+          gateway ?? "-"
+        }) on the gateway.`
+      );
+    }
+    if (pierced) return false;
 
     if (!entry)
       throw new Error(
@@ -62,8 +73,14 @@ export class ReactPortable extends HTMLElement {
       );
     this.fragmentId = createFragmentId(entry, gateway);
 
+    return true;
+  }
+
+  private async render() {
     const fragment = await this.fetchFragmentStream();
     if (!fragment.body || !fragment.ok) {
+      this.setAttribute("pierced", "failed");
+      const { entry, gateway } = parseFragmentId(this.fragmentId);
       throw new Error(
         `Failed to retrieve fragment (entry: ${entry}, gateway: ${
           gateway ?? "-"

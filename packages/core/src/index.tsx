@@ -21,8 +21,14 @@ const qwikifyOption =
         event: undefined,
       };
 const QComponent = qwikify$(Entry.default, qwikifyOption);
-const getProps = routeLoader$(({ request }) => {
-  return Entry.loader?.(request) ?? {};
+const getProps = routeLoader$(async ({ request, error }) => {
+  try {
+    const res = (await Entry.loader?.(request, { error })) ?? {};
+    if (res instanceof Error) throw res;
+    return res;
+  } catch (e) {
+    throw e;
+  }
 });
 export default component$(() => {
   const props = getProps().value;

@@ -170,8 +170,6 @@ const buildWorker = async (seamless = false) => {
   });
 };
 
-program.version("0.0.1");
-
 program
   .command("init")
   .description("initialize project")

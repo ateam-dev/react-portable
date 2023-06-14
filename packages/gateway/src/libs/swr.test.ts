@@ -28,18 +28,21 @@ const dummyResponse = ({
   ignoreHeaderKeys = [],
   headers = {},
   status = 200,
+  statusText = "OK",
 }: {
   ignoreHeaderKeys?: KeyOfCacheableHeader[];
   headers?: Record<string, string>;
   status?: number;
+  statusText?: string;
 } = {}) => {
-  if (status === 304) return new Response(null, { status });
+  if (status === 304) return new Response(null, { status, statusText });
   return new Response(body, {
     headers: {
       ...omitCacheableHeader(ignoreHeaderKeys),
       ...headers,
     },
     status,
+    statusText,
   });
 };
 
@@ -80,6 +83,8 @@ describe("swr", () => {
             etag: "current-etag",
             headers: cacheableHeader,
             staleAt: "2023-01-01T00:01:00.000Z",
+            status: 200,
+            statusText: "OK",
           },
         }
       );
@@ -104,6 +109,8 @@ describe("swr", () => {
             etag: null,
             headers: omitCacheableHeader(["etag"]),
             staleAt: "2023-01-01T00:01:00.000Z",
+            status: 200,
+            statusText: "OK",
           },
         }
       );
@@ -354,6 +361,8 @@ describe("swr", () => {
               etag: "new-etag",
             },
             staleAt: "2023-01-01T00:01:00.000Z",
+            status: 200,
+            statusText: "OK",
           },
         }
       );
@@ -372,6 +381,8 @@ describe("swr", () => {
           headers: cacheableHeader,
           // already stale
           staleAt: "2022-12-31T23:59:59.000Z",
+          status: 200,
+          statusText: "OK",
         },
       });
       vi.clearAllMocks();
@@ -399,6 +410,8 @@ describe("swr", () => {
             etag: "current-etag",
             headers: cacheableHeader,
             staleAt: "2023-01-01T00:01:00.000Z",
+            status: 200,
+            statusText: "OK",
           },
         }
       );
@@ -432,6 +445,8 @@ describe("swr", () => {
           etag: "current-etag",
           headers: cacheableHeader,
           staleAt: "2023-01-01T00:01:00.000Z",
+          status: 200,
+          statusText: "OK",
         },
       }
     );
@@ -446,6 +461,8 @@ describe("swr", () => {
         etag: null,
         headers: omitCacheableHeader(["etag"]),
         staleAt: "2023-01-01T00:01:00.000Z",
+        status: 200,
+        statusText: "OK",
       },
     });
     vi.clearAllMocks();
@@ -469,6 +486,8 @@ describe("swr", () => {
           etag: "current-etag",
           headers: cacheableHeader,
           staleAt: "2023-01-01T00:01:00.000Z",
+          status: 200,
+          statusText: "OK",
         },
       }
     );
@@ -503,6 +522,8 @@ describe("swr", () => {
             "cache-control": "public, stale-while-revalidate=3600",
           },
           staleAt: "2023-01-01T00:00:00.000Z",
+          status: 200,
+          statusText: "OK",
         },
       }
     );
@@ -516,6 +537,8 @@ describe("swr", () => {
         headers: {
           "Cache-Control": "public, s-maxage=180",
         },
+        status: 200,
+        statusText: "OK",
       })
     );
     const request = dummyRequest();
@@ -537,6 +560,8 @@ describe("swr", () => {
             "cache-control": "public, s-maxage=180",
           },
           staleAt: "2023-01-01T00:03:00.000Z",
+          status: 200,
+          statusText: "OK",
         },
       }
     );

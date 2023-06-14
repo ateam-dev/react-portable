@@ -2,8 +2,7 @@ import {
   CLASS_NAME_FOR_GATEWAY_CACHE,
   createFragmentId,
 } from "@react-portable/client";
-
-type FragmentMap = Map<string, string>;
+import { FragmentMap } from "./fragments";
 
 // handler for <react-portable />
 export class ReactPortablePiercer {
@@ -24,8 +23,12 @@ export class ReactPortablePiercer {
     const fragment = this.fragments.get(fragmentId);
     if (!fragment) return;
 
-    element.setInnerContent(fragment, { html: true });
-    element.setAttribute("pierced", "");
+    if (fragment.ok) {
+      element.setInnerContent(fragment.body, { html: true });
+      element.setAttribute("pierced", "succeed");
+    } else {
+      element.setAttribute("pierced", "failed");
+    }
   }
 }
 
@@ -37,8 +40,9 @@ export class FragmentTemplatesAppender {
 
   element(element: Element) {
     for (const [fragmentId, fragment] of this.fragments) {
+      if (!fragment.ok) continue;
       element.append(
-        `<template id="${fragmentId}" class="${CLASS_NAME_FOR_GATEWAY_CACHE}" >${fragment}</template>`,
+        `<template id="${fragmentId}" class="${CLASS_NAME_FOR_GATEWAY_CACHE}" >${fragment.body}</template>`,
         {
           html: true,
         }

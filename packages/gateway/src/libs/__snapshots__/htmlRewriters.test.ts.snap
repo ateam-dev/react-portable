@@ -13,6 +13,7 @@ exports[`htmlRewriters > FragmentTemplatesAppender > fulfilled fragmentIdsMap 1`
     <react-portable entry=\\"f3:/component3\\">has inner text</react-portable>
     <react-portable>this is bad component (no entry attribute)</react-portable>
     <react-portablee entry=\\"f3:/component3\\">this is bad component (typo)</react-portablee>
+    <react-portable entry=\\"f4:/component4\\">this is bad component (response status is 404)</react-portable>
   </body>
 </html>
 "
@@ -26,11 +27,12 @@ exports[`htmlRewriters > ReactPortablePiercer > fulfilled fragmentIdsMap 1`] = `
   </head>
   <body>
     <h1>dummy page</h1>
-    <react-portable entry=\\"f1:/component1\\" gateway=\\"https://gw1.com\\" pierced=\\"\\"><react-portable-fragment>this is component1</react-portable-fragment></react-portable>
-    <react-portable entry=\\"f2:/component2\\" pierced=\\"\\"><react-portable-fragment>this is component2</react-portable-fragment></react-portable>
-    <react-portable entry=\\"f3:/component3\\" pierced=\\"\\"><react-portable-fragment>this is component3</react-portable-fragment></react-portable>
+    <react-portable entry=\\"f1:/component1\\" gateway=\\"https://gw1.com\\" pierced=\\"succeed\\"><react-portable-fragment>this is component1</react-portable-fragment></react-portable>
+    <react-portable entry=\\"f2:/component2\\" pierced=\\"succeed\\"><react-portable-fragment>this is component2</react-portable-fragment></react-portable>
+    <react-portable entry=\\"f3:/component3\\" pierced=\\"succeed\\"><react-portable-fragment>this is component3</react-portable-fragment></react-portable>
     <react-portable>this is bad component (no entry attribute)</react-portable>
     <react-portablee entry=\\"f3:/component3\\">this is bad component (typo)</react-portablee>
+    <react-portable entry=\\"f4:/component4\\" pierced=\\"failed\\">this is bad component (response status is 404)</react-portable>
   </body>
 </html>
 "
