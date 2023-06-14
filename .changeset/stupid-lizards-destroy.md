@@ -5,4 +5,4 @@
 "@react-portable/core": minor
 ---
 
-support error handler on data loader function
+Support error handling within data loader
