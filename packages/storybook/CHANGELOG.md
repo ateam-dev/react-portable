@@ -1,5 +1,16 @@
 # @react-portable/storybook
 
+## 0.2.0
+
+### Minor Changes
+
+- [#25](https://github.com/ateam-dev/react-portable/pull/25) [`3190319`](https://github.com/ateam-dev/react-portable/commit/3190319d3c0cde8c8344a7f5f3cf508106a76d6c) Thanks [@aiji42](https://github.com/aiji42)! - Support error handling within data loader
+
+### Patch Changes
+
+- Updated dependencies [[`3190319`](https://github.com/ateam-dev/react-portable/commit/3190319d3c0cde8c8344a7f5f3cf508106a76d6c)]:
+  - @react-portable/core@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes
