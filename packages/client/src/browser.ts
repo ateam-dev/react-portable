@@ -1,3 +1,2 @@
-import { registerReactPortable } from "./register";
-
-registerReactPortable();
+import "./react-portable/browser";
+import "./react-portable-preview/browser";

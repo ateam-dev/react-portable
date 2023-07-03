@@ -8,8 +8,8 @@ import {
   test,
   vi,
 } from "vitest";
-import { createFragmentId } from "./react-portable";
-import { registerReactPortable } from "./register";
+import { ReactPortable } from "./element";
+import { register } from "./register";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { setTimeout } from "node:timers/promises";
@@ -53,7 +53,7 @@ const prepare = async (
 ) => {
   for (const { innerHTML, gateway, entry } of templates) {
     const template = document.createElement("template");
-    template.id = createFragmentId(entry, gateway);
+    template.id = ReactPortable.createFragmentId(entry, gateway);
     template.className = "react-portable-gateway-cache";
     template.innerHTML = innerHTML;
     document.head.appendChild(template);
@@ -85,7 +85,7 @@ const prepare = async (
 };
 
 beforeAll(() => {
-  registerReactPortable();
+  register();
   server.listen({ onUnhandledRequest: "error" });
 });
 beforeEach(() => {
