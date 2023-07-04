@@ -1,10 +1,11 @@
 import {
+  ActivateReactPortablePreviewReplacer,
   FragmentBaseReplacer,
   FragmentTemplatesAppender,
   ReactPortablePiercer,
 } from "./htmlRewriters";
-import { createFragmentId } from "@react-portable/client";
-import { beforeEach, describe, expect, test } from "vitest";
+import { ReactPortable } from "@react-portable/client/web-components";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { FragmentMap } from "./fragments";
 
 const hostDummyResponseBody = `<!DOCTYPE html>
@@ -26,7 +27,7 @@ const hostDummyResponseBody = `<!DOCTYPE html>
 
 const fragmentIdMapping: FragmentMap = new Map([
   [
-    createFragmentId("f1:/component1", "https://gw1.com"),
+    ReactPortable.createFragmentId("f1:/component1", "https://gw1.com"),
     {
       ok: true,
       body: `<react-portable-fragment>this is component1</react-portable-fragment>`,
@@ -35,7 +36,7 @@ const fragmentIdMapping: FragmentMap = new Map([
     },
   ],
   [
-    createFragmentId("f2:/component2"),
+    ReactPortable.createFragmentId("f2:/component2"),
     {
       ok: true,
       body: `<react-portable-fragment>this is component2</react-portable-fragment>`,
@@ -44,7 +45,7 @@ const fragmentIdMapping: FragmentMap = new Map([
     },
   ],
   [
-    createFragmentId("f3:/component3"),
+    ReactPortable.createFragmentId("f3:/component3"),
     {
       ok: true,
       body: `<react-portable-fragment>this is component3</react-portable-fragment>`,
@@ -53,7 +54,7 @@ const fragmentIdMapping: FragmentMap = new Map([
     },
   ],
   [
-    createFragmentId("f4:/component4"),
+    ReactPortable.createFragmentId("f4:/component4"),
     {
       ok: false,
       body: null,
@@ -208,6 +209,31 @@ describe("htmlRewriters", () => {
           rewriter.transform(response).text()
         ).rejects.toThrowError();
       });
+    });
+  });
+
+  describe("ActivateReactPortablePreviewReplacer", () => {
+    test("insert the activate script for react-portable-preview", async () => {
+      const activator = new ActivateReactPortablePreviewReplacer();
+      const rewriter = new HTMLRewriter().on(activator.selector, activator);
+
+      const response = new Response(`<!DOCTYPE html>
+<html>
+  <head>
+    <title>dummy page title</title>
+  </head>
+  <body></body>
+</html>
+`);
+
+      expect(await rewriter.transform(response).text()).toBe(`<!DOCTYPE html>
+<html>
+  <head>
+    <title>dummy page title</title>
+  <script>activate script</script></head>
+  <body></body>
+</html>
+`);
     });
   });
 });

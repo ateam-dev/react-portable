@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import workers, { Env } from "./worker";
-import * as swr from "./libs/swr";
+import * as swr from "../libs/swr";
 import { parse } from "node-html-parser";
-import { gateway } from "./index";
+import { gateway } from "../index";
 
 const bindings: Env = getMiniflareBindings();
 

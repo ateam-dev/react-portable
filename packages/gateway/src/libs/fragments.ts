@@ -1,5 +1,5 @@
 import { FragmentBaseReplacer } from "./htmlRewriters";
-import { parseFragmentId as _parseFragmentId } from "@react-portable/client";
+import { ReactPortable } from "@react-portable/client/web-components";
 
 export type FragmentMap = Map<
   string,
@@ -60,7 +60,7 @@ export const getFragmentsForPiercing = async (
 };
 
 const parseFragmentId = (id: string) => {
-  const { entry, gateway } = _parseFragmentId(id);
+  const { entry, gateway } = ReactPortable.parseFragmentId(id);
   const [, code, path] = entry.match(/^([^:]+):(.+)$/) ?? [];
   if (!code || !path) throw new Error(`invalid entry ${entry}`);
 

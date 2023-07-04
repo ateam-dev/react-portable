@@ -1,4 +1,4 @@
-import { gateway } from "./index";
+import { gateway } from "../index";
 
 export type Env = {
   ORIGIN: string;
