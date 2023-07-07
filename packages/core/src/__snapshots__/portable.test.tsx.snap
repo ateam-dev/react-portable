@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`portable > hoge 1`] = `
+<DocumentFragment>
+  <react-portable-preview
+    code="foo"
+  >
+    <div>
+      sample foo
+    </div>
+  </react-portable-preview>
+</DocumentFragment>
+`;
+
+exports[`portable > the component will NOT be wrapped by react-portable-preview when \`disablePreview\` is specified true 1`] = `
+<DocumentFragment>
+  <div>
+    sample
+  </div>
+</DocumentFragment>
+`;
+
+exports[`portable > the component will be wrapped by react-portable-preview 1`] = `
+<DocumentFragment>
+  <react-portable-preview
+    code="foo"
+  >
+    <div>
+      sample
+    </div>
+  </react-portable-preview>
+</DocumentFragment>
+`;

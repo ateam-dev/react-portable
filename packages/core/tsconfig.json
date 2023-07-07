@@ -1,7 +1,13 @@
 {
-  "compilerOptions": {},
-  "references": [
-    { "path": "tsconfig.cli.json"},
-    { "path": "tsconfig.qwik.json"}
-  ]
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "CommonJS",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "outDir": "dist"
+  },
+  "include": ["src"]
 }

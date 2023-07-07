@@ -1,9 +1,8 @@
-/// <reference types="@react-portable/core" />
 import { serveStatic } from "hono/cloudflare-workers";
 import qwikCityPlan from "@qwik-city-plan";
 import { qwikMiddleware } from "@hono/qwik-city";
 import { Context, Hono, Next } from "hono";
-import render from "@entry";
+import render from "./entry.ssr";
 
 const sha1 = async (message: string) => {
   const encoder = new TextEncoder();
@@ -35,7 +34,7 @@ const etagAdapter = async (c: Context, next: Next) => {
 
 const app = new Hono();
 app.get("*", etagAdapter);
-app.get("*", qwikMiddleware({ render, qwikCityPlan }));
+app.all("*", qwikMiddleware({ render, qwikCityPlan }));
 app.get("*", serveStatic({ root: "./" }));
 
 export default app;

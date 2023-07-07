@@ -1,3 +1,4 @@
+/** @jsxImportSource @builder.io/qwik */
 import {
   renderToStream,
   type RenderToStreamOptions,
