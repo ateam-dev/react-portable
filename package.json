@@ -6,10 +6,10 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "turbo run build --filter=@react-portable/*",
-    "build:watch": "turbo run build:watch --filter=@react-portable/*",
+    "watch": "turbo run watch --filter=@react-portable/*",
     "start": "turbo run start --filter=examples-*",
-    "test": "turbo run test",
-    "test:coverage": "turbo run test:coverage",
+    "test": "turbo run test --filter=@react-portable/*",
+    "test:coverage": "turbo run test:coverage --filter=@react-portable/*",
     "typecheck": "turbo run typecheck",
     "cp-readme": "for dir in ./packages/*/; do cp ./README.md \"$dir\"; done",
     "release": "yarn build && yarn cp-readme && changeset version && changeset publish"

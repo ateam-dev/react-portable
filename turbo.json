@@ -3,9 +3,9 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "bin/**", ".next/**", "!.next/cache/**", ".rp/**"]
+      "outputs": ["dist/**", "browser/**", ".next/**", "!.next/cache/**", ".portable/**"]
     },
-    "build:watch": {
+    "watch": {
       "dependsOn": ["^build"],
       "persistent": true
     },
