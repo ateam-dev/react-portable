@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import Header from "./Header";
-import * as ReactPotable from "./header.rp";
 import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {
@@ -10,4 +9,4 @@ const meta: Meta = {
 
 export default meta;
 
-export const Default = reactPortableStory("/header", ReactPotable);
+export const Default = reactPortableStory(Header);

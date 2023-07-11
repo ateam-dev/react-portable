@@ -1,15 +1,17 @@
 {
   "name": "examples-tailwind-ui",
   "private": true,
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "version": "0.0.0",
   "scripts": {
-    "build": "react-portable build",
-    "start": "wrangler dev --port 3001",
-    "preview:build": "react-portable watch --preBuilt",
-    "preview:worker": "wrangler dev --port 3001",
-    "preview": "yarn build && run-p preview:*",
+    "build": "vite build",
+    "portable:build": "portable build",
+    "portable:dev": "wrangler dev --port 3001 --live-reload",
+    "preview": "wrangler dev --port 3001",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "storybook:build": "storybook build"
   },
   "dependencies": {
     "@builder.io/qwik-react": "0.5.0",

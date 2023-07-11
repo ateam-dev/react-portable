@@ -1,6 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { Pokemon } from "./Pokemon";
-import * as ReactPortable from "./pokemon.rp";
 import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {
@@ -10,17 +9,22 @@ const meta: Meta = {
 
 export default meta;
 
-export const reactPortable: StoryObj = {
-  ...reactPortableStory("/pokemon", ReactPortable, {
-    paramKeys: ["code"],
+export const Default: StoryObj<typeof Pokemon> = {
+  args: {
+    name: "bulbasaur",
+    imgSrc:
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+    types: ["grass", "poison"],
+  },
+};
+
+export const Portable = {
+  ...reactPortableStory(Pokemon, {
+    paramKeys: ["id"],
   }),
   argTypes: {
-    code: {
-      control: { type: "select" },
-      options: ["bulbasaur", "ivysaur", "venusaur", "charmander"],
+    id: {
+      control: { type: "number" },
     },
-  },
-  args: {
-    code: "bulbasaur",
   },
 };

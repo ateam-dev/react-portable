@@ -7,7 +7,9 @@
     "strict": true,
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "skipLibCheck": true,
+    "outDir": "dist"
   },
   "include": ["src"]
 }

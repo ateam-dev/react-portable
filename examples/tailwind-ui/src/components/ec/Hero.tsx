@@ -1,4 +1,7 @@
-export default function Example() {
+import { portable } from "@react-portable/core";
+import "../../global.css";
+
+function Hero() {
   return (
     <div className="relative overflow-hidden bg-white">
       <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
@@ -93,3 +96,5 @@ export default function Example() {
     </div>
   );
 }
+
+export default portable(Hero, "hero");

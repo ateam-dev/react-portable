@@ -1,6 +1,10 @@
 name = "react-portable"
-main = ".rp/server/worker.mjs"
+main = ".portable/server/worker.mjs"
 compatibility_date = "2023-05-10"
 
+[build]
+command = "npx portable build --continuous"
+watch_dir = "src"
+
 [site]
-bucket = ".rp/client"
+bucket = ".portable/client"
