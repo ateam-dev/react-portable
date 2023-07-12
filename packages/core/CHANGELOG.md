@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.3.0
+
+### Minor Changes
+
+- [#38](https://github.com/ateam-dev/react-portable/pull/38) [`80b57ce`](https://github.com/ateam-dev/react-portable/commit/80b57ce375318a1e8a229f4f55fd3902358f8c80) Thanks [@aiji42](https://github.com/aiji42)! - add feature for preview components on deployed page
+
 ## 0.2.0
 
 ### Minor Changes
