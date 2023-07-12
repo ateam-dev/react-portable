@@ -54,8 +54,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { registerReactPortable } from '@react-portable/client'; // [!code ++]
-registerReactPortable();                                        // [!code ++]
+import { reactPortableRegister } from '@react-portable/client/web-components' // [!code ++]
+registerReactPortable();                                                      // [!code ++]
 
 ReactDOM.render(
   <React.StrictMode>
@@ -89,7 +89,7 @@ The entry attribute is composed of two parts: `code` and `path`, formatted as `$
   ```
   :::
 - `path`: This is the URL path part for accessing the component on the Component Delivering System.
-    - Basically, it will be the filename of [the entry point file](/introduction/component-delivering-system.html#prepare-entry-point-file); `{path}.rp.ts`
+    - The unique string passed as the second argument to `portable` is it (`portable(Component, 'path')`)
 
 ---
 
