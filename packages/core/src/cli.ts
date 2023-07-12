@@ -25,8 +25,8 @@ program
   .description("build scripts for react portable")
   .option(
     "--continuous",
-    "Watch the specified (glob format) path and rebuild if there are any changes. default: ./src/**/*",
-    false
+    "Disables cleanup of the destination directory before build. This prevents the server from temporarily losing referenced files during continuous builds with file change watching.",
+    false,
   )
   .action(async ({ continuous }) => {
     await buildClient();
