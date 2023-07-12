@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "main": "./dist/index.mjs",
@@ -22,7 +22,9 @@
   },
   "typesVersions": {
     "*": {
-      "web-components": ["./dist/web-components.d.ts"]
+      "web-components": [
+        "./dist/web-components.d.ts"
+      ]
     }
   },
   "files": [
