@@ -74,7 +74,6 @@ export default preview;
 ```ts [Pokemon.stories.ts]
 import { Meta, StoryObj } from "@storybook/react";
 import { Pokemon } from "./Pokemon";
-import * as ReactPortable from "./pokemon.rp";
 import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {
@@ -85,7 +84,7 @@ const meta: Meta = {
 export default meta;
 
 export const reactPortable: StoryObj = {
-  ...reactPortableStory("/pokemon", ReactPortable, {
+  ...reactPortableStory(ReactPortable, {
     paramKeys: ["code"],
   }),
   argTypes: {
@@ -100,14 +99,20 @@ export const reactPortable: StoryObj = {
 };
 ```
 
-```ts [pokemon.rp.ts]
-import { Pokemon } from "./Pokemon";
-import { Strategy, Loader } from "@react-portable/core";
-import { ComponentProps } from "react";
+```ts [Pokemon.tsx]
+import { portable, Strategy, Loader } from "@react-portable/core";
 
-export default Pokemon;
+type Props = { 
+  imgSrc: string; 
+  name: string; 
+  types: string[]
+}
 
-export const loader: Loader<ComponentProps<typeof Pokemon>> = async (
+const Component = (props: Props) => {
+  /* component for displaying a pokemon */ 
+};
+
+const loader: Loader<Props> = async (
   req: Request
 ) => {
   const search = new URL(req.url).searchParams;
@@ -122,6 +127,8 @@ export const loader: Loader<ComponentProps<typeof Pokemon>> = async (
   };
 };
 
-export const strategy: Strategy = { revalidate: 60, hydrate: "disable" };
+const strategy: Strategy = { revalidate: 60, hydrate: "disable" };
+
+export const Pokemon = portable(Component, 'pokemon', { loader, strategy })
 ```
 :::

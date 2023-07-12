@@ -26,17 +26,56 @@ yarn add -D wrangler
 
 ### Initialize
 
-```bash
-npx react-portable init
+Add `wrangler.toml` in your project.
+```toml
+name = "react-portable"
+main = ".portable/server/worker.mjs"
+compatibility_date = "2023-05-10"
+
+[build]
+command = "npx portable build --continuous"
+watch_dir = "src" # Change it to fit the structure of your project
+
+[site]
+bucket = ".portable/client"
 ```
 
-Several files, including configuration files, will be located.
+Add `scripts` in your `package.json`
 
-![npx react-portable init](/npx-react-portable-init.png)
+```json
+"scripts": {
+  "portable:build": "portable build",
+  "portable:dev": "wrangler dev --live-reload",
+  "portable:preview": "wrangler dev",
+}
+```
 
-::: tip
-By default, React Portable stores its dev server output, and the production build output in `.rp`. If using Git, you should add them to your `.gitignore` file. These locations can also be [configured](/customizations/react-portable-core-configurations).
-:::
+Update your `vite.config.ts`; add the plugin `reactPortablePlugin`
+
+```ts
+import { defineConfig } from "vite";
+import { reactPortablePlugin } from "@react-portable/core/vite";
+
+export default defineConfig({
+  plugins: [
+    reactPortablePlugin({ prepare: true }),
+    // your vite plugins
+  ],
+  // your vite configure
+});
+```
+
+Add `vite.portable.config.ts` in your project
+
+```ts
+import { defineConfig } from "vite";
+import { reactPortablePlugin } from "@react-portable/core/vite";
+
+export default defineConfig({
+  // If you need any plugins (e.g. vite-tsconfig-paths) to build the components, add them
+  plugins: [reactPortablePlugin()],
+});
+```
 
 ## Deliver Your Components
 
@@ -44,52 +83,55 @@ It's very easy to deliver your components, since you you've installed React Port
 
 Your components are automatically server-side-rendered (SSR) during delivery. Also, you can perform Incremental Static Regeneration (ISR) on components with data loaded from an API server. In addition, you can control the timing of hydration on the client.
 
-### Prepare Entry Point File
+### Wrap your components by `portable`
 
-First, prepare the entry point files. React Portal treats files with extensions `.rp.ts(x)` or `.rp.js(x)` as the entry points for delivering components. 
-Then, name of the file becomes part of the delivery URL. For example, if you prepare `foo.rp.ts`, you can access the component using `/foo` 
+Let's take the following React component as an example:
 
-```
-├─ src
-│  └─ components
-│     ├─ Component1
-│     │   ├─ Component1.tsx
-│     │   ├─ Component1.stories.tsx
-│     │   ├─ Component1.test.tsx
-│     │   └─ component1.rp.ts => delivered by https://your.host/component1
-│     └─ Component2
-│         ├─ Component2.tsx
-│         ├─ Component2.stories.tsx
-│         ├─ Component2.test.tsx
-│         └─ component2.rp.ts => delivered by https://your.host/component2
+```tsx
+export const Example = () => {
+  return (
+    <div>
+      {/* content omitted for brevity */}
+    </div>
+  )
+}
 ```
 
-::: tip
-You can place everywhere the entry point files within the src directory. `src/` can also be [configured](/customizations/react-portable-core-configurations).
+To use the portable function, we first need to import it from the '@react-portable/core' library, and then wrap our component with it as follows:
+
+```tsx
+import { portable } from '@react-portable/core'
+
+const Component = () => {
+  return (
+    <div>
+      {/* content omitted for brevity */}
+    </div>
+  )
+}
+
+export const Example = portable(Component, 'example')
+```
+
+In this example, the portable function is being used to wrap the `Component`. The first argument to portable is the component you want to make portable, and the second argument is a string that serves as a unique identifier for the component.
+
+::: warning
+The second argument to portable must be a unique identifier within your project. This uniqueness helps '@react-portable/core' to track and manage your portable components efficiently. If two components share the same identifier, it will lead to conflicts and unexpected behavior. Therefore, always ensure that each portable component has a unique identifier.
 :::
-
-Export the component you want to deliver as default export in the entry file.
-
-```ts
-import { Component } from './your-comopnent'
-
-export default Component
-```
 
 #### Loader
 
-When data fetching is required during Server Side Rendering (SSR) for a component, export the `loader` function as a named export. This function is invoked before SSR and passes returned values to the component as props.
+When data fetching is required during Server Side Rendering (SSR) for a component, pass the `loader` function. This function is invoked before SSR and passes returned values to the component as props.
 
 ```ts
-import { Loader } from '@react-portable/core'
-import { Component, ComponentProps } from './your-comopnent'
-
-export default Component
+import { portable, Loader } from '@react-portable/core'
 
 export const loader: Loader<ComponentProps> = async (request) => {
   // ...data fetch from an API server
   return { ... } // ComponentProps
 }
+
+export const Example = portable(Component, 'example', { loader })
 ```
 
 ##### Error Handling
@@ -97,10 +139,7 @@ export const loader: Loader<ComponentProps> = async (request) => {
 When handling errors within `loader`, throw or return `ctx.error` with the appropriate status code and message as arguments.
 
 ```ts
-import { Loader } from '@react-portable/core'
-import { Component, ComponentProps } from './your-comopnent'
-
-export default Component
+import { portable, Loader } from '@react-portable/core'
 
 export const loader: Loader<ComponentProps> = async (request, ctx) => {
   try {
@@ -110,21 +149,24 @@ export const loader: Loader<ComponentProps> = async (request, ctx) => {
     throw ctx.error(404, e.message)
   }
 }
+
+export const Example = portable(Component, 'example', { loader })
 ```
 
 When embedding the component on a page through the Gateway, if the loader returns a status other than 2xx via ctx.error, the component will not be displayed. Instead, the error will be displayed in the browser's console.
 
 #### Strategy
 
-You can apply various configurations by exporting the `strategy` object as a named export.
+You can apply various configurations by passing the `strategy` object.
 
 ::: tip
 When you do not specify `strategy`, it is same as the following value.
 ```ts
-export const strategy = {
+const strategy = {
   revalidate: 0,
-  hydrate: 'disable'
+  hydrate: 'onIdle'
 }
+export const Example = portable(Component, 'example', { strategy })
 ```
 :::
 
@@ -142,40 +184,34 @@ If you redeploy the component delivering system, the cache becomes stale regardl
 :::
 
 ```ts
-import { loader, Strategy } from '@react-portable/core'
-import { Component, ComponentProps } from './your-comopnent'
-
-export default Component
+import { portable, Loader, Strategy } from '@react-portable/core'
 
 export const loader: Loader<ComponentProps> = async (request) => {
   // ...data fetch from an API server
   return { ... } // ComponentProps
 }
 
-export const strategy: Strategy = {
+const strategy: Strategy = {
   // The cache is used for 60 seconds.
   // After 60 seconds, the cache will be regenerated, but it will still be used until the regeneration process is completed.
   revalidate: 60
 }
+
+export const Example = portable(Component, 'example', { loader, strategy })
 ```
 
 ##### Timing of Hydration
 
 By controlling the timing of component hydration on the client with the `hydrate` option, you can avoid loading unnecessary scripts.
 
-- `disable`: (default) No hydration is required for static components.
-- `onIdle`: Hydration will occur after the browser becomes idle.
+- `disable`: No hydration is required for static components.
+- `onIdle`: (default) Hydration will occur after the browser becomes idle.
 - `onUse`: Hydration will occur when thr component is hovered over or focused on.
 
 ```ts
-import { Strategy } from '@react-portable/core'
-import { SomeInteractiveComponent } from './your-comopnent'
+import { portable } from '@react-portable/core'
 
-export default SomeInteractiveComponent
-
-export const strategy: Strategy = {
-  hydarate: 'onUse'
-}
+export const Example = portable(Component, 'example', { strategy: { hydarate: 'onUse' } })
 ```
 
 #### Styling
@@ -188,13 +224,13 @@ Since React Portable uses Vite for building, it supports the styling methods off
 ##### Tailwind
 React Portable also supports Tailwind. Follow the official [documentation for setup](https://tailwindcss.com/docs/guides/vite).
 
-You can apply styles by importing into your entry point file.
+You can apply styles by importing into your component files.
 
 ```ts {1} 
 import './index.css'
-import { Component } from './your-comopnent'
+import { portable } from '@react-portable/core'
 
-export default Component
+export const Example = portable(Component, 'example')
 ```
 
 #### Env Variables
@@ -202,40 +238,6 @@ export default Component
 If you want to use environment variables, follow the rules for using environment variables in Vite.
 
 [Env - Vite](https://vitejs.dev/guide/env-and-mode.html#env-files)
-
-### Build & Launch Server
-
-#### Build
-
-```bash
-npx react-portable build
-```
-
-#### Watch mode
-
-```bash
-npx react-portable watch
-```
-
-#### Start Server
-
-```bash
-npx wrangler dev
-```
-
-[dev command - Cloudflare Workers](https://developers.cloudflare.com/workers/wrangler/commands/#dev)
-
-:::tip
-By configuring the following scripts in the `package.json`, you can restart the server whenever the components are changed. (You need to install `npm-run-all`.)
-
-```json [package.json]
-"scripts": {
-  "preview:build": "react-portable watch --preBuilt",
-  "preview:worker": "wrangler dev --port 3001",
-  "preview": "yarn build && run-p preview:*",
-}
-```
-:::
 
 ## Deployment
 

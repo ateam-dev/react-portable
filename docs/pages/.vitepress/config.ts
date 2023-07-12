@@ -45,15 +45,6 @@ export default defineConfig({
           },
         ],
       },
-      {
-        text: "Customizations",
-        items: [
-          {
-            text: "react-portable.config.js",
-            link: "/customizations/react-portable-core-configurations",
-          },
-        ],
-      },
     ],
 
     socialLinks: [
