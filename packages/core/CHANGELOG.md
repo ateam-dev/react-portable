@@ -1,5 +1,13 @@
 # @react-portable/core
 
+## 0.3.1
+
+### Patch Changes
+
+- [#43](https://github.com/ateam-dev/react-portable/pull/43) [`72048f5`](https://github.com/ateam-dev/react-portable/commit/72048f55022be5f79d95dee3be87bae3344a46bc) Thanks [@aiji42](https://github.com/aiji42)! - bumpup and remove `@builder.io/qwik` and `@builder.io/qwik-city` from core dependencies
+
+- [#41](https://github.com/ateam-dev/react-portable/pull/41) [`4b6a803`](https://github.com/ateam-dev/react-portable/commit/4b6a8032cdf724302bf89688d4c62c02b96fe48e) Thanks [@aiji42](https://github.com/aiji42)! - fix cli option description
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @react-portable/gateway
 
+## 0.3.1
+
+### Patch Changes
+
+- [#43](https://github.com/ateam-dev/react-portable/pull/43) [`72048f5`](https://github.com/ateam-dev/react-portable/commit/72048f55022be5f79d95dee3be87bae3344a46bc) Thanks [@aiji42](https://github.com/aiji42)! - bumpup and remove `@builder.io/qwik` and `@builder.io/qwik-city` from core dependencies
+
 ## 0.3.0
 
 ### Minor Changes
