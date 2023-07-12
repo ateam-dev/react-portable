@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useId } from "react";
-import { registerReactPortable } from "./register";
+import { register } from "./register";
 
 export const ReactPortable = ({
   entry,
@@ -13,7 +13,7 @@ export const ReactPortable = ({
   const ref = useRef("");
   if (!isMounted && typeof window !== "undefined") {
     ref.current = document.getElementById(id)?.innerText ?? "";
-    registerReactPortable();
+    register();
   }
 
   return (

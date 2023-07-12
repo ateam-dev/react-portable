@@ -1,6 +1,5 @@
 import React from "react";
-import type { JSXElementConstructor } from "react";
-import type { Strategy, Loader } from "@react-portable/core";
+import type { Loader, PortableComponent } from "@react-portable/core";
 import { PARAM_KEY } from "./constants";
 import { Params } from "./Panel";
 import { Fallback } from "./components/Fallback";
@@ -19,16 +18,13 @@ type ErrorFunction = Parameters<Loader>[1]["error"];
 const error = ((status: number, message: string) =>
   new CustomError(status, message)) as ErrorFunction;
 
-export const reactPortableStory = (
-  path: string,
-  mods: {
-    default: keyof JSX.IntrinsicElements | JSXElementConstructor<any>;
-    strategy?: Strategy;
-    loader?: Loader;
-  },
+type InferProps<T> = T extends PortableComponent<infer U> ? U : never;
+
+export const reactPortableStory = <T extends PortableComponent<any>>(
+  component: T,
   params?: Pick<Params, "paramKeys">
 ) => {
-  const Component = mods.default;
+  const Component = component;
   return {
     render: (
       args: unknown,
@@ -37,7 +33,7 @@ export const reactPortableStory = (
           ok: boolean;
           status: number;
           message: string;
-          data: Record<string, any> | null;
+          data: InferProps<T> | null;
         };
       }
     ) => {
@@ -50,7 +46,8 @@ export const reactPortableStory = (
         const search = new URLSearchParams(context.args);
         url.search = search.toString();
         try {
-          const res = (await mods.loader?.(new Request(url), { error })) ?? {};
+          const res =
+            (await component.__loader?.(new Request(url), { error })) ?? {};
           if (res instanceof CustomError) throw res;
           return { status: 200, message: "", data: res, ok: true };
         } catch (e) {
@@ -68,8 +65,8 @@ export const reactPortableStory = (
     ],
     parameters: {
       [PARAM_KEY]: {
-        strategy: mods.strategy,
-        path,
+        strategy: component.__strategy,
+        path: `/${component.__code}`,
         ...params,
       },
     },

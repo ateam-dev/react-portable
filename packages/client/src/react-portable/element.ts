@@ -1,11 +1,11 @@
 import WritableDOM from "writable-dom";
-import type { DOMAttributes } from "react";
+import { DetailedHTMLProps, HTMLAttributes } from "react";
 
 const promiseStore = new Map<string, Promise<Response> | Response>();
 
 const restoreGatewayCache = () => {
   const templates = document.querySelectorAll<HTMLTemplateElement>(
-    `.${CLASS_NAME_FOR_GATEWAY_CACHE}`
+    `.${ReactPortable.CLASS_NAME_FOR_GATEWAY_CACHE}`
   );
 
   Array.from(templates).forEach((template) => {
@@ -33,6 +33,9 @@ export class ReactPortable extends HTMLElement {
   private fragmentId = "";
   public pierced = false;
   public failed = false;
+
+  static readonly CUSTOM_HEADER_KEY_GATEWAY = "X-React-Portable-Gateway";
+  static readonly CLASS_NAME_FOR_GATEWAY_CACHE = "react-portable-gateway-cache";
 
   constructor() {
     restoreGatewayCache();
@@ -71,7 +74,7 @@ export class ReactPortable extends HTMLElement {
       throw new Error(
         "The react portable component has been applied without `entry`"
       );
-    this.fragmentId = createFragmentId(entry, gateway);
+    this.fragmentId = ReactPortable.createFragmentId(entry, gateway);
 
     return true;
   }
@@ -80,7 +83,7 @@ export class ReactPortable extends HTMLElement {
     const fragment = await this.fetchFragmentStream();
     if (!fragment.body || !fragment.ok) {
       this.setAttribute("pierced", "failed");
-      const { entry, gateway } = parseFragmentId(this.fragmentId);
+      const { entry, gateway } = ReactPortable.parseFragmentId(this.fragmentId);
       throw new Error(
         `Failed to retrieve fragment (entry: ${entry}, gateway: ${
           gateway ?? "-"
@@ -91,14 +94,15 @@ export class ReactPortable extends HTMLElement {
   }
 
   private async fetchFragmentStream() {
-    const { entry, gateway } = parseFragmentId(this.fragmentId);
+    const { entry, gateway } = ReactPortable.parseFragmentId(this.fragmentId);
     const { code, path } = parseEntry(entry);
 
     const url = `${
       gateway ?? window.location.origin
     }/_fragments/${code}${path}`;
     const request = new Request(url);
-    if (gateway) request.headers.set(CUSTOM_HEADER_KEY_GATEWAY, gateway);
+    if (gateway)
+      request.headers.set(ReactPortable.CUSTOM_HEADER_KEY_GATEWAY, gateway);
 
     return fetcher(request, this.fragmentId);
   }
@@ -110,23 +114,18 @@ export class ReactPortable extends HTMLElement {
 
     this.setAttribute("pierced", "");
   }
+
+  static createFragmentId(entry: string, gateway?: string | null): string {
+    return btoa(JSON.stringify({ entry, gateway: gateway ?? null }));
+  }
+
+  static parseFragmentId(text: string): {
+    entry: string;
+    gateway: string | null;
+  } {
+    return JSON.parse(atob(text));
+  }
 }
-
-export const createFragmentId = (
-  entry: string,
-  gateway?: string | null
-): string => {
-  return btoa(JSON.stringify({ entry, gateway: gateway ?? null }));
-};
-
-export const parseFragmentId = (
-  text: string
-): { entry: string; gateway: string | null } => {
-  return JSON.parse(atob(text));
-};
-
-export const CUSTOM_HEADER_KEY_GATEWAY = "X-React-Portable-Gateway";
-export const CLASS_NAME_FOR_GATEWAY_CACHE = "react-portable-gateway-cache";
 
 const parseEntry = (text: string): { code: string; path: string } => {
   const [, code, path] = text.match(/^([^:]+):(.+)$/) ?? [];
@@ -138,21 +137,18 @@ const parseEntry = (text: string): { code: string; path: string } => {
   return { code, path };
 };
 
+interface ReactPortableAttributes {
+  gateway?: string;
+  entry: string;
+}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      "react-portable": ReactPortableAttributes;
+      "react-portable": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement> & ReactPortableAttributes,
+        ReactPortable
+      >;
     }
-
-    type ReactPortableAttributes = {
-      gateway?: string;
-      entry: string;
-    } & Partial<
-      ReactPortable &
-        DOMAttributes<ReactPortable> & {
-          "fragment-fetch-params"?: string;
-          [onProp: `on${string}`]: Function | undefined;
-        }
-    >;
   }
 }

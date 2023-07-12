@@ -1,8 +1,7 @@
-import {
-  CLASS_NAME_FOR_GATEWAY_CACHE,
-  createFragmentId,
-} from "@react-portable/client";
+import { ReactPortable } from "@react-portable/client/web-components";
+import { CLASS_NAME_FOR_GATEWAY_CACHE } from "./constants";
 import { FragmentMap } from "./fragments";
+import inline from "@react-portable/client/dist/browser.umd?raw";
 
 // handler for <react-portable />
 export class ReactPortablePiercer {
@@ -17,7 +16,7 @@ export class ReactPortablePiercer {
 
     if (!entry) return;
 
-    const fragmentId = createFragmentId(entry, gateway);
+    const fragmentId = ReactPortable.createFragmentId(entry, gateway);
     this.fragmentIds.add(fragmentId);
 
     const fragment = this.fragments.get(fragmentId);
@@ -80,5 +79,13 @@ export class FragmentBaseReplacer {
         ? `${this.assetPath.replace(/\/$/, "")}${originalBasePath}`
         : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
     );
+  }
+}
+
+export class ActivateReactPortablePreviewReplacer {
+  public readonly selector = "head";
+
+  element(element: Element) {
+    element.append(`<script>${inline}</script>`, { html: true });
   }
 }

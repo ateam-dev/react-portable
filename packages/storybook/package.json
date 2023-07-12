@@ -26,9 +26,10 @@
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsup",
-    "build:watch": "yarn build --watch"
+    "watch": "tsup --watch"
   },
   "devDependencies": {
+    "@react-portable/core": "0.2.0",
     "@storybook/components": "^7.0.20",
     "@storybook/manager-api": "^7.0.20",
     "@storybook/theming": "^7.0.20",

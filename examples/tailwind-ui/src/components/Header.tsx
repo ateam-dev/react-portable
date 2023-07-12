@@ -15,6 +15,8 @@ import {
   PhoneIcon,
   PlayCircleIcon,
 } from "@heroicons/react/20/solid";
+import { portable } from "@react-portable/core";
+import "../global.css";
 
 const products = [
   {
@@ -57,7 +59,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
+function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -257,3 +259,5 @@ export default function Example() {
     </header>
   );
 }
+
+export default portable(Header, "header");

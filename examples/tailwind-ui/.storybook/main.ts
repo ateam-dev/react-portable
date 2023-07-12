@@ -7,12 +7,7 @@ const config: StorybookConfig = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "@react-portable/storybook",
-    {
-      name: "@storybook/addon-styling",
-      options: {
-        postCss: true,
-      },
-    },
+    "@storybook/addon-styling",
   ],
   framework: {
     name: "@storybook/react-vite",

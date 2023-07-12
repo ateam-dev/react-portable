@@ -10,10 +10,10 @@
     "dist"
   ],
   "scripts": {
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "NODE_NO_WARNINGS=1 vitest run",
+    "test:coverage": "NODE_NO_WARNINGS=1 vitest run --coverage",
     "build": "vite build",
-    "build:watch": "vite build --watch",
+    "watch": "vite build --watch",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

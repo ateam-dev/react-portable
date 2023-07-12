@@ -1,6 +1,6 @@
-import { ReactPortable } from "./react-portable";
+import { ReactPortable } from "./element";
 
-export const registerReactPortable = () => {
+export const register = () => {
   if (
     typeof window === "undefined" ||
     window.customElements.get("react-portable")

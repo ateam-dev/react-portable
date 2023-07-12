@@ -1,5 +1,7 @@
 import QwikView, { Props } from "../../components/ec/QwikView";
 import { useState } from "react";
+import { portable } from "@react-portable/core";
+import "../../global.css";
 
 const products_: Props["product"][] = [
   {
@@ -108,7 +110,7 @@ const products_: Props["product"][] = [
   },
 ];
 
-export default function Example() {
+function Products() {
   const [selectedProduct, setSelectProduct] = useState<Props["product"] | null>(
     null
   );
@@ -159,3 +161,5 @@ export default function Example() {
     </div>
   );
 }
+
+export default portable(Products, "products");

@@ -39,13 +39,12 @@ jobs:
           working-directory: ./packages/client
           flags: client
 
-# TODO: core test
-#      - name: 📏Report coverage (core)
-#        uses: codecov/codecov-action@v3
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          working-directory: ./packages/core
-#          flags: core
+      - name: 📏Report coverage (core)
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          working-directory: ./packages/core
+          flags: core
 
   build:
     name: 🏗Build

@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import Products from "./Products";
-import * as ReactPotable from "./ec.products.rp";
 import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {
@@ -10,4 +9,4 @@ const meta: Meta = {
 
 export default meta;
 
-export const Default = reactPortableStory("/ec/products", ReactPotable);
+export const Default = reactPortableStory(Products);

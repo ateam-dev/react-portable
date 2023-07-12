@@ -1,27 +1,15 @@
-import { ReactPortable } from "@react-portable/client";
+import React from "react";
+import { Header, Hero, Products } from "examples-tailwind-ui";
 
 export default function Home() {
   return (
     <>
-      <ReactPortable
-        gateway="http://127.0.0.1:8787"
-        entry="tailwind-ui:/header"
-      />
+      <Header />
       <main className="min-h-screen mt-2">
-        <ReactPortable
-          gateway="http://127.0.0.1:8787"
-          entry="tailwind-ui:/ec/hero"
-        />
+        <Hero />
         <div className="mt-1">
-          <ReactPortable
-            gateway="http://127.0.0.1:8787"
-            entry="tailwind-ui:/ec/products"
-          />
+          <Products />
         </div>
-        <ReactPortable
-          gateway="http://127.0.0.1:8787"
-          entry="tailwind-ui:/pokemon?code=bulbasaur"
-        />
       </main>
     </>
   );

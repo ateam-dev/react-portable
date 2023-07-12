@@ -130,8 +130,9 @@ dist
 .pnp.*
 
 # react-portable
-.rp
+.portable
 bin
+browser
 
 # wrangler
 .wrangler
