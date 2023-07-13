@@ -1,4 +1,4 @@
-import { gateway } from "@react-portable/gateway";
+import { previewGateway } from "@react-portable/gateway";
 
 export type Env = {
   ORIGIN: string;
@@ -9,11 +9,8 @@ export type Env = {
 
 export default {
   fetch: (request: Request, env: Env, ctx: ExecutionContext) => {
-    return gateway({
+    return previewGateway({
       proxy: env.ORIGIN,
-      cds: JSON.parse(env.COMPONENT_DELIVERING_SYSTEMS),
-      cors: { origin: env.ALLOW_ORIGINS.split(",") },
-      kv: env.STORE,
     })(request, env, ctx);
   },
 };
