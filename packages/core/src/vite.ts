@@ -14,7 +14,7 @@ const copyAndReplace = async (
   replacements: {
     search: string;
     replace: string;
-  }[] = []
+  }[] = [],
 ): Promise<void> => {
   await fs.mkdir(path.dirname(destPath), { recursive: true });
 
@@ -53,7 +53,7 @@ const getPortableCode = async (fileName: string) => {
     "test.ts",
     script,
     ts.ScriptTarget.Latest,
-    true
+    true,
   );
 
   if (sourceFile) return findPortableFunctionCalls(sourceFile);
@@ -77,9 +77,9 @@ export const reactPortablePlugin = ({
           ["root.tsx", "entry.ssr.tsx", "worker.ts"].map((file) => {
             return copyAndReplace(
               path.resolve(currentDir(), "../src/templates", file),
-              path.resolve(coreDir, file)
+              path.resolve(coreDir, file),
             );
-          })
+          }),
         );
         return config;
       },
@@ -96,7 +96,7 @@ export const reactPortablePlugin = ({
                 { search: "__code__", replace: code },
                 { search: "__entryPath__", replace: importer },
                 { search: "../portable", replace: "@react-portable/core" },
-              ]
+              ],
             );
           }
         }
@@ -143,6 +143,10 @@ export const reactPortablePlugin = ({
       ssr: {
         outDir: path.resolve(portableDir, "server"),
       },
+      vendorRoots: [
+        path.dirname(require.resolve("@builder.io/qwik-city")),
+        path.dirname(require.resolve("@builder.io/qwik-react")),
+      ],
     }),
     qwikReact(),
   ];

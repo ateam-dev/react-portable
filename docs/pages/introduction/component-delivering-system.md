@@ -14,12 +14,12 @@ Install React Portable in a project where you are creating and managing your com
 
 ::: code-group
 ```bash [npm]
-npm install @react-portable/core @builder.io/qwik @builder.io/qwik-city @builder.io/qwik-react
+npm install @react-portable/core
 npm install -D wrangler
 ```
 
 ```bash [yarn]
-yarn add @react-portable/core @builder.io/qwik @builder.io/qwik-city @builder.io/qwik-react
+yarn add @react-portable/core
 yarn add -D wrangler
 ```
 :::
