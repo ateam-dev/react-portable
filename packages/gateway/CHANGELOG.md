@@ -1,5 +1,12 @@
 # @react-portable/gateway
 
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`f938adc`](https://github.com/ateam-dev/react-portable/commit/f938adc5e29a314718a2dd67e598513b8d73f7c2)]:
+  - @react-portable/client@0.3.1
+
 ## 0.3.1
 
 ### Patch Changes

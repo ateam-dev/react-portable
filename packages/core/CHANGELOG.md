@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.4.0
+
+### Minor Changes
+
+- [#47](https://github.com/ateam-dev/react-portable/pull/47) [`5d32caf`](https://github.com/ateam-dev/react-portable/commit/5d32cafc27d80b99584604b15cff2c38e526c439) Thanks [@aiji42](https://github.com/aiji42)! - make manual installation of Qwik libraries unnecessary
+
 ## 0.3.1
 
 ### Patch Changes

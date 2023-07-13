@@ -1,5 +1,11 @@
 # @react-portable/client
 
+## 0.3.1
+
+### Patch Changes
+
+- [#45](https://github.com/ateam-dev/react-portable/pull/45) [`f938adc`](https://github.com/ateam-dev/react-portable/commit/f938adc5e29a314718a2dd67e598513b8d73f7c2) Thanks [@aiji42](https://github.com/aiji42)! - fix client componet `ReactPortable`
+
 ## 0.3.0
 
 ### Minor Changes
