@@ -94,6 +94,10 @@ export const reactPortablePlugin = ({
               destPath,
               [
                 { search: "__code__", replace: code },
+                {
+                  search: "__sanitized__",
+                  replace: code.replace(/[-/:;*]/g, "_"),
+                },
                 { search: "__entryPath__", replace: importer },
                 { search: "../portable", replace: "@react-portable/core" },
               ],
@@ -143,10 +147,10 @@ export const reactPortablePlugin = ({
       ssr: {
         outDir: path.resolve(portableDir, "server"),
       },
-      vendorRoots: [
-        path.dirname(require.resolve("@builder.io/qwik-city")),
-        path.dirname(require.resolve("@builder.io/qwik-react")),
-      ],
+      // vendorRoots: [
+      //   path.dirname(require.resolve("@builder.io/qwik-city")),
+      //   path.dirname(require.resolve("@builder.io/qwik-react")),
+      // ],
     }),
     qwikReact(),
   ];

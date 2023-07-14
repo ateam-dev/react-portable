@@ -14,7 +14,7 @@ vi.mock("app-root-path", () => ({
 
 type ConfigFunction = (
   config: UserConfig,
-  env?: ConfigEnv
+  env?: ConfigEnv,
 ) => Promise<UserConfig>;
 
 type TransformFunction = (code: string, id: string) => string;
@@ -24,7 +24,7 @@ type ResolveIdFunction = (source: string, importer?: string) => Promise<void>;
 const sampleComponentFile = `
 import { portable } from '@react-portable/core'
 const Component = () => <div></div>
-export const Sample = portable(Component, 'sample')`;
+export const Sample = portable(Component, 'sample/foo-bar')`;
 
 const routeFileDummy = `
 import { PortableComponent } from "../portable";
@@ -32,7 +32,8 @@ import * as Entries from "__entryPath__";
 const Entry = Object.values(Entries).find((module) => {
   if (typeof module === "function" && "__code" in module)
     return module.__code === "__code__";
-}) as PortableComponent;`;
+}) as PortableComponent;
+const QComponent__sanitized__ = qwikify$(Entry, qwikifyOption);`;
 
 describe("reactPortablePlugin", () => {
   describe("react-portable-prepare", () => {
@@ -57,7 +58,7 @@ describe("reactPortablePlugin", () => {
       vi.spyOn(fsPro, "writeFile").mockImplementation(fs.promises.writeFile);
 
       vi.spyOn(utils, "currentDir").mockReturnValue(
-        "/working-dir/node_modules/@react-portable/core/dist"
+        "/working-dir/node_modules/@react-portable/core/dist",
       );
     });
     afterEach(() => {
@@ -85,21 +86,22 @@ describe("reactPortablePlugin", () => {
     test("Install the route file if `portable` is called in the file", async () => {
       await (plugin.resolveId as ResolveIdFunction)(
         "@react-portable/core",
-        "/working-dir/src/components/sample.tsx"
+        "/working-dir/src/components/sample.tsx",
       );
 
       expect(
         vol.toJSON(
-          "/working-dir/node_modules/.portable/routes/sample/index.tsx"
-        )
+          "/working-dir/node_modules/.portable/routes/sample/foo-bar/index.tsx",
+        ),
       ).toStrictEqual({
-        "/working-dir/node_modules/.portable/routes/sample/index.tsx": `
+        "/working-dir/node_modules/.portable/routes/sample/foo-bar/index.tsx": `
 import { PortableComponent } from "@react-portable/core";
 import * as Entries from "/working-dir/src/components/sample.tsx";
 const Entry = Object.values(Entries).find((module) => {
   if (typeof module === "function" && "__code" in module)
-    return module.__code === "sample";
-}) as PortableComponent;`,
+    return module.__code === "sample/foo-bar";
+}) as PortableComponent;
+const QComponentsample_foo_bar = qwikify$(Entry, qwikifyOption);`,
       });
     });
   });
@@ -117,16 +119,16 @@ const Entry = Object.values(Entries).find((module) => {
       expect(
         (plugin.config as ConfigFunction)(
           {},
-          { command: "build", mode: "", ssrBuild: false }
-        )
+          { command: "build", mode: "", ssrBuild: false },
+        ),
       ).toStrictEqual({});
 
       // ssr build
       expect(
         (plugin.config as ConfigFunction)(
           {},
-          { command: "build", mode: "", ssrBuild: true }
-        )
+          { command: "build", mode: "", ssrBuild: true },
+        ),
       ).toStrictEqual({
         build: {
           rollupOptions: {
@@ -141,14 +143,14 @@ const Entry = Object.values(Entries).find((module) => {
 
     test("the `@jsxImportSource` hint comment is inserted by `transform` on tsx and jsx file", () => {
       expect(
-        (plugin.transform as TransformFunction)("base", "foo.ts")
+        (plugin.transform as TransformFunction)("base", "foo.ts"),
       ).toBeUndefined();
 
       expect((plugin.transform as TransformFunction)("base", "foo.tsx")).toBe(
-        `/** @jsxImportSource react */\nbase`
+        `/** @jsxImportSource react */\nbase`,
       );
       expect((plugin.transform as TransformFunction)("base", "foo.jsx")).toBe(
-        `/** @jsxImportSource react */\nbase`
+        `/** @jsxImportSource react */\nbase`,
       );
     });
   });
