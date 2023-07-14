@@ -1,7 +1,6 @@
 import QwikView, { Props } from "../../components/ec/QwikView";
 import { useState } from "react";
 import { portable } from "@react-portable/core";
-import "../../global.css";
 
 const products_: Props["product"][] = [
   {

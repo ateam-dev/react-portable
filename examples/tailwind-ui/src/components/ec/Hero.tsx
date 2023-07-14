@@ -1,5 +1,4 @@
 import { portable } from "@react-portable/core";
-import "../../global.css";
 
 function Hero() {
   return (
