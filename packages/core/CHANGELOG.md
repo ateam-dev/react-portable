@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.4.1
+
+### Patch Changes
+
+- [#51](https://github.com/ateam-dev/react-portable/pull/51) [`8c56847`](https://github.com/ateam-dev/react-portable/commit/8c5684777ee108c7b8ee8a58128305a047b5c34a) Thanks [@aiji42](https://github.com/aiji42)! - sanitizing portable code and fix dependencies of qwik libraries
+
 ## 0.4.0
 
 ### Minor Changes
