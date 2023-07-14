@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.5.0
+
+### Minor Changes
+
+- [#54](https://github.com/ateam-dev/react-portable/pull/54) [`5c70f44`](https://github.com/ateam-dev/react-portable/commit/5c70f44ee445aa686bfecb8eb857f676e23b9c25) Thanks [@aiji42](https://github.com/aiji42)! - import css on building
+
 ## 0.4.1
 
 ### Patch Changes
