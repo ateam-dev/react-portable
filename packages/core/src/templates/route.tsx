@@ -28,7 +28,7 @@ const qwikifyOption =
         eagerness: undefined,
         event: undefined,
       };
-const QComponent__code__ = qwikify$(Entry, qwikifyOption);
+const QComponent__sanitized__ = qwikify$(Entry, qwikifyOption);
 const getProps = routeLoader$(async ({ request, error }) => {
   try {
     if (request.method === "POST") return await request.json();
@@ -42,7 +42,7 @@ const getProps = routeLoader$(async ({ request, error }) => {
 });
 export default component$(() => {
   const props = getProps().value;
-  return <QComponent__code__ {...props} />;
+  return <QComponent__sanitized__ {...props} />;
 });
 
 export const onRequest: RequestHandler = async (requestEvent) => {
@@ -54,6 +54,6 @@ export const onRequest: RequestHandler = async (requestEvent) => {
       ? `no-store`
       : `public, s-maxage=${revalidate}, stale-while-revalidate=${
           3600 * 24 * 365
-        }`
+        }`,
   );
 };
