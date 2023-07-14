@@ -14,7 +14,7 @@ vi.mock("app-root-path", () => ({
 
 type ConfigFunction = (
   config: UserConfig,
-  env?: ConfigEnv,
+  env?: ConfigEnv
 ) => Promise<UserConfig>;
 
 type TransformFunction = (code: string, id: string) => string;
@@ -49,6 +49,7 @@ describe("reactPortablePlugin", () => {
         "/working-dir/node_modules/@react-portable/core/src/templates/route.tsx":
           routeFileDummy,
         "/working-dir/src/components/sample.tsx": sampleComponentFile,
+        "/working-dir/src/style.css": "body {}",
       });
       // @ts-ignore
       vi.spyOn(fsPro, "mkdir").mockImplementation(fs.promises.mkdir);
@@ -58,7 +59,7 @@ describe("reactPortablePlugin", () => {
       vi.spyOn(fsPro, "writeFile").mockImplementation(fs.promises.writeFile);
 
       vi.spyOn(utils, "currentDir").mockReturnValue(
-        "/working-dir/node_modules/@react-portable/core/dist",
+        "/working-dir/node_modules/@react-portable/core/dist"
       );
     });
     afterEach(() => {
@@ -86,13 +87,13 @@ describe("reactPortablePlugin", () => {
     test("Install the route file if `portable` is called in the file", async () => {
       await (plugin.resolveId as ResolveIdFunction)(
         "@react-portable/core",
-        "/working-dir/src/components/sample.tsx",
+        "/working-dir/src/components/sample.tsx"
       );
 
       expect(
         vol.toJSON(
-          "/working-dir/node_modules/.portable/routes/sample/foo-bar/index.tsx",
-        ),
+          "/working-dir/node_modules/.portable/routes/sample/foo-bar/index.tsx"
+        )
       ).toStrictEqual({
         "/working-dir/node_modules/.portable/routes/sample/foo-bar/index.tsx": `
 import { PortableComponent } from "@react-portable/core";
@@ -107,7 +108,9 @@ const QComponentsample_foo_bar = qwikify$(Entry, qwikifyOption);`,
   });
 
   describe("react-portable-build", () => {
-    const [plugin] = reactPortablePlugin() as [Plugin];
+    const [plugin] = reactPortablePlugin({ css: "./src/style.css" }) as [
+      Plugin
+    ];
 
     test("`name` and `enforce`", () => {
       expect(plugin.name).toBe("react-portable-build");
@@ -119,16 +122,16 @@ const QComponentsample_foo_bar = qwikify$(Entry, qwikifyOption);`,
       expect(
         (plugin.config as ConfigFunction)(
           {},
-          { command: "build", mode: "", ssrBuild: false },
-        ),
+          { command: "build", mode: "", ssrBuild: false }
+        )
       ).toStrictEqual({});
 
       // ssr build
       expect(
         (plugin.config as ConfigFunction)(
           {},
-          { command: "build", mode: "", ssrBuild: true },
-        ),
+          { command: "build", mode: "", ssrBuild: true }
+        )
       ).toStrictEqual({
         build: {
           rollupOptions: {
@@ -143,15 +146,24 @@ const QComponentsample_foo_bar = qwikify$(Entry, qwikifyOption);`,
 
     test("the `@jsxImportSource` hint comment is inserted by `transform` on tsx and jsx file", () => {
       expect(
-        (plugin.transform as TransformFunction)("base", "foo.ts"),
+        (plugin.transform as TransformFunction)("base", "foo.ts")
       ).toBeUndefined();
 
       expect((plugin.transform as TransformFunction)("base", "foo.tsx")).toBe(
-        `/** @jsxImportSource react */\nbase`,
+        `/** @jsxImportSource react */\nbase`
       );
       expect((plugin.transform as TransformFunction)("base", "foo.jsx")).toBe(
-        `/** @jsxImportSource react */\nbase`,
+        `/** @jsxImportSource react */\nbase`
       );
+    });
+
+    test("css path inserted by `transform` on root.tsx", () => {
+      expect(
+        (plugin.transform as TransformFunction)(
+          "base",
+          "/working-dir/node_modules/.portable/root.tsx"
+        )
+      ).toMatch(/^base\nimport '\/.*\/src\/style\.css'$/);
     });
   });
 });
