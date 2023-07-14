@@ -5,7 +5,7 @@ import {
   ReactPortablePiercer,
 } from "./htmlRewriters";
 import { ReactPortable } from "@react-portable/client/web-components";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { FragmentMap } from "./fragments";
 
 const hostDummyResponseBody = `<!DOCTYPE html>
@@ -75,7 +75,7 @@ describe("htmlRewriters", () => {
       const rewriter = new HTMLRewriter().on(piercer.selector, piercer);
 
       expect(await rewriter.transform(response).text()).toBe(
-        hostDummyResponseBody
+        hostDummyResponseBody,
       );
     });
     test("fulfilled fragmentIdsMap", async () => {
@@ -96,7 +96,7 @@ describe("htmlRewriters", () => {
       const rewriter = new HTMLRewriter().on(appender.selector, appender);
 
       expect(await rewriter.transform(response).text()).toBe(
-        hostDummyResponseBody
+        hostDummyResponseBody,
       );
     });
     test("fulfilled fragmentIdsMap", async () => {
@@ -112,7 +112,7 @@ describe("htmlRewriters", () => {
       let response: Response;
       beforeEach(() => {
         response = new Response(
-          '<react-portable-fragment q:base="/build/">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="/build/">this is fragment component</react-portable-fragment>',
         );
       });
       test("no gateway, no assetPath", async () => {
@@ -120,7 +120,7 @@ describe("htmlRewriters", () => {
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
         expect(await rewriter.transform(response).text()).toBe(
-          '<react-portable-fragment q:base="/_fragments/code1/build/">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="/_fragments/code1/build/">this is fragment component</react-portable-fragment>',
         );
       });
 
@@ -129,7 +129,7 @@ describe("htmlRewriters", () => {
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
         expect(await rewriter.transform(response).text()).toBe(
-          '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/">this is fragment component</react-portable-fragment>',
         );
       });
 
@@ -137,12 +137,12 @@ describe("htmlRewriters", () => {
         const replacer = new FragmentBaseReplacer(
           "code2",
           "https://gw.com",
-          "https://asset.com/asset/"
+          "https://asset.com/asset/",
         );
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
         expect(await rewriter.transform(response).text()).toBe(
-          '<react-portable-fragment q:base="https://asset.com/asset/build/">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="https://asset.com/asset/build/">this is fragment component</react-portable-fragment>',
         );
       });
 
@@ -150,20 +150,20 @@ describe("htmlRewriters", () => {
         const replacer = new FragmentBaseReplacer("code1");
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
         const response = new Response(
-          "<react-portable-fragment>this is fragment component</react-portable-fragment>"
+          "<react-portable-fragment>this is fragment component</react-portable-fragment>",
         );
 
         await expect(
-          rewriter.transform(response).text()
+          rewriter.transform(response).text(),
         ).rejects.toThrowError();
       });
     });
 
-    describe("react-portable-fragment > link[rel=stylesheet]", () => {
+    describe("react-portable-fragment > link[rel=stylesheet], react-portable-fragment > link[rel=modulepreload]", () => {
       let response: Response;
       beforeEach(() => {
         response = new Response(
-          '<react-portable-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component<link rel="modulepreload" href="/build/foo.js"></react-portable-fragment>',
         );
       });
 
@@ -172,7 +172,7 @@ describe("htmlRewriters", () => {
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
         expect(await rewriter.transform(response).text()).toBe(
-          '<react-portable-fragment q:base="/_fragments/code1/build/"><link rel="stylesheet" href="/_fragments/code1/build/style.css">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="/_fragments/code1/build/"><link rel="stylesheet" href="/_fragments/code1/build/style.css">this is fragment component<link rel="modulepreload" href="/_fragments/code1/build/foo.js"></react-portable-fragment>',
         );
       });
 
@@ -181,7 +181,7 @@ describe("htmlRewriters", () => {
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
         expect(await rewriter.transform(response).text()).toBe(
-          '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/"><link rel="stylesheet" href="https://gw.com/_fragments/code2/build/style.css">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="https://gw.com/_fragments/code2/build/"><link rel="stylesheet" href="https://gw.com/_fragments/code2/build/style.css">this is fragment component<link rel="modulepreload" href="https://gw.com/_fragments/code2/build/foo.js"></react-portable-fragment>',
         );
       });
 
@@ -189,12 +189,12 @@ describe("htmlRewriters", () => {
         const replacer = new FragmentBaseReplacer(
           "code2",
           "https://gw.com",
-          "https://asset.com/asset/"
+          "https://asset.com/asset/",
         );
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
 
         expect(await rewriter.transform(response).text()).toBe(
-          '<react-portable-fragment q:base="https://asset.com/asset/build/"><link rel="stylesheet" href="https://asset.com/asset/build/style.css">this is fragment component</react-portable-fragment>'
+          '<react-portable-fragment q:base="https://asset.com/asset/build/"><link rel="stylesheet" href="https://asset.com/asset/build/style.css">this is fragment component<link rel="modulepreload" href="https://asset.com/asset/build/foo.js"></react-portable-fragment>',
         );
       });
 
@@ -202,11 +202,11 @@ describe("htmlRewriters", () => {
         const replacer = new FragmentBaseReplacer("code1");
         const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
         const response = new Response(
-          `<react-portable-fragment q:base="/build/"><link rel="stylesheet">this is fragment component</react-portable-fragment>`
+          `<react-portable-fragment q:base="/build/"><link rel="stylesheet">this is fragment component</react-portable-fragment>`,
         );
 
         await expect(
-          rewriter.transform(response).text()
+          rewriter.transform(response).text(),
         ).rejects.toThrowError();
       });
     });
