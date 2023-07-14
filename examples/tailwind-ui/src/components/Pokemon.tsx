@@ -1,6 +1,5 @@
 import { FC } from "react";
 import { portable } from "@react-portable/core";
-import "../global.css";
 
 type Props = {
   imgSrc?: string;

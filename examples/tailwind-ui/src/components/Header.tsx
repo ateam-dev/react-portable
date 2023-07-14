@@ -16,7 +16,6 @@ import {
   PlayCircleIcon,
 } from "@heroicons/react/20/solid";
 import { portable } from "@react-portable/core";
-import "../global.css";
 
 const products = [
   {
