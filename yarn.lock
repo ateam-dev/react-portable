@@ -6978,9 +6978,9 @@ headers-polyfill@^3.1.0, headers-polyfill@^3.1.2:
   integrity sha512-tWCK4biJ6hcLqTviLXVR9DTRfYGQMXEIUj3gwJ2rZ5wO/at3XtkI4g8mCvFdUF9l1KMBNCfmNAdnahm1cgavQA==
 
 hono@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/hono/-/hono-3.3.0.tgz#64ea5f85fd4e3e833036dd1a594627e65e7c0ab5"
-  integrity sha512-H15s0aRWebhry9d1yevYO2LqBbrJZTPZwui9S39mv6rZE9LdJWoYn2tWCa6etL3mlu5JHm0e3xVMcQiu2TfjJg==
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-3.3.4.tgz#063655dd73e0f46a64682d65181f255551f4e6f1"
+  integrity sha512-lqvcsQrXS0bSydj/MkOXi3opAwrlauIjZefhXMMRj9prABfBWdrYHSrWk/xfxgxNPs4yuEMh2Z5zV0L2b1Jmdw==
 
 hookable@^5.5.3:
   version "5.5.3"
