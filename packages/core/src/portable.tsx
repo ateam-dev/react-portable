@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useRef } from "react";
+import React, { FunctionComponent, useEffect, useMemo, useRef } from "react";
 import { ReactPortablePreview } from "@react-portable/client/web-components";
 import { RequestEventCommon } from "@builder.io/qwik-city/middleware/request-handler";
 
@@ -11,7 +11,7 @@ type ErrorResponse = ReturnType<RequestEventCommon["error"]>;
 
 export type Loader<T extends Record<string, unknown> = {}> = (
   r: Request,
-  ctx: { error: RequestEventCommon["error"] }
+  ctx: { error: RequestEventCommon["error"] },
 ) => T | ErrorResponse | Promise<T | ErrorResponse>;
 
 export interface PortableComponent<T extends Record<string, unknown> = {}>
@@ -30,7 +30,7 @@ type InferProps<T> = T extends FunctionComponent<infer U>
   : never;
 
 export const portable = <
-  T extends FunctionComponent | ((props: any) => JSX.Element)
+  T extends FunctionComponent | ((props: any) => JSX.Element),
 >(
   Component: T,
   code: string,
@@ -42,26 +42,25 @@ export const portable = <
     loader?: Loader<InferProps<T>>;
     strategy?: Strategy;
     disablePreview?: boolean;
-  } = {}
+  } = {},
 ): PortableComponent<InferProps<T>> => {
   const Wrapped = (props: InferProps<T>) => {
     const ref = useRef<ReactPortablePreview>(null);
     useEffect(() => {
       if (!ref.current) return;
 
-      if (JSON.stringify(ref.current.props) === JSON.stringify(props)) return;
-
       ref.current.props = props;
       ref.current.rerender?.();
     }, [props]);
 
-    const component = <Component {...(props as any)} />;
-
-    if (disablePreview) return component;
+    if (disablePreview) return <Component {...(props as any)} />;
 
     return (
       <react-portable-preview ref={ref} code={code}>
-        {component}
+        <Component
+          {...(props as any)}
+          children={<rp-outlet>{props.children}</rp-outlet>}
+        />
       </react-portable-preview>
     );
   };

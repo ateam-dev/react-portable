@@ -3,13 +3,18 @@
  */
 import { beforeEach, describe, expect, test } from "vitest";
 import { portable } from "./portable";
-import { act, render, cleanup } from "@testing-library/react";
+import { render, cleanup } from "@testing-library/react";
 import {
   ReactPortablePreview,
   reactPortableRegister,
 } from "@react-portable/client/web-components";
+import { ReactNode } from "react";
 
 const Sample = () => <div>sample</div>;
+
+const SampleWithChildren = ({ children }: { children: ReactNode }) => (
+  <div>sample with children: {children}</div>
+);
 
 describe("portable", () => {
   beforeEach(() => {
@@ -47,6 +52,17 @@ describe("portable", () => {
     expect(asFragment()).toMatchSnapshot();
   });
 
+  test("children will be wrapped by rp-outlet", () => {
+    const Component = portable(SampleWithChildren, "foo");
+    const { asFragment } = render(
+      <Component>
+        <p>this is children</p>
+      </Component>,
+    );
+
+    expect(asFragment()).toMatchSnapshot();
+  });
+
   test("the component will NOT be wrapped by react-portable-preview when `disablePreview` is specified true", () => {
     const Component = portable(Sample, "foo", { disablePreview: true });
     const { asFragment } = render(<Component />);
@@ -62,7 +78,7 @@ describe("portable", () => {
     const { rerender } = render(<Component foo="foo" />);
 
     const element = document.querySelector<ReactPortablePreview>(
-      "react-portable-preview"
+      "react-portable-preview",
     );
 
     expect(element!.props).toStrictEqual({ foo: "foo" });
