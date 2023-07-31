@@ -7,47 +7,77 @@ if (typeof globalThis.HTMLElement === "undefined") {
 }
 
 export class ReactPortablePreview extends HTMLElement {
+  private uuid = "";
+  private code = "";
   private remote = "";
-  private _props: Record<string, unknown> = {};
+  public props: Record<string, unknown> = {};
+  private outlet: Node | null = null;
+  private fetching = false;
+  private previousRequestBody = "";
+  private handlerProxyListener: VoidFunction | EventListener = () => {};
 
-  public set props(p: Record<string, unknown> | null | undefined) {
-    this._props = p ?? {};
+  private connectedCallback() {
+    this.uuid ||= crypto.randomUUID();
+
+    const code = this.getAttribute("code");
+    if (!code) {
+      console.error("react-portable-preview: The code is not set.");
+      return;
+    }
+    this.code = code;
+
+    this.addHandlerProxy();
   }
-  public get props() {
-    return this._props;
+
+  private disconnectedCallback() {
+    this.removeHandlerProxy();
   }
 
   public async preview(remote: string) {
     this.remote = remote;
-    const code = this.getAttribute("code");
 
-    if (!code) {
-      throw new Error("react-portable-preview: The code is not set.");
-    }
-
-    return this.render(remote, code);
+    return this.render(remote);
   }
 
   public async rerender() {
     if (this.remote) return this.preview(this.remote);
   }
 
-  private async render(remote: string, code: string) {
-    const fragment = await this.fetchFragmentStream(remote, code);
-    if (!fragment.body || !fragment.ok) {
-      throw new Error(`react-portable-preview: Failed to retrieve fragment`);
+  private async render(remote: string) {
+    if (this.fetching) return;
+
+    const body = JSON.stringify(this.props, serialize(this.uuid));
+
+    if (body !== this.previousRequestBody) {
+      this.fetching = true;
+      try {
+        this.storeOutlet();
+
+        const fragment = await this.fetchFragmentStream(remote, body);
+        if (!fragment.body || !fragment.ok) {
+          throw new Error(
+            `react-portable-preview: Failed to retrieve fragment`,
+          );
+        }
+        await this.piercing(fragment.body);
+
+        this.restoreOutletToSlot();
+      } finally {
+        this.fetching = false;
+      }
     }
-    await this.piercing(fragment.body);
+
+    this.previousRequestBody = body;
   }
 
-  private async fetchFragmentStream(remote: string, code: string) {
+  private async fetchFragmentStream(remote: string, body: string) {
     const url = `${window.location.origin}/_fragments/${encodeURIComponent(
-      remote
-    )}/${code}`;
+      remote,
+    )}/${this.code}`;
     const request = new Request(url);
 
     return fetch(request, {
-      body: JSON.stringify(this._props),
+      body,
       method: "POST",
     });
   }
@@ -59,7 +89,52 @@ export class ReactPortablePreview extends HTMLElement {
       .pipeThrough(new TextDecoderStream())
       .pipeTo(new WritableDOM(this));
   }
+
+  private storeOutlet() {
+    this.outlet ||= this.querySelector("rp-outlet");
+  }
+
+  private restoreOutletToSlot() {
+    const slot = this.querySelector("rp-slot");
+    if (slot && this.outlet) slot.appendChild(this.outlet);
+  }
+
+  private addHandlerProxy() {
+    this.handlerProxyListener = (e: Event) => {
+      if (!("detail" in e)) return;
+
+      const { uuid, path, args } = e.detail as {
+        uuid: string;
+        path: string;
+        args: unknown[];
+      };
+
+      if (this.uuid === uuid) {
+        const receiver = this.props[path];
+        if (typeof receiver === "function") receiver(...args);
+      }
+    };
+    window.addEventListener(
+      "react-portable-preview-message",
+      this.handlerProxyListener,
+    );
+  }
+
+  private removeHandlerProxy() {
+    window.removeEventListener(
+      "react-portable-preview-message",
+      this.handlerProxyListener,
+    );
+  }
 }
+
+const serialize = (id: string) => (key: string, val: unknown) => {
+  if (key === "children") return undefined;
+  if (typeof val === "function") {
+    return `__function__:${id}:${key}`;
+  }
+  return val;
+};
 
 interface ReactPortablePreviewAttributes {
   code: string;
@@ -70,6 +145,14 @@ declare global {
     interface IntrinsicElements {
       "react-portable-preview": DetailedHTMLProps<
         HTMLAttributes<HTMLElement> & ReactPortablePreviewAttributes,
+        ReactPortablePreview
+      >;
+      "rp-outlet": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement>,
+        ReactPortablePreview
+      >;
+      "rp-slot": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement>,
         ReactPortablePreview
       >;
     }

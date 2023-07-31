@@ -13,7 +13,7 @@ const getPokemonData = async (id: number): Promise<PokemonData> => {
       imgSrc: data.sprites.front_default,
       name: data.name,
       types: data.types.map(
-        ({ type }: { type: { name: string } }) => type.name
+        ({ type }: { type: { name: string } }) => type.name,
       ),
     };
   } catch (e) {
@@ -29,5 +29,24 @@ export default function Home() {
     keepPreviousData: true,
   });
 
-  return <div onClick={increment}>{pokemon && <Pokemon {...pokemon} />}</div>;
+  if (!pokemon) return null;
+
+  return (
+    <Pokemon
+      {...pokemon}
+      onClick={() => {
+        console.log("clicked parent");
+      }}
+    >
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log("inclement!");
+          increment();
+        }}
+      >
+        Next {">"}
+      </button>
+    </Pokemon>
+  );
 }

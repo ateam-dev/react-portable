@@ -1,5 +1,22 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`portable > children will be wrapped by rp-outlet 1`] = `
+<DocumentFragment>
+  <react-portable-preview
+    code="foo"
+  >
+    <div>
+      sample with children: 
+      <rp-outlet>
+        <p>
+          this is children
+        </p>
+      </rp-outlet>
+    </div>
+  </react-portable-preview>
+</DocumentFragment>
+`;
+
 exports[`portable > the component will NOT be wrapped by react-portable-preview when \`disablePreview\` is specified true 1`] = `
 <DocumentFragment>
   <div>

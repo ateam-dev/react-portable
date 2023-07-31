@@ -1,6 +1,6 @@
 /** @jsxImportSource @builder.io/qwik */
 import { qwikify$ } from "@builder.io/qwik-react";
-import { component$ } from "@builder.io/qwik";
+import { component$, $ } from "@builder.io/qwik";
 import { RequestHandler, routeLoader$ } from "@builder.io/qwik-city";
 import { PortableComponent } from "../portable";
 // @ts-ignore
@@ -41,8 +41,30 @@ const getProps = routeLoader$(async ({ request, error }) => {
   }
 });
 export default component$(() => {
-  const props = getProps().value;
-  return <QComponent__sanitized__ {...props} />;
+  const props = Object.fromEntries(
+    Object.entries(getProps().value).map(([key, val]) => {
+      if (typeof val !== "string") return [key, val];
+      const match = val.match(/__function__:(.*):(.*)/);
+      if (!match) return [key, val];
+
+      return [
+        `${key}$`,
+        $((...args: unknown[]) => {
+          window.dispatchEvent(
+            new CustomEvent("react-portable-preview-message", {
+              detail: {
+                uuid: match[1],
+                path: match[2],
+                args,
+              },
+            }),
+          );
+        }),
+      ];
+    }),
+  );
+
+  return <QComponent__sanitized__ {...props} children={<rp-slot />} />;
 });
 
 export const onRequest: RequestHandler = async (requestEvent) => {
