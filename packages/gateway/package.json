@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/gateway",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "type": "module",
@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-portable/client": "0.3.1",
+    "@react-portable/client": "0.4.0",
     "hono": "^3.3.0"
   },
   "devDependencies": {
