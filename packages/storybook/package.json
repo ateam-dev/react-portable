@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/storybook",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "exports": {
@@ -29,7 +29,7 @@
     "watch": "tsup --watch"
   },
   "devDependencies": {
-    "@react-portable/core": "0.5.0",
+    "@react-portable/core": "0.6.0",
     "@storybook/components": "^7.0.26",
     "@storybook/manager-api": "^7.0.26",
     "@storybook/theming": "^7.0.26",
@@ -43,7 +43,7 @@
     "typescript": "^5.1.6"
   },
   "peerDependencies": {
-    "@react-portable/core": "0.5.0",
+    "@react-portable/core": "0.6.0",
     "@storybook/blocks": "^7.0.0",
     "@storybook/components": "^7.0.0",
     "@storybook/core-events": "^7.0.0",

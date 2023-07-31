@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.6.0
+
+### Minor Changes
+
+- [#59](https://github.com/ateam-dev/react-portable/pull/59) [`798dfe7`](https://github.com/ateam-dev/react-portable/commit/798dfe7ba03612cad6124a7296e8fdb440e4a17f) Thanks [@aiji42](https://github.com/aiji42)! - support for preview of children and functional props
+
 ## 0.5.0
 
 ### Minor Changes
