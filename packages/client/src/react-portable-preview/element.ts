@@ -36,24 +36,24 @@ export class ReactPortablePreview extends HTMLElement {
   public async preview(remote: string) {
     this.remote = remote;
 
-    return this.render(remote);
+    return this.render(remote, true);
   }
 
-  public async rerender() {
-    if (this.remote) return this.preview(this.remote);
+  public async rerender(force = false) {
+    if (this.remote) return this.render(this.remote, force);
   }
 
-  private async render(remote: string) {
+  private async render(remote: string, force = false) {
     if (this.fetching) return;
 
-    const body = JSON.stringify(this.props, serialize(this.uuid));
+    const requestBody = JSON.stringify(this.props, serialize(this.uuid));
 
-    if (body !== this.previousRequestBody) {
+    if (requestBody !== this.previousRequestBody || force) {
       this.fetching = true;
       try {
         this.storeOutlet();
 
-        const fragment = await this.fetchFragmentStream(remote, body);
+        const fragment = await this.fetchFragmentStream(remote, requestBody);
         if (!fragment.body || !fragment.ok) {
           throw new Error(
             `react-portable-preview: Failed to retrieve fragment`,
@@ -67,7 +67,7 @@ export class ReactPortablePreview extends HTMLElement {
       }
     }
 
-    this.previousRequestBody = body;
+    this.previousRequestBody = requestBody;
   }
 
   private async fetchFragmentStream(remote: string, body: string) {
