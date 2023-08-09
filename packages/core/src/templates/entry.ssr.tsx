@@ -10,7 +10,7 @@ export default function (opts: RenderToStreamOptions) {
   return renderToStream(<Root />, {
     manifest,
     ...opts,
-    containerTagName: "react-portable-fragment",
+    containerTagName: "rp-fragment",
     qwikLoader: { include: "always" },
   });
 }

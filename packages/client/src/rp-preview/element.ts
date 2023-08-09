@@ -6,7 +6,7 @@ if (typeof globalThis.HTMLElement === "undefined") {
   globalThis.HTMLElement = class {};
 }
 
-export class ReactPortablePreview extends HTMLElement {
+export class RpPreview extends HTMLElement {
   private uuid = "";
   private code = "";
   private remote = "";
@@ -21,7 +21,7 @@ export class ReactPortablePreview extends HTMLElement {
 
     const code = this.getAttribute("code");
     if (!code) {
-      console.error("react-portable-preview: The code is not set.");
+      console.error("rp-preview: The code is not set.");
       return;
     }
     this.code = code;
@@ -55,9 +55,7 @@ export class ReactPortablePreview extends HTMLElement {
 
         const fragment = await this.fetchFragmentStream(remote, requestBody);
         if (!fragment.body || !fragment.ok) {
-          throw new Error(
-            `react-portable-preview: Failed to retrieve fragment`,
-          );
+          throw new Error(`rp-preview: Failed to retrieve fragment`);
         }
         await this.piercing(fragment.body);
 
@@ -114,17 +112,11 @@ export class ReactPortablePreview extends HTMLElement {
         if (typeof receiver === "function") receiver(...args);
       }
     };
-    window.addEventListener(
-      "react-portable-preview-message",
-      this.handlerProxyListener,
-    );
+    window.addEventListener("rp-preview-message", this.handlerProxyListener);
   }
 
   private removeHandlerProxy() {
-    window.removeEventListener(
-      "react-portable-preview-message",
-      this.handlerProxyListener,
-    );
+    window.removeEventListener("rp-preview-message", this.handlerProxyListener);
   }
 }
 
@@ -136,25 +128,19 @@ const serialize = (id: string) => (key: string, val: unknown) => {
   return val;
 };
 
-interface ReactPortablePreviewAttributes {
+interface RpPreviewAttributes {
   code: string;
 }
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      "react-portable-preview": DetailedHTMLProps<
-        HTMLAttributes<HTMLElement> & ReactPortablePreviewAttributes,
-        ReactPortablePreview
+      "rp-preview": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement> & RpPreviewAttributes,
+        RpPreview
       >;
-      "rp-outlet": DetailedHTMLProps<
-        HTMLAttributes<HTMLElement>,
-        ReactPortablePreview
-      >;
-      "rp-slot": DetailedHTMLProps<
-        HTMLAttributes<HTMLElement>,
-        ReactPortablePreview
-      >;
+      "rp-outlet": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
+      "rp-slot": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
     }
   }
 }

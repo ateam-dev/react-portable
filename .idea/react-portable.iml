@@ -3,7 +3,24 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/examples/gateway/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/gateway/.wrangler" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/nextjs/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind-ui/.portable" />
       <excludeFolder url="file://$MODULE_DIR$/examples/tailwind-ui/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind-ui/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/client/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/client/browser" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/client/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/client/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/core/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/core/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/core/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/gateway/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/gateway/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/gateway/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/storybook/.turbo" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/storybook/dist" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
