@@ -12,28 +12,28 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { register } from "./register";
 
-const restHandlers = [
-  rest.post(`/_fragments/:remote/:code`, (req, res, ctx) => {
-    const { remote, code } = req.params;
+const restSpy = vi.fn();
+const restHandlers = [rest.post(`/_fragments/:remote/:code`, restSpy)];
+restSpy.mockImplementation((req, res, ctx) => {
+  const { remote, code } = req.params;
 
-    if (code === "404") return res(ctx.status(404));
+  if (code === "404") return res(ctx.status(404));
 
-    if (code === "with-children")
-      return res(
-        ctx.status(200),
-        ctx.text(
-          `<react-portable-fragment>${remote} ${code} ${req.body} <rp-slot></rp-slot></react-portable-fragment>`,
-        ),
-      );
-
+  if (code === "with-children")
     return res(
       ctx.status(200),
       ctx.text(
-        `<react-portable-fragment>${remote} ${code} ${req.body}</react-portable-fragment>`,
+        `<react-portable-fragment>${remote} ${code} ${req.body} <rp-slot></rp-slot></react-portable-fragment>`,
       ),
     );
-  }),
-];
+
+  return res(
+    ctx.status(200),
+    ctx.text(
+      `<react-portable-fragment>${remote} ${code} ${req.body}</react-portable-fragment>`,
+    ),
+  );
+});
 
 const server = setupServer(...restHandlers);
 
@@ -58,6 +58,7 @@ describe("react-portable-preview", () => {
     expect(element.innerHTML).toBe(
       '<react-portable-fragment>https://example.com code1 {"foo":"bar"}</react-portable-fragment>',
     );
+    expect(restSpy).toBeCalledTimes(1);
 
     element.props = { foo: "baz" };
     // rerender
@@ -65,6 +66,19 @@ describe("react-portable-preview", () => {
     expect(element.innerHTML).toBe(
       '<react-portable-fragment>https://example.com code1 {"foo":"baz"}</react-portable-fragment>',
     );
+    expect(restSpy).toBeCalledTimes(2);
+
+    // If props do not change, requests are suppressed
+    await element.rerender();
+    expect(restSpy).toBeCalledTimes(2);
+
+    // If preview is called, the request is forced regardless of props
+    await element.preview("https://example.com");
+    expect(restSpy).toBeCalledTimes(3);
+
+    // If true is passed to the rerender argument, it is forced to request
+    await element.rerender(true);
+    expect(restSpy).toBeCalledTimes(4);
   });
 
   test("preview with functional props", async () => {
