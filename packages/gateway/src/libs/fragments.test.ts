@@ -16,12 +16,12 @@ const fragmentConfigs: FragmentConfigs = {
 
 const fragments = {
   f1: {
-    component1: `<rp-fragment q:base="/build/">f1:component1</rp-fragment>`,
-    component2: `<rp-fragment q:base="/build/">f1:component2</rp-fragment>`,
+    component1: `<react-portable-fragment q:base="/build/">f1:component1</react-portable-fragment>`,
+    component2: `<react-portable-fragment q:base="/build/">f1:component2</react-portable-fragment>`,
   },
   f2: {
-    component1: `<rp-fragment q:base="/build/">f2:component1</rp-fragment>`,
-    component2: `<rp-fragment q:base="/build/">f2:component2</rp-fragment>`,
+    component1: `<react-portable-fragment q:base="/build/">f2:component1</react-portable-fragment>`,
+    component2: `<react-portable-fragment q:base="/build/">f2:component2</react-portable-fragment>`,
   },
 };
 
@@ -51,10 +51,10 @@ describe("fragments", () => {
       const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
       expect(fragments.get(id1)!.body).toEqual(
-        `<rp-fragment q:base="/_fragments/f1/build/">f1:component1</rp-fragment>`,
+        `<react-portable-fragment q:base="/_fragments/f1/build/">f1:component1</react-portable-fragment>`
       );
       expect(fragments.get(id2)!.body).toBe(
-        `<rp-fragment q:base="/_fragments/f1/build/">f1:component2</rp-fragment>`,
+        `<react-portable-fragment q:base="/_fragments/f1/build/">f1:component2</react-portable-fragment>`
       );
 
       expect(fetchMock.mock.calls[0][0].url).toBe("https://f1.com/component1");
@@ -69,10 +69,10 @@ describe("fragments", () => {
     const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
     expect(fragments.get(id1)!.body).toBe(
-      `<rp-fragment q:base="https://assets.f2.com/statics/build/">f2:component1</rp-fragment>`,
+      `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2:component1</react-portable-fragment>`
     );
     expect(fragments.get(id2)!.body).toBe(
-      `<rp-fragment q:base="https://assets.f2.com/statics/build/">f2:component2</rp-fragment>`,
+      `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2:component2</react-portable-fragment>`
     );
     expect(fetchMock.mock.calls[0][0].url).toBe("https://f2.com/component1");
     expect(fetchMock.mock.calls[1][0].url).toBe("https://f2.com/component2");
@@ -81,20 +81,20 @@ describe("fragments", () => {
   test("gateway is ignored (gateway is data to be used by clients)", async () => {
     const id1 = ReactPortable.createFragmentId(
       "f1:/component1",
-      "https://gw1.com",
+      "https://gw1.com"
     );
     const id2 = ReactPortable.createFragmentId(
       "f2:/component1",
-      "https://gw2.com",
+      "https://gw2.com"
     );
 
     const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
 
     expect(fragments.get(id1)!.body).toBe(
-      `<rp-fragment q:base="/_fragments/f1/build/">f1:component1</rp-fragment>`,
+      `<react-portable-fragment q:base="/_fragments/f1/build/">f1:component1</react-portable-fragment>`
     );
     expect(fragments.get(id2)!.body).toBe(
-      `<rp-fragment q:base="https://assets.f2.com/statics/build/">f2:component1</rp-fragment>`,
+      `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2:component1</react-portable-fragment>`
     );
     expect(fetchMock.mock.calls[0][0].url).toBe("https://f1.com/component1");
     expect(fetchMock.mock.calls[1][0].url).toBe("https://f2.com/component1");
@@ -104,7 +104,7 @@ describe("fragments", () => {
     const id1 = ReactPortable.createFragmentId("not-exist-code1:/component1");
     const id2 = ReactPortable.createFragmentId(
       "not-exist-code2:/component2",
-      "https://gw.com",
+      "https://gw.com"
     );
 
     const fragments = await getFragmentsForPiercing([id1, id2], fetchMock);
@@ -133,10 +133,10 @@ describe("fragments", () => {
     });
 
     expect(fetchMock.mock.calls[0][0].url).toBe(
-      "https://f1.com/not-exist-component",
+      "https://f1.com/not-exist-component"
     );
     expect(fetchMock.mock.calls[1][0].url).toBe(
-      "https://f2.com/not-exist-component",
+      "https://f2.com/not-exist-component"
     );
   });
   test("invalid id format", async () => {

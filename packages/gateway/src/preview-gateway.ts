@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import {
-  ActivateRpPreviewReplacer,
+  ActivateReactPortablePreviewReplacer,
   FragmentBaseReplacer,
 } from "./libs/htmlRewriters";
 import { originProxy } from "./gateway";
@@ -24,7 +24,7 @@ app.all("/_fragments/:remote/*", async (c) => {
   const baseReplacer = new FragmentBaseReplacer(
     encodeURIComponent(remote),
     null,
-    null,
+    null
   );
   const rewriter = new HTMLRewriter().on(baseReplacer.selector, baseReplacer);
 
@@ -42,7 +42,7 @@ app.all("*", async (c) => {
   )
     return response;
 
-  const activator = new ActivateRpPreviewReplacer();
+  const activator = new ActivateReactPortablePreviewReplacer();
   return new HTMLRewriter()
     .on(activator.selector, activator)
     .transform(response);
@@ -58,7 +58,7 @@ const fragmentProxy = (request: Request, _remote: string): Request => {
   url.protocol = remote.protocol;
   url.pathname = url.pathname.replace(
     `/_fragments/${encodeURIComponent(_remote)}`,
-    "",
+    ""
   );
 
   return new Request(url, request);

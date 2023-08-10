@@ -51,7 +51,7 @@ export class FragmentTemplatesAppender {
 }
 
 export class FragmentBaseReplacer {
-  public readonly selector = `rp-fragment,rp-fragment>link[rel="stylesheet"],rp-fragment>link[rel="modulepreload"]`;
+  public readonly selector = `react-portable-fragment,react-portable-fragment>link[rel="stylesheet"],react-portable-fragment>link[rel="modulepreload"]`;
 
   constructor(
     private code: string,
@@ -69,8 +69,8 @@ export class FragmentBaseReplacer {
     if (!originalBasePath)
       throw new Error(
         element.tagName === "link"
-          ? `rp-fragment > link has no href (code: ${this.code})`
-          : `rp-fragment has no q:base (code: ${this.code})`,
+          ? `react-portable-fragment > link has no href (code: ${this.code})`
+          : `react-portable-fragment has no q:base (code: ${this.code})`,
       );
 
     element.setAttribute(
@@ -82,7 +82,7 @@ export class FragmentBaseReplacer {
   }
 }
 
-export class ActivateRpPreviewReplacer {
+export class ActivateReactPortablePreviewReplacer {
   public readonly selector = "head";
 
   element(element: Element) {

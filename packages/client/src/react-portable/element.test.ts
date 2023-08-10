@@ -24,16 +24,20 @@ const restHandlers = [
       mockFn(req.headers);
       return res(
         ctx.status(200),
-        ctx.text(`<rp-fragment>${code} ${component}</rp-fragment>`),
+        ctx.text(
+          `<react-portable-fragment>${code} ${component}</react-portable-fragment>`
+        )
       );
-    },
+    }
   ),
   rest.get("https://gw.com/_fragments/:code/:component", (req, res, ctx) => {
     const { code, component } = req.params;
     mockFn(req.headers);
     return res(
       ctx.status(200),
-      ctx.text(`<rp-fragment>pass gw; ${code} ${component}</rp-fragment>`),
+      ctx.text(
+        `<react-portable-fragment>pass gw; ${code} ${component}</react-portable-fragment>`
+      )
     );
   }),
   rest.get(/.*/, (req, res, ctx) => {
@@ -45,7 +49,7 @@ const server = setupServer(...restHandlers);
 
 const prepare = async (
   body: string,
-  templates: { innerHTML: string; entry: string; gateway?: string }[] = [],
+  templates: { innerHTML: string; entry: string; gateway?: string }[] = []
 ) => {
   for (const { innerHTML, gateway, entry } of templates) {
     const template = document.createElement("template");
@@ -93,53 +97,57 @@ afterAll(() => server.close());
 describe("ReactPortable", () => {
   test("default", async () => {
     const rpPromise = prepare(
-      '<react-portable entry="f1:/component1"></react-portable>',
+      '<react-portable entry="f1:/component1"></react-portable>'
     );
     expect(
-      document.querySelector("react-portable")!.getAttribute("loading"),
+      document.querySelector("react-portable")!.getAttribute("loading")
     ).toBe("");
 
     const rp = await rpPromise;
 
-    expect(rp.innerHTML).toBe(`<rp-fragment>f1 component1</rp-fragment>`);
+    expect(rp.innerHTML).toBe(
+      `<react-portable-fragment>f1 component1</react-portable-fragment>`
+    );
     expect(
-      document.querySelector("react-portable")!.getAttribute("loading"),
+      document.querySelector("react-portable")!.getAttribute("loading")
     ).toBe(null);
     expect(mockFn.mock.lastCall[0].get("X-React-Portable-Gateway")).toBe(null);
   });
 
   test("use gateway", async () => {
     const rp = await prepare(
-      '<react-portable entry="f1:/component1" gateway="https://gw.com"></react-portable>',
+      '<react-portable entry="f1:/component1" gateway="https://gw.com"></react-portable>'
     );
 
     expect(rp.innerHTML).toBe(
-      `<rp-fragment>pass gw; f1 component1</rp-fragment>`,
+      `<react-portable-fragment>pass gw; f1 component1</react-portable-fragment>`
     );
     expect(mockFn.mock.lastCall[0].get("X-React-Portable-Gateway")).toBe(
-      "https://gw.com",
+      "https://gw.com"
     );
   });
 
   test("piercing is succeed on gateway", async () => {
     const rp = await prepare(
-      '<react-portable entry="f1:/component1" pierced="succeed"><rp-fragment>f1 component1</rp-fragment></react-portable>',
+      '<react-portable entry="f1:/component1" pierced="succeed"><react-portable-fragment>f1 component1</react-portable-fragment></react-portable>'
     );
 
-    expect(rp.innerHTML).toBe(`<rp-fragment>f1 component1</rp-fragment>`);
+    expect(rp.innerHTML).toBe(
+      `<react-portable-fragment>f1 component1</react-portable-fragment>`
+    );
     expect(mockFn).not.toBeCalled();
   });
 
   test("piercing is failed on gateway", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     await prepare(
-      '<react-portable entry="f1:/component1" pierced="failed"></react-portable>',
+      '<react-portable entry="f1:/component1" pierced="failed"></react-portable>'
     );
 
     expect(spy).toBeCalledWith(
       Error(
-        "Failed to retrieve fragment (entry: f1:/component1, gateway: -) on the gateway.",
-      ),
+        "Failed to retrieve fragment (entry: f1:/component1, gateway: -) on the gateway."
+      )
     );
   });
 
@@ -148,14 +156,14 @@ describe("ReactPortable", () => {
       '<react-portable entry="f1:/component1"></react-portable>',
       [
         {
-          innerHTML: `<rp-fragment>f1 component1 cached</rp-fragment>`,
+          innerHTML: `<react-portable-fragment>f1 component1 cached</react-portable-fragment>`,
           entry: "f1:/component1",
         },
-      ],
+      ]
     );
 
     expect(rp.innerHTML).toBe(
-      `<rp-fragment>f1 component1 cached</rp-fragment>`,
+      `<react-portable-fragment>f1 component1 cached</react-portable-fragment>`
     );
     expect(mockFn).not.toBeCalled();
   });
@@ -163,10 +171,10 @@ describe("ReactPortable", () => {
   test("without entry attribute", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     await prepare(
-      '<react-portable entry="" gateway="https://gw.com"></react-portable>',
+      '<react-portable entry="" gateway="https://gw.com"></react-portable>'
     );
     expect(spy).toBeCalledWith(
-      Error("The react portable component has been applied without `entry`"),
+      Error("The react portable component has been applied without `entry`")
     );
   });
 
@@ -176,29 +184,29 @@ describe("ReactPortable", () => {
     await prepare('<react-portable entry="f1/component1"></react-portable>');
     expect(spy).toBeCalledWith(
       Error(
-        "The react portable component has been applied with wrong format `entry`",
-      ),
+        "The react portable component has been applied with wrong format `entry`"
+      )
     );
   });
 
   test("bad fragment request", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     const promise = prepare(
-      '<react-portable entry="f1:/component1" gateway="https://not-exist.gw.com"></react-portable>',
+      '<react-portable entry="f1:/component1" gateway="https://not-exist.gw.com"></react-portable>'
     );
     expect(
-      document.querySelector("react-portable")!.getAttribute("loading"),
+      document.querySelector("react-portable")!.getAttribute("loading")
     ).toBe("");
 
     await promise;
 
     expect(spy).toBeCalledWith(
       Error(
-        "Failed to retrieve fragment (entry: f1:/component1, gateway: https://not-exist.gw.com)",
-      ),
+        "Failed to retrieve fragment (entry: f1:/component1, gateway: https://not-exist.gw.com)"
+      )
     );
     expect(
-      document.querySelector("react-portable")!.getAttribute("loading"),
+      document.querySelector("react-portable")!.getAttribute("loading")
     ).toBe(null);
   });
 });

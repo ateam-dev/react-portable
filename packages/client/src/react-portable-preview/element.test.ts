@@ -7,7 +7,7 @@ import {
   expect,
   vi,
 } from "vitest";
-import { RpPreview } from "./element";
+import { ReactPortablePreview } from "./element";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { register } from "./register";
@@ -23,13 +23,15 @@ restSpy.mockImplementation((req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.text(
-        `<rp-fragment>${remote} ${code} ${req.body} <rp-slot></rp-slot></rp-fragment>`,
+        `<react-portable-fragment>${remote} ${code} ${req.body} <rp-slot></rp-slot></react-portable-fragment>`,
       ),
     );
 
   return res(
     ctx.status(200),
-    ctx.text(`<rp-fragment>${remote} ${code} ${req.body}</rp-fragment>`),
+    ctx.text(
+      `<react-portable-fragment>${remote} ${code} ${req.body}</react-portable-fragment>`,
+    ),
   );
 });
 
@@ -42,17 +44,19 @@ beforeAll(() => {
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-describe("rp-preview", () => {
+describe("react-portable-preview", () => {
   test("preview and rerender", async () => {
-    document.body.innerHTML = `<rp-preview code="code1">original content</rp-preview>`;
+    document.body.innerHTML = `<react-portable-preview code="code1">original content</react-portable-preview>`;
 
-    const element = document.querySelector<RpPreview>(`rp-preview`)!;
+    const element = document.querySelector<ReactPortablePreview>(
+      `react-portable-preview`,
+    )!;
 
     element.props = { foo: "bar" };
     // preview
     await element.preview("https://example.com");
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code1 {"foo":"bar"}</rp-fragment>',
+      '<react-portable-fragment>https://example.com code1 {"foo":"bar"}</react-portable-fragment>',
     );
     expect(restSpy).toBeCalledTimes(1);
 
@@ -60,7 +64,7 @@ describe("rp-preview", () => {
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code1 {"foo":"baz"}</rp-fragment>',
+      '<react-portable-fragment>https://example.com code1 {"foo":"baz"}</react-portable-fragment>',
     );
     expect(restSpy).toBeCalledTimes(2);
 
@@ -82,9 +86,11 @@ describe("rp-preview", () => {
       "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
     );
 
-    document.body.innerHTML = `<rp-preview code="code">original content</rp-preview>`;
+    document.body.innerHTML = `<react-portable-preview code="code">original content</react-portable-preview>`;
 
-    const element = document.querySelector<RpPreview>(`rp-preview`)!;
+    const element = document.querySelector<ReactPortablePreview>(
+      `react-portable-preview`,
+    )!;
 
     const onClickMock = vi.fn();
 
@@ -92,12 +98,12 @@ describe("rp-preview", () => {
     // preview
     await element.preview("https://example.com");
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code {"foo":"bar","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
+      '<react-portable-fragment>https://example.com code {"foo":"bar","onClick":"__function__:dummy-uuid:onClick"}</react-portable-fragment>',
     );
 
     // dispatch event from previewing component
     window.dispatchEvent(
-      new CustomEvent("rp-preview-message", {
+      new CustomEvent("react-portable-preview-message", {
         detail: {
           uuid: "dummy-uuid",
           path: "onClick",
@@ -113,12 +119,12 @@ describe("rp-preview", () => {
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code {"foo":"baz","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
+      '<react-portable-fragment>https://example.com code {"foo":"baz","onClick":"__function__:dummy-uuid:onClick"}</react-portable-fragment>',
     );
 
     // dispatch event from previewing component
     window.dispatchEvent(
-      new CustomEvent("rp-preview-message", {
+      new CustomEvent("react-portable-preview-message", {
         detail: {
           uuid: "dummy-uuid",
           path: "onClick",
@@ -132,41 +138,45 @@ describe("rp-preview", () => {
   });
 
   test("preview with children", async () => {
-    document.body.innerHTML = `<rp-preview code="with-children">original content<rp-outlet>original children</rp-outlet></rp-preview>`;
+    document.body.innerHTML = `<react-portable-preview code="with-children">original content<rp-outlet>original children</rp-outlet></react-portable-preview>`;
 
-    const element = document.querySelector<RpPreview>(`rp-preview`)!;
+    const element = document.querySelector<ReactPortablePreview>(
+      `react-portable-preview`,
+    )!;
 
     element.props = { foo: "bar" };
     // preview
     await element.preview("https://example.com");
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com with-children {"foo":"bar"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
+      '<react-portable-fragment>https://example.com with-children {"foo":"bar"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></react-portable-fragment>',
     );
 
     element.props = { foo: "baz" };
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com with-children {"foo":"baz"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
+      '<react-portable-fragment>https://example.com with-children {"foo":"baz"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></react-portable-fragment>',
     );
   });
 
   test("the code is not set", async () => {
     const log = vi.spyOn(console, "error").mockImplementationOnce(() => {});
 
-    document.body.innerHTML = `<rp-preview>original content</rp-preview>`;
+    document.body.innerHTML = `<react-portable-preview>original content</react-portable-preview>`;
 
-    expect(log).toBeCalledWith("rp-preview: The code is not set.");
+    expect(log).toBeCalledWith("react-portable-preview: The code is not set.");
   });
 
   test("failed on fetching a fragment", async () => {
-    document.body.innerHTML = `<rp-preview code="404">original content</rp-preview>`;
+    document.body.innerHTML = `<react-portable-preview code="404">original content</react-portable-preview>`;
 
-    const element = document.querySelector<RpPreview>(`rp-preview`)!;
+    const element = document.querySelector<ReactPortablePreview>(
+      `react-portable-preview`,
+    )!;
 
     element.props = { foo: "bar" };
     await expect(element.preview("https://example.com")).rejects.toThrowError(
-      "rp-preview: Failed to retrieve fragment",
+      "react-portable-preview: Failed to retrieve fragment",
     );
   });
 });

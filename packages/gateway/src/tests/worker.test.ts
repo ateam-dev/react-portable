@@ -76,27 +76,43 @@ const prepareOriginMock = () => {
     });
   f1Origin
     .intercept({ method: "GET", path: "/component1" })
-    .reply(200, `<rp-fragment q:base="/build/">f1 component #1</rp-fragment>`, {
-      headers: { "Content-Type": "text/html; charset=UTF-8" },
-    });
+    .reply(
+      200,
+      `<react-portable-fragment q:base="/build/">f1 component #1</react-portable-fragment>`,
+      {
+        headers: { "Content-Type": "text/html; charset=UTF-8" },
+      }
+    );
   f1Origin
     .intercept({ method: "GET", path: "/component2" })
-    .reply(200, `<rp-fragment q:base="/build/">f1 component #2</rp-fragment>`, {
-      headers: { "Content-Type": "text/html; charset=UTF-8" },
-    });
+    .reply(
+      200,
+      `<react-portable-fragment q:base="/build/">f1 component #2</react-portable-fragment>`,
+      {
+        headers: { "Content-Type": "text/html; charset=UTF-8" },
+      }
+    );
 
   // fragment remote server has assetPath
   const f2Origin = fetchMock.get("https://f2.com");
   f2Origin
     .intercept({ method: "GET", path: "/component1" })
-    .reply(200, `<rp-fragment q:base="/build/">f2 component #1</rp-fragment>`, {
-      headers: { "Content-Type": "text/html; charset=UTF-8" },
-    });
+    .reply(
+      200,
+      `<react-portable-fragment q:base="/build/">f2 component #1</react-portable-fragment>`,
+      {
+        headers: { "Content-Type": "text/html; charset=UTF-8" },
+      }
+    );
   f2Origin
     .intercept({ method: "GET", path: "/component2" })
-    .reply(200, `<rp-fragment q:base="/build/">f2 component #2</rp-fragment>`, {
-      headers: { "Content-Type": "text/html; charset=UTF-8" },
-    });
+    .reply(
+      200,
+      `<react-portable-fragment q:base="/build/">f2 component #2</react-portable-fragment>`,
+      {
+        headers: { "Content-Type": "text/html; charset=UTF-8" },
+      }
+    );
 
   return origin;
 };
@@ -106,15 +122,15 @@ describe("OPTION(preflight) request", () => {
     const res = await workers.fetch(
       new Request("http://localhost", { method: "OPTIONS" }),
       bindings,
-      new ExecutionContext(),
+      new ExecutionContext()
     );
 
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
     expect(res.headers.get("Access-Control-Allow-Methods")).toBe(
-      "GET, HEAD, OPTIONS",
+      "GET, HEAD, OPTIONS"
     );
     expect(res.headers.get("Access-Control-Allow-Headers")).toBe(
-      `Content-Type, Accept, X-React-Portable-Gateway`,
+      `Content-Type, Accept, X-React-Portable-Gateway`
     );
   });
 });
@@ -138,7 +154,7 @@ describe("GET request to /_fragments/:code", () => {
     await workers.fetch(
       new Request("http://localhost/_fragments/f1/component1"),
       bindings,
-      ctx,
+      ctx
     );
     await getMiniflareWaitUntil(ctx);
 
@@ -148,11 +164,11 @@ describe("GET request to /_fragments/:code", () => {
     const res = await workers.fetch(
       new Request("http://localhost/_fragments/f1/build/index.js"),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(res.headers.get("Content-Type")).toBe(
-      "application/javascript; charset=UTF-8",
+      "application/javascript; charset=UTF-8"
     );
   });
   test("CORS headers are attached regardless of Content-Type", async () => {
@@ -160,56 +176,56 @@ describe("GET request to /_fragments/:code", () => {
     const res = await workers.fetch(
       new Request("http://localhost/_fragments/f1/build/index.js"),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(res.headers.get("Content-Type")).toBe(
-      "application/javascript; charset=UTF-8",
+      "application/javascript; charset=UTF-8"
     );
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
     expect(res.headers.get("Access-Control-Allow-Methods")).toBe(
-      "GET, HEAD, OPTIONS",
+      "GET, HEAD, OPTIONS"
     );
     expect(res.headers.get("Access-Control-Allow-Headers")).toBe(
-      `Content-Type, Accept, X-React-Portable-Gateway`,
+      `Content-Type, Accept, X-React-Portable-Gateway`
     );
 
     // fragment component request
     const res2 = await workers.fetch(
       new Request("http://localhost/_fragments/f1/component1"),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(res2.headers.get("Content-Type")).toBe("text/html; charset=UTF-8");
     expect(res2.headers.get("Access-Control-Allow-Origin")).toBe("*");
     expect(res2.headers.get("Access-Control-Allow-Methods")).toBe(
-      "GET, HEAD, OPTIONS",
+      "GET, HEAD, OPTIONS"
     );
     expect(res2.headers.get("Access-Control-Allow-Headers")).toBe(
-      `Content-Type, Accept, X-React-Portable-Gateway`,
+      `Content-Type, Accept, X-React-Portable-Gateway`
     );
   });
-  test("q:base of <rp-fragment> is replaced", async () => {
+  test("q:base of <react-portable-fragment> is replaced", async () => {
     const res = await workers.fetch(
       new Request("http://localhost/_fragments/f1/component1"),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(await res.text()).toBe(
-      `<rp-fragment q:base="/_fragments/f1/build/">f1 component #1</rp-fragment>`,
+      `<react-portable-fragment q:base="/_fragments/f1/build/">f1 component #1</react-portable-fragment>`
     );
   });
   test("Replacement of q:base by assetPath information", async () => {
     const res = await workers.fetch(
       new Request("http://localhost/_fragments/f2/component1"),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(await res.text()).toBe(
-      `<rp-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</rp-fragment>`,
+      `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</react-portable-fragment>`
     );
   });
   test("Replacement of q:base by request and header's gateway data", async () => {
@@ -220,11 +236,11 @@ describe("GET request to /_fragments/:code", () => {
         },
       }),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(await res.text()).toBe(
-      `<rp-fragment q:base="https://f1.gw.com/_fragments/f1/build/">f1 component #1</rp-fragment>`,
+      `<react-portable-fragment q:base="https://f1.gw.com/_fragments/f1/build/">f1 component #1</react-portable-fragment>`
     );
   });
   test("If both assetPath information and request and header's gateway data are present, assetPath is prioritized", async () => {
@@ -235,11 +251,11 @@ describe("GET request to /_fragments/:code", () => {
         },
       }),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(await res.text()).toBe(
-      `<rp-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</rp-fragment>`,
+      `<react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</react-portable-fragment>`
     );
   });
 });
@@ -274,7 +290,7 @@ describe("Request to the proxied origin", () => {
     const res = await workers.fetch(
       new Request("http://localhost/no-react-portable"),
       bindings,
-      ctx,
+      ctx
     );
     expect(await res.text()).toBe(dummyOriginBody);
   });
@@ -282,11 +298,11 @@ describe("Request to the proxied origin", () => {
     const res = await workers.fetch(
       new Request("http://localhost/assets/index.js"),
       bindings,
-      ctx,
+      ctx
     );
 
     expect(res.headers.get("Content-Type")).toBe(
-      "application/javascript; charset=UTF-8",
+      "application/javascript; charset=UTF-8"
     );
   });
   describe("When <react-portable> is included", () => {
@@ -301,11 +317,11 @@ describe("Request to the proxied origin", () => {
 
           const savedIdList = await CACHE.get(
             "ID_LIST:https://origin.com/",
-            "json",
+            "json"
           );
           expect(savedIdList.length).toBe(4);
         });
-      },
+      }
     );
     kvIsolateDescribe(
       "Request from the second time onward (when fragmentIdList is in KV)",
@@ -318,33 +334,33 @@ describe("Request to the proxied origin", () => {
           prepareOriginMock();
         });
 
-        test("<rp-fragment> is inserted into <react-portable>", async () => {
+        test("<react-portable-fragment> is inserted into <react-portable>", async () => {
           const res = await workers.fetch(
             new Request("http://localhost/"),
             bindings,
-            ctx,
+            ctx
           );
 
           const text = await res.text();
 
           // no gateway & remote server has no assetPath => default piercing
           expect(text).toMatch(
-            '<react-portable entry="f1:/component1" pierced="succeed"><rp-fragment q:base="/_fragments/f1/build/">f1 component #1</rp-fragment></react-portable>',
+            '<react-portable entry="f1:/component1" pierced="succeed"><react-portable-fragment q:base="/_fragments/f1/build/">f1 component #1</react-portable-fragment></react-portable>'
           );
 
           // has gateway & remote server has no assetPath => default piercing (gateway is ignored)
           expect(text).toMatch(
-            '<react-portable entry="f1:/component2" gateway="https://gw1.com" pierced="succeed"><rp-fragment q:base="/_fragments/f1/build/">f1 component #2</rp-fragment></react-portable>',
+            '<react-portable entry="f1:/component2" gateway="https://gw1.com" pierced="succeed"><react-portable-fragment q:base="/_fragments/f1/build/">f1 component #2</react-portable-fragment></react-portable>'
           );
 
           // no gateway & remote server has no assetPath => piercing with assetPath
           expect(text).toMatch(
-            '<react-portable entry="f2:/component1" pierced="succeed"><rp-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</rp-fragment></react-portable>',
+            '<react-portable entry="f2:/component1" pierced="succeed"><react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #1</react-portable-fragment></react-portable>'
           );
 
           // has gateway & remote server has no assetPath => piercing with assetPath (gateway is ignored)
           expect(text).toMatch(
-            '<react-portable entry="f2:/component2" gateway="https://gw2.com" pierced="succeed"><rp-fragment q:base="https://assets.f2.com/statics/build/">f2 component #2</rp-fragment></react-portable>',
+            '<react-portable entry="f2:/component2" gateway="https://gw2.com" pierced="succeed"><react-portable-fragment q:base="https://assets.f2.com/statics/build/">f2 component #2</react-portable-fragment></react-portable>'
           );
         });
         test("swr's revalidate is executed with untilWait", async () => {
@@ -357,16 +373,16 @@ describe("Request to the proxied origin", () => {
           const res = await workers.fetch(
             new Request("http://localhost/"),
             bindings,
-            ctx,
+            ctx
           );
 
           const html = parse(await res.text());
           expect(html.querySelectorAll("head > template").length).toBe(4);
           for (const template of html.querySelectorAll("template")) {
-            expect(template.innerHTML).toMatch(/rp-fragment/);
+            expect(template.innerHTML).toMatch(/react-portable-fragment/);
           }
         });
-      },
+      }
     );
   });
 });

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { portable } from "./portable";
 import { render, cleanup } from "@testing-library/react";
 import {
-  RpPreview,
+  ReactPortablePreview,
   reactPortableRegister,
 } from "@react-portable/client/web-components";
 import { ReactNode } from "react";
@@ -13,7 +13,7 @@ import { ReactNode } from "react";
 const Sample = () => <div>sample</div>;
 
 const SampleWithChildren = ({ children }: { children: ReactNode }) => (
-  <div>sample with children:{children}</div>
+  <div>sample with children: {children}</div>
 );
 
 describe("portable", () => {
@@ -45,7 +45,7 @@ describe("portable", () => {
     expect(Component.__loader).toBe(loader);
   });
 
-  test("the component will be wrapped by rp-preview", () => {
+  test("the component will be wrapped by react-portable-preview", () => {
     const Component = portable(Sample, "foo");
     const { asFragment } = render(<Component />);
 
@@ -63,7 +63,7 @@ describe("portable", () => {
     expect(asFragment()).toMatchSnapshot();
   });
 
-  test("the component will NOT be wrapped by rp-preview when `disablePreview` is specified true", () => {
+  test("the component will NOT be wrapped by react-portable-preview when `disablePreview` is specified true", () => {
     const Component = portable(Sample, "foo", { disablePreview: true });
     const { asFragment } = render(<Component />);
 
@@ -77,7 +77,9 @@ describe("portable", () => {
     const Component = portable(SampleWithProps, "foo");
     const { rerender } = render(<Component foo="foo" />);
 
-    const element = document.querySelector<RpPreview>("rp-preview");
+    const element = document.querySelector<ReactPortablePreview>(
+      "react-portable-preview",
+    );
 
     expect(element!.props).toStrictEqual({ foo: "foo" });
 

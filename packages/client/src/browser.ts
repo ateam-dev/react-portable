@@ -1,2 +1,2 @@
 import "./react-portable/browser";
-import "./rp-preview/browser";
+import "./react-portable-preview/browser";

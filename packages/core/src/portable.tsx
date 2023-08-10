@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useEffect, useRef } from "react";
-import { RpPreview } from "@react-portable/client/web-components";
+import React, { FunctionComponent, useEffect, useMemo, useRef } from "react";
+import { ReactPortablePreview } from "@react-portable/client/web-components";
 import { RequestEventCommon } from "@builder.io/qwik-city/middleware/request-handler";
 
 export type Strategy = {
@@ -45,7 +45,7 @@ export const portable = <
   } = {},
 ): PortableComponent<InferProps<T>> => {
   const Wrapped = (props: InferProps<T>) => {
-    const ref = useRef<RpPreview>(null);
+    const ref = useRef<ReactPortablePreview>(null);
     useEffect(() => {
       if (!ref.current) return;
 
@@ -56,12 +56,12 @@ export const portable = <
     if (disablePreview) return <Component {...(props as any)} />;
 
     return (
-      <rp-preview ref={ref} code={code}>
+      <react-portable-preview ref={ref} code={code}>
         <Component
           {...(props as any)}
           children={<rp-outlet>{props.children}</rp-outlet>}
         />
-      </rp-preview>
+      </react-portable-preview>
     );
   };
 
