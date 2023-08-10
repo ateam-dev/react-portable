@@ -77,7 +77,6 @@ export const previewify = <
 >(
   Component: T,
   code: string,
-  { loader, strategy }: Omit<PortableOption<T>, "disablePreview"> = {},
 ): PortableComponent<InferProps<T>> => {
-  return portable(Component, code, { loader, strategy });
+  return portable(Component, code, { strategy: { hydrate: "onIdle" } });
 };
