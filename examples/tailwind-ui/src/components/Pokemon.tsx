@@ -43,7 +43,7 @@ export const Pokemon = portable(Component, "pokemon", {
         imgSrc: data.sprites.front_default,
         name: data.name,
         types: data.types.map(
-          ({ type }: { type: { name: string } }) => type.name
+          ({ type }: { type: { name: string } }) => type.name,
         ),
       };
     } catch (e) {
