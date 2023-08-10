@@ -1,2 +1,2 @@
-export { portable } from "./portable";
+export { portable, previewify } from "./portable";
 export type { Strategy, PortableComponent, Loader } from "./portable";

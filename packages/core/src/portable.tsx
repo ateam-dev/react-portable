@@ -29,20 +29,20 @@ type InferProps<T> = T extends FunctionComponent<infer U>
   ? {}
   : never;
 
+type PortableOption<
+  T extends FunctionComponent | ((props: any) => JSX.Element),
+> = {
+  loader?: Loader<InferProps<T>>;
+  strategy?: Strategy;
+  disablePreview?: boolean;
+};
+
 export const portable = <
   T extends FunctionComponent | ((props: any) => JSX.Element),
 >(
   Component: T,
   code: string,
-  {
-    loader,
-    strategy,
-    disablePreview = false,
-  }: {
-    loader?: Loader<InferProps<T>>;
-    strategy?: Strategy;
-    disablePreview?: boolean;
-  } = {},
+  { loader, strategy, disablePreview = false }: PortableOption<T> = {},
 ): PortableComponent<InferProps<T>> => {
   const Wrapped = (props: InferProps<T>) => {
     const ref = useRef<RpPreview>(null);
@@ -70,4 +70,13 @@ export const portable = <
   Wrapped.__strategy = strategy;
 
   return Wrapped;
+};
+
+export const previewify = <
+  T extends FunctionComponent | ((props: any) => JSX.Element),
+>(
+  Component: T,
+  code: string,
+): PortableComponent<InferProps<T>> => {
+  return portable(Component, code, { strategy: { hydrate: "onIdle" } });
 };
