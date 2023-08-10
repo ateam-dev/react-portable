@@ -51,7 +51,7 @@ export default component$(() => {
         `${key}$`,
         $((...args: unknown[]) => {
           window.dispatchEvent(
-            new CustomEvent("react-portable-preview-message", {
+            new CustomEvent("rp-preview-message", {
               detail: {
                 uuid: match[1],
                 path: match[2],
