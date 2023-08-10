@@ -14,7 +14,7 @@ const copyAndReplace = async (
   replacements: {
     search: string;
     replace: string;
-  }[] = []
+  }[] = [],
 ): Promise<void> => {
   await fs.mkdir(path.dirname(destPath), { recursive: true });
 
@@ -53,62 +53,61 @@ const getPortableCode = async (fileName: string) => {
     "test.ts",
     script,
     ts.ScriptTarget.Latest,
-    true
+    true,
   );
 
   if (sourceFile) return findPortableFunctionCalls(sourceFile);
 };
 
-export const reactPortablePlugin = ({
-  prepare,
-  outDir: portableDir = ".portable",
+const coreDir = path.resolve(appRootPath.path, "node_modules", ".portable");
+
+export const portablePreparePlugin = (): PluginOption => {
+  return {
+    name: "react-portable-prepare",
+    enforce: "pre",
+    config: async (config) => {
+      await Promise.all(
+        ["root.tsx", "entry.ssr.tsx", "worker.ts"].map((file) => {
+          return copyAndReplace(
+            path.resolve(currentDir(), "../src/templates", file),
+            path.resolve(coreDir, file),
+          );
+        }),
+      );
+      return config;
+    },
+    resolveId: async (source, importer) => {
+      if (importer && source === "@react-portable/core") {
+        const code = await getPortableCode(importer);
+        if (code) {
+          const destPath = path.resolve(coreDir, "routes", code, "index.tsx");
+          console.log("router:", `/${code} => ${destPath}`);
+          await copyAndReplace(
+            path.resolve(currentDir(), "../src/templates", "route.tsx"),
+            destPath,
+            [
+              { search: "__code__", replace: code },
+              {
+                search: "__sanitized__",
+                replace: code.replace(/[-/:;*]/g, "_"),
+              },
+              { search: "__entryPath__", replace: importer },
+              { search: "../portable", replace: "@react-portable/core" },
+            ],
+          );
+        }
+      }
+    },
+  };
+};
+
+export const portablePlugin = ({
+  outDir = ".portable",
   css,
 }: {
-  prepare?: boolean;
   outDir?: string;
   css?: string;
 } = {}): PluginOption => {
-  const coreDir = path.resolve(appRootPath.path, "node_modules", ".portable");
-
-  if (prepare)
-    return {
-      name: "react-portable-prepare",
-      enforce: "pre",
-      config: async (config) => {
-        await Promise.all(
-          ["root.tsx", "entry.ssr.tsx", "worker.ts"].map((file) => {
-            return copyAndReplace(
-              path.resolve(currentDir(), "../src/templates", file),
-              path.resolve(coreDir, file)
-            );
-          })
-        );
-        return config;
-      },
-      resolveId: async (source, importer) => {
-        if (importer && source === "@react-portable/core") {
-          const code = await getPortableCode(importer);
-          if (code) {
-            const destPath = path.resolve(coreDir, "routes", code, "index.tsx");
-            console.log("router:", `/${code} => ${destPath}`);
-            await copyAndReplace(
-              path.resolve(currentDir(), "../src/templates", "route.tsx"),
-              destPath,
-              [
-                { search: "__code__", replace: code },
-                {
-                  search: "__sanitized__",
-                  replace: code.replace(/[-/:;*]/g, "_"),
-                },
-                { search: "__entryPath__", replace: importer },
-                { search: "../portable", replace: "@react-portable/core" },
-              ]
-            );
-          }
-        }
-      },
-    };
-
   return [
     {
       name: "react-portable-build",
@@ -145,10 +144,10 @@ export const reactPortablePlugin = ({
     qwikVite({
       srcDir: coreDir,
       client: {
-        outDir: path.resolve(portableDir, "client"),
+        outDir: path.resolve(outDir, "client"),
       },
       ssr: {
-        outDir: path.resolve(portableDir, "server"),
+        outDir: path.resolve(outDir, "server"),
       },
       // vendorRoots: [
       //   path.dirname(require.resolve("@builder.io/qwik-city")),

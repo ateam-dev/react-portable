@@ -7,9 +7,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "vite build",
-    "portable:build": "portable build",
-    "portable:dev": "wrangler dev --port 3001 --live-reload",
-    "preview": "wrangler dev --port 3001",
+    "preview": "npx portable prepare && npx wrangler dev --port 3001",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },
