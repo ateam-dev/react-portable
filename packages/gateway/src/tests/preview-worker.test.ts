@@ -39,7 +39,7 @@ const prepareOriginMock = () => {
   fragmentOrigin.intercept({ method: "POST", path: "/code1" }).reply(() => {
     return {
       statusCode: 200,
-      data: `<react-portable-fragment q:base="/build/"><react-portable-prereview code="code1">modified component #1</react-portable-prereview></react-portable-fragment>`,
+      data: `<rp-fragment q:base="/build/"><react-portable-prereview code="code1">modified component #1</react-portable-prereview></rp-fragment>`,
       responseOptions: {
         headers: { "Content-Type": "text/html; charset=UTF-8" },
       },
@@ -58,29 +58,29 @@ describe("POST request to /_fragments/:remote", () => {
     const res = await workers.fetch(
       new Request(
         `http://localhost/_fragments/${encodeURIComponent(
-          "https://fragment.com"
-        )}/build/index.js`
+          "https://fragment.com",
+        )}/build/index.js`,
       ),
       bindings,
-      ctx
+      ctx,
     );
 
     expect(res.headers.get("Content-Type")).toBe(
-      "application/javascript; charset=UTF-8"
+      "application/javascript; charset=UTF-8",
     );
   });
-  test("q:base of <react-portable-fragment> is replaced", async () => {
+  test("q:base of <rp-fragment> is replaced", async () => {
     const res = await workers.fetch(
       new Request(
         `http://localhost/_fragments/${encodedFragmentOrigin}/code1`,
-        { method: "POST" }
+        { method: "POST" },
       ),
       bindings,
-      ctx
+      ctx,
     );
 
     expect(await res.text()).toBe(
-      `<react-portable-fragment q:base="/_fragments/${encodedFragmentOrigin}/build/"><react-portable-prereview code="code1">modified component #1</react-portable-prereview></react-portable-fragment>`
+      `<rp-fragment q:base="/_fragments/${encodedFragmentOrigin}/build/"><react-portable-prereview code="code1">modified component #1</react-portable-prereview></rp-fragment>`,
     );
   });
 });
@@ -95,18 +95,18 @@ describe("Request to the proxied origin", () => {
     const res = await workers.fetch(
       new Request("http://localhost/assets/index.js"),
       bindings,
-      ctx
+      ctx,
     );
 
     expect(res.headers.get("Content-Type")).toBe(
-      "application/javascript; charset=UTF-8"
+      "application/javascript; charset=UTF-8",
     );
   });
-  test("The activate script for <react-portable-preview> is inserted", async () => {
+  test("The activate script for <rp-preview> is inserted", async () => {
     const res = await workers.fetch(
       new Request("http://localhost/"),
       bindings,
-      ctx
+      ctx,
     );
 
     expect(await res.text()).toBe(`<!DOCTYPE html>
