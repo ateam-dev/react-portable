@@ -55,8 +55,7 @@
     "retry-cli": "^0.7.0",
     "typescript": "5.1.6",
     "unbuild": "^1.2.1",
-    "vitest": "^0.33.0",
-    "wrangler": "^3.2.0"
+    "vitest": "^0.33.0"
   },
   "peerDependencies": {
     "@builder.io/qwik": ">=1.2.0",
@@ -65,14 +64,17 @@
     "react": ">=18.0.1",
     "react-dom": ">=18.0.0",
     "typescript": ">=4",
-    "vite": ">=4",
-    "wrangler": ">=3"
+    "vite": ">=4"
   },
   "dependencies": {
     "@hono/qwik-city": "^0.0.3",
+    "@react-portable/gateway": "^0.4.1",
     "app-root-path": "^3.1.0",
+    "chokidar": "^3.5.3",
     "commander": "^11.0.0",
-    "hono": "^3.3.0"
+    "hono": "^3.3.0",
+    "untun": "^0.1.1",
+    "wrangler": "^3.2.0"
   },
   "engines": {
     "node": ">=15.0.0"

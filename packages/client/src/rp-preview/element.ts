@@ -33,10 +33,10 @@ export class RpPreview extends HTMLElement {
     this.removeHandlerProxy();
   }
 
-  public async preview(remote: string) {
-    this.remote = remote;
+  public async preview(remote?: string) {
+    this.remote = remote ?? window._rpPreviewRemote ?? "";
 
-    return this.render(remote, true);
+    return this.render(this.remote, true);
   }
 
   public async rerender(force = false) {
@@ -142,5 +142,8 @@ declare global {
       "rp-outlet": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
       "rp-slot": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
     }
+  }
+  interface Window {
+    _rpPreviewRemote?: string;
   }
 }

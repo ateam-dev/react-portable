@@ -2224,6 +2224,21 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
+"@react-portable/client@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@react-portable/client/-/client-0.4.0.tgz#605852d4ec145e7d2eab00ab6082891fce5053e3"
+  integrity sha512-rb3D3xcxeEgRKPBu7ju+RDLwL1bf0TZkS2r/0h3ncChhDSSpl3wGDYvnQlS723mzEzwfkhkw33H+gGGs9n1xJg==
+  dependencies:
+    writable-dom "^1.0.3"
+
+"@react-portable/gateway@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@react-portable/gateway/-/gateway-0.4.1.tgz#6a9444f18d3e1edfc7a00ce909ae11b4f5b3564f"
+  integrity sha512-xmrm4ZRc8FhnbOAfnNwu02SUUco9KQ/BFlNoS/a6c3ADBZQZ+8h21ti/B9fGlrupcohkuhBD+S2xdpWgo8yDPA==
+  dependencies:
+    "@react-portable/client" "0.4.0"
+    hono "^3.3.0"
+
 "@rollup/plugin-alias@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-alias/-/plugin-alias-5.0.0.tgz#70f3d504bd17d8922e35c6b61c08b40a6ec25af2"
@@ -10968,6 +10983,15 @@ untildify@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/untildify/-/untildify-4.0.0.tgz#2bc947b953652487e4600949fb091e3ae8cd919b"
   integrity sha512-KK8xQ1mkzZeg9inewmFVDNkg3l5LUhoq9kN6iWYB/CC9YMG8HA+c1Q8HwDe6dEX7kErrEVNVBO3fWsVq5iDgtw==
+
+untun@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/untun/-/untun-0.1.1.tgz#9e1aa425eb9586bcd858c5d2397eac5868685eaa"
+  integrity sha512-Xyo/3TLi2pMLr8SFSXAHVTEpEtVrqXZTzXkZAglRIairiO+utD6y7bCemYejj7GazEwomMwpNB1Gg3hoehY+zA==
+  dependencies:
+    citty "^0.1.2"
+    consola "^3.2.3"
+    pathe "^1.1.1"
 
 untyped@^1.3.2:
   version "1.4.0"

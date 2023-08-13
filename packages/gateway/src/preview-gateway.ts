@@ -8,6 +8,7 @@ import { originProxy } from "./gateway";
 const app = new Hono();
 
 let proxyOrigin: string;
+let componentServer: string | undefined;
 
 app.all("/_fragments/:remote/*", async (c) => {
   const remote = c.req.param().remote;
@@ -42,7 +43,7 @@ app.all("*", async (c) => {
   )
     return response;
 
-  const activator = new ActivateRpPreviewReplacer();
+  const activator = new ActivateRpPreviewReplacer(componentServer);
   return new HTMLRewriter()
     .on(activator.selector, activator)
     .transform(response);
@@ -64,8 +65,12 @@ const fragmentProxy = (request: Request, _remote: string): Request => {
   return new Request(url, request);
 };
 
-export const previewGateway = (config: { proxy: string }) => {
+export const previewGateway = (config: {
+  proxy: string;
+  componentServer?: string;
+}) => {
   proxyOrigin = config.proxy;
+  componentServer = config.componentServer;
 
   return app.fetch;
 };

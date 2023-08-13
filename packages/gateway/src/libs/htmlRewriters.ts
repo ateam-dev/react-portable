@@ -85,7 +85,19 @@ export class FragmentBaseReplacer {
 export class ActivateRpPreviewReplacer {
   public readonly selector = "head";
 
+  constructor(private readonly componentServer?: string | undefined) {}
+
   element(element: Element) {
     element.append(`<script>${inline}</script>`, { html: true });
+    if (this.componentServer) {
+      element.append(
+        `<script>window._rpPreviewRemote = '${this.componentServer}'</script>`,
+        { html: true },
+      );
+      element.append(
+        `<script>rpPreview = () => Array.from(document.querySelectorAll('rp-preview')).forEach((el) => el.preview())</script>`,
+        { html: true },
+      );
+    }
   }
 }
