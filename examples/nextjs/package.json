@@ -10,7 +10,7 @@
     "preview": "next build && next start"
   },
   "dependencies": {
-    "@react-portable/client": "*",
+    "@react-portable/client": "0.5.0-next.0",
     "examples-tailwind-ui": "*",
     "next": "13.4.9",
     "react": "18.2.0",
