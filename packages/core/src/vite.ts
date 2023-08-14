@@ -30,7 +30,8 @@ const findPortableFunctionCalls = (node: ts.Node): string | null => {
   if (
     ts.isCallExpression(node) &&
     ts.isIdentifier(node.expression) &&
-    node.expression.escapedText === "portable" &&
+    typeof node.expression.escapedText === "string" &&
+    ["portable", "previewify"].includes(node.expression.escapedText) &&
     node.arguments.length >= 2
   ) {
     const [, secondArg] = node.arguments;
