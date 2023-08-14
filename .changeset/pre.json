@@ -5,7 +5,16 @@
     "@react-portable/client": "0.4.0",
     "@react-portable/core": "0.6.0",
     "@react-portable/gateway": "0.4.1",
-    "@react-portable/storybook": "4.0.0"
+    "@react-portable/storybook": "4.0.0",
+    "examples-gateway": "0.0.0",
+    "examples-nextjs": "0.1.0",
+    "examples-tailwind-ui": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "chilled-stingrays-behave",
+    "empty-beers-do",
+    "green-hornets-hang",
+    "shy-dodos-guess",
+    "violet-kiwis-vanish"
+  ]
 }

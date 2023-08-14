@@ -1,5 +1,13 @@
 # @react-portable/client
 
+## 0.5.0-next.0
+
+### Minor Changes
+
+- [#76](https://github.com/ateam-dev/react-portable/pull/76) [`c3f2d4d`](https://github.com/ateam-dev/react-portable/commit/c3f2d4d8112fd8475b83d84245a88c7a4e6650c6) Thanks [@aiji42](https://github.com/aiji42)! - rename modules and web components for shortify
+
+- [#71](https://github.com/ateam-dev/react-portable/pull/71) [`c158491`](https://github.com/ateam-dev/react-portable/commit/c1584916ad057c5b3c15e3f0ee2a561134db4420) Thanks [@aiji42](https://github.com/aiji42)! - selectable forced rerender and preview always requested
+
 ## 0.4.0
 
 ### Minor Changes

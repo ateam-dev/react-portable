@@ -1,5 +1,19 @@
 # @react-portable/core
 
+## 0.7.0-next.0
+
+### Minor Changes
+
+- [#76](https://github.com/ateam-dev/react-portable/pull/76) [`c3f2d4d`](https://github.com/ateam-dev/react-portable/commit/c3f2d4d8112fd8475b83d84245a88c7a4e6650c6) Thanks [@aiji42](https://github.com/aiji42)! - rename modules and web components for shortify
+
+- [#77](https://github.com/ateam-dev/react-portable/pull/77) [`4635d9e`](https://github.com/ateam-dev/react-portable/commit/4635d9e5cedb6a417c83fdc453c32fa1832262a9) Thanks [@aiji42](https://github.com/aiji42)! - export `previewify` as alias of `portable`
+
+- [#78](https://github.com/ateam-dev/react-portable/pull/78) [`992c4a6`](https://github.com/ateam-dev/react-portable/commit/992c4a616d794c0432ba6db3f1ddddecaf141831) Thanks [@aiji42](https://github.com/aiji42)! - separate vite plugin and cli commands for build and preparation
+
+### Patch Changes
+
+- [#79](https://github.com/ateam-dev/react-portable/pull/79) [`4bb0290`](https://github.com/ateam-dev/react-portable/commit/4bb0290f0d7aee0902c346cd768c330dd04de1ca) Thanks [@aiji42](https://github.com/aiji42)! - fix support `previewify`
+
 ## 0.6.0
 
 ### Minor Changes
