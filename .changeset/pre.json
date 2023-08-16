@@ -11,6 +11,7 @@
     "examples-tailwind-ui": "0.0.0"
   },
   "changesets": [
+    "calm-kiwis-deliver",
     "chilled-stingrays-behave",
     "empty-beers-do",
     "green-hornets-hang",
