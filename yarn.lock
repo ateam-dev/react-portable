@@ -2224,21 +2224,6 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@react-portable/client@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@react-portable/client/-/client-0.4.0.tgz#605852d4ec145e7d2eab00ab6082891fce5053e3"
-  integrity sha512-rb3D3xcxeEgRKPBu7ju+RDLwL1bf0TZkS2r/0h3ncChhDSSpl3wGDYvnQlS723mzEzwfkhkw33H+gGGs9n1xJg==
-  dependencies:
-    writable-dom "^1.0.3"
-
-"@react-portable/gateway@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@react-portable/gateway/-/gateway-0.4.1.tgz#6a9444f18d3e1edfc7a00ce909ae11b4f5b3564f"
-  integrity sha512-xmrm4ZRc8FhnbOAfnNwu02SUUco9KQ/BFlNoS/a6c3ADBZQZ+8h21ti/B9fGlrupcohkuhBD+S2xdpWgo8yDPA==
-  dependencies:
-    "@react-portable/client" "0.4.0"
-    hono "^3.3.0"
-
 "@rollup/plugin-alias@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-alias/-/plugin-alias-5.0.0.tgz#70f3d504bd17d8922e35c6b61c08b40a6ec25af2"
@@ -7651,9 +7636,9 @@ media-typer@0.3.0:
   integrity sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==
 
 memfs@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/memfs/-/memfs-4.2.0.tgz#b30d4b70626b1015f4c35548eab34087a903a5f5"
-  integrity sha512-V5/xE+zl6+soWxlBjiVTQSkfXybTwhEBj2I8sK9LaS5lcZsTuhRftakrcRpDY7Ycac2NTK/VzEtpKMp+gpymrQ==
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/memfs/-/memfs-4.2.1.tgz#8c5a48707a460dde8e734b15e405e8377db2bec5"
+  integrity sha512-CINEB6cNAAhLUfRGrB4lj2Pj47ygerEmw3jxPb6R1gkD6Jfp484gJLteQ6MzqIjGWtFWuVzDl+KN7HiipMuKSw==
   dependencies:
     json-joy "^9.2.0"
     thingies "^1.11.1"
