@@ -1,5 +1,11 @@
 # @react-portable/client
 
+## 0.5.0-next.1
+
+### Minor Changes
+
+- [#81](https://github.com/ateam-dev/react-portable/pull/81) [`5c5c595`](https://github.com/ateam-dev/react-portable/commit/5c5c595a90ecb0db06d487be8b69b0eb2b956eab) Thanks [@aiji42](https://github.com/aiji42)! - start and integrate the gateway and component servers for preview with a single command
+
 ## 0.5.0-next.0
 
 ### Minor Changes
