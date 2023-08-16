@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import workers, { Env } from "./preview-worker";
 
 const bindings: Env = getMiniflareBindings();
@@ -114,6 +114,24 @@ describe("Request to the proxied origin", () => {
   <head>
     <title>dummy page title</title>
   <script>activate script</script></head>
+  <body>
+    <h1>dummy page</h1>
+    <react-portable-prereview code="code1">component #1</react-portable-prereview>
+  </body>
+</html>`);
+  });
+  test("Additional scripts are appended to the head when a component server is specified.", async () => {
+    const res = await workers.fetch(
+      new Request("http://localhost/"),
+      { ...bindings, COMPONENT_SERVER: "https://component.server.com" },
+      ctx,
+    );
+
+    expect(await res.text()).toBe(`<!DOCTYPE html>
+<html>
+  <head>
+    <title>dummy page title</title>
+  <script>activate script</script><script>window._rpPreviewRemote = 'https://component.server.com'</script><script>rpPreview = () => Array.from(document.querySelectorAll('rp-preview')).forEach((el) => el.preview())</script></head>
   <body>
     <h1>dummy page</h1>
     <react-portable-prereview code="code1">component #1</react-portable-prereview>

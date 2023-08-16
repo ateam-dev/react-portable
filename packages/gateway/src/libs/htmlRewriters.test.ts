@@ -213,11 +213,9 @@ describe("htmlRewriters", () => {
   });
 
   describe("ActivateRpPreviewReplacer", () => {
-    test("insert the activate script for rp-preview", async () => {
-      const activator = new ActivateRpPreviewReplacer();
-      const rewriter = new HTMLRewriter().on(activator.selector, activator);
-
-      const response = new Response(`<!DOCTYPE html>
+    let response: Response;
+    beforeEach(() => {
+      response = new Response(`<!DOCTYPE html>
 <html>
   <head>
     <title>dummy page title</title>
@@ -225,12 +223,31 @@ describe("htmlRewriters", () => {
   <body></body>
 </html>
 `);
+    });
+
+    test("insert the activate script for rp-preview", async () => {
+      const activator = new ActivateRpPreviewReplacer();
+      const rewriter = new HTMLRewriter().on(activator.selector, activator);
 
       expect(await rewriter.transform(response).text()).toBe(`<!DOCTYPE html>
 <html>
   <head>
     <title>dummy page title</title>
   <script>activate script</script></head>
+  <body></body>
+</html>
+`);
+    });
+
+    test("When specifying the origin of the component server", async () => {
+      const activator = new ActivateRpPreviewReplacer("https://example.com");
+      const rewriter = new HTMLRewriter().on(activator.selector, activator);
+
+      expect(await rewriter.transform(response).text()).toBe(`<!DOCTYPE html>
+<html>
+  <head>
+    <title>dummy page title</title>
+  <script>activate script</script><script>window._rpPreviewRemote = 'https://example.com'</script><script>rpPreview = () => Array.from(document.querySelectorAll('rp-preview')).forEach((el) => el.preview())</script></head>
   <body></body>
 </html>
 `);

@@ -7,7 +7,8 @@
   "version": "0.0.0",
   "scripts": {
     "build": "vite build",
-    "preview": "npx portable prepare && npx wrangler dev --port 3001",
+    "preview": "portable prepare && portable preview -c ./vite.portable.config.ts",
+    "preview:global": "npx portable prepare && portable preview -c ./vite.portable.config.ts -g",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },

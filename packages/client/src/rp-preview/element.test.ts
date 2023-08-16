@@ -77,6 +77,20 @@ describe("rp-preview", () => {
     expect(restSpy).toBeCalledTimes(4);
   });
 
+  test("The preview argument can be omitted when `window._rpPreviewRemote` is set.", async () => {
+    window._rpPreviewRemote = "https://example2.com";
+
+    document.body.innerHTML = `<rp-preview code="code1">original content</rp-preview>`;
+
+    const element = document.querySelector<RpPreview>(`rp-preview`)!;
+
+    // preview without arguments
+    await element.preview();
+    expect(element.innerHTML).toBe(
+      "<rp-fragment>https://example2.com code1 {}</rp-fragment>",
+    );
+  });
+
   test("preview with functional props", async () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValueOnce(
       "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
