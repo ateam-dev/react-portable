@@ -2224,21 +2224,6 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@react-portable/client@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@react-portable/client/-/client-0.4.0.tgz#605852d4ec145e7d2eab00ab6082891fce5053e3"
-  integrity sha512-rb3D3xcxeEgRKPBu7ju+RDLwL1bf0TZkS2r/0h3ncChhDSSpl3wGDYvnQlS723mzEzwfkhkw33H+gGGs9n1xJg==
-  dependencies:
-    writable-dom "^1.0.3"
-
-"@react-portable/gateway@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@react-portable/gateway/-/gateway-0.4.1.tgz#6a9444f18d3e1edfc7a00ce909ae11b4f5b3564f"
-  integrity sha512-xmrm4ZRc8FhnbOAfnNwu02SUUco9KQ/BFlNoS/a6c3ADBZQZ+8h21ti/B9fGlrupcohkuhBD+S2xdpWgo8yDPA==
-  dependencies:
-    "@react-portable/client" "0.4.0"
-    hono "^3.3.0"
-
 "@rollup/plugin-alias@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-alias/-/plugin-alias-5.0.0.tgz#70f3d504bd17d8922e35c6b61c08b40a6ec25af2"
@@ -8344,9 +8329,9 @@ node-getopt@^0.3.2:
   integrity sha512-yqkmYrMbK1wPrfz7mgeYvA4tBperLg9FQ4S3Sau3nSAkpOA0x0zC8nQ1siBwozy1f4SE8vq2n1WKv99r+PCa1Q==
 
 node-html-parser@^6.1.5:
-  version "6.1.5"
-  resolved "https://registry.yarnpkg.com/node-html-parser/-/node-html-parser-6.1.5.tgz#c819dceb13a10a7642ff92f94f870b4f77968097"
-  integrity sha512-fAaM511feX++/Chnhe475a0NHD8M7AxDInsqQpz6x63GRF7xYNdS8Vo5dKsIVPgsOvG7eioRRTZQnWBrhDHBSg==
+  version "6.1.6"
+  resolved "https://registry.yarnpkg.com/node-html-parser/-/node-html-parser-6.1.6.tgz#8369a11d629a92ab2db2344bb650261135ac8e13"
+  integrity sha512-C/MGDQ2NjdjzUq41bW9kW00MPZecAe/oo89vZEFLDfWoQVDk/DdML1yuxVVKLDMFIFax2VTq6Vpfzyn7z5yYgQ==
   dependencies:
     css-select "^5.1.0"
     he "1.2.0"
