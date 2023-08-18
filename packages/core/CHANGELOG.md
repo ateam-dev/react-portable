@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.7.0-next.3
+
+### Patch Changes
+
+- [#95](https://github.com/ateam-dev/react-portable/pull/95) [`be9055f`](https://github.com/ateam-dev/react-portable/commit/be9055fcff8b38f827cdb6da3236235faad825d6) Thanks [@aiji42](https://github.com/aiji42)! - stabilize build task
+
 ## 0.7.0-next.2
 
 ### Patch Changes
