@@ -5,6 +5,7 @@ import { portablePlugin, portablePreparePlugin } from "./vite";
 import * as chokidar from "chokidar";
 import * as path from "node:path";
 import { Worker } from "./worker";
+import { BuildQueue } from "./buildQueue";
 
 type Color = "cyan" | "yellow" | "green";
 const displayLog = (...messages: (string | [Color, string])[]) => {
@@ -149,14 +150,18 @@ program
         const watcher = chokidar.watch(watch, {
           persistent: true,
           ignoreInitial: true,
+          interval: 100,
         });
+        const queue = new BuildQueue();
         watcher.on("all", async () => {
-          displayLog(`♻️ Rebuilding component assets...`);
-          await buildClient(config);
-          await buildServer(false, config);
-          displayLog(`♻️ Restarting components server...`);
-          await devWorker.restart();
-          displayLog(`🟢 Restarted components server`);
+          queue.enqueue(async () => {
+            displayLog(`♻️ Rebuilding component assets...`);
+            await buildClient(config);
+            await buildServer(false, config);
+            displayLog(`♻️ Restarting components server...`);
+            await devWorker.restart();
+            displayLog(`🟢 Restarted components server`);
+          });
         });
       }
     },
