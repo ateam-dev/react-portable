@@ -3,9 +3,28 @@ import * as vite from "vite";
 import { program } from "commander";
 import { portablePlugin, portablePreparePlugin } from "./vite";
 import * as chokidar from "chokidar";
-import { unstable_dev, UnstableDevOptions, UnstableDevWorker } from "wrangler";
-import { startTunnel } from "untun";
 import * as path from "node:path";
+import { Worker } from "./worker";
+
+// override console log and add prefix
+const originalConsoleLog = console.log;
+console.log = (...args) => {
+  originalConsoleLog("\x1b[90m%s\x1b[0m", `[react-portable]`, ...args);
+};
+
+type Color = "cyan" | "yellow" | "green";
+const displayLog = (...messages: (string | [Color, string])[]) => {
+  const formatted = messages.map((msg) => {
+    if (typeof msg === "string") return msg;
+    const [color, txt] = msg;
+    return color === "cyan"
+      ? `\x1b[36m${txt}\x1b[0m`
+      : color === "yellow"
+      ? `\x1b[34m${txt}\x1b[0m`
+      : `\x1b[32m${txt}\x1b[0m`;
+  });
+  console.log(...formatted);
+};
 
 const prepare = async (configFile?: string | null) => {
   return vite.build(
@@ -50,7 +69,7 @@ program
     "Specifying the path of the config file will overwrite the settings.",
   )
   .action(async ({ config }) => {
-    if (config) console.log("Load custom config", config);
+    if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
 
     await prepare(config);
   });
@@ -63,7 +82,7 @@ program
     "Specifying the path of the config file of vite will overwrite the settings for build.",
   )
   .action(async ({ config }) => {
-    if (config) console.log("Load custom config", config);
+    if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
 
     await buildClient(config);
     await buildServer(true, config);
@@ -83,7 +102,7 @@ program
     "Specifying the path of the config file of vite will overwrite the settings for build.",
   )
   .option(
-    "-g --global",
+    "-t --tunnel",
     "Use cloudflared tunnel to allow global access.",
     false,
   )
@@ -100,27 +119,22 @@ program
   .action(
     async (
       origin,
-      { watch, config, port, global: tunnel, serverEntry, clientEntry },
+      { watch, config, port, tunnel, serverEntry, clientEntry },
     ) => {
-      if (config) console.log("Load custom config", config);
+      if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
 
-      const devWorker = new Worker(
-        serverEntry,
-        {
-          site: clientEntry,
-          experimental: {
-            disableExperimentalWarning: true,
-          },
+      const devWorker = new Worker(serverEntry, {
+        site: clientEntry,
+        experimental: {
+          disableExperimentalWarning: true,
         },
-        {
-          name: "dev server",
-          silent: true,
-        },
-      );
+      });
 
       await buildClient(config);
       await buildServer(true, config);
       await devWorker.start();
+      displayLog("📁 Serving static files from", ["cyan", clientEntry]);
+      displayLog("🚀 Loading server entry", ["cyan", serverEntry]);
 
       const gateway = new Worker(
         path.resolve(__dirname, "../src/templates/preview-gateway.js"),
@@ -134,80 +148,32 @@ program
             disableExperimentalWarning: true,
           },
         },
-        { name: "gateway server" },
       );
       await gateway.start(tunnel);
-      console.log("Proxy", gateway.globalUrl ?? gateway.localUrl, "~>", origin);
+      displayLog(
+        "🟢 Previewing",
+        gateway.globalUrl ?? gateway.localUrl,
+        "~>",
+        origin,
+      );
 
       if (watch) {
+        displayLog("👀 Watching", ["cyan", watch], "for changes");
         const watcher = chokidar.watch(watch, {
           persistent: true,
           ignoreInitial: true,
         });
         watcher.on("all", async (event) => {
+          displayLog(`♻️ Rebuilding component assets...`);
           await buildClient(config);
           await buildServer(false, config);
+          displayLog(`♻️ Restarting components server...`);
           await devWorker.restart();
+          displayLog(`🟢 Restarted components server`);
         });
       }
     },
   );
-
-class Worker {
-  private worker: UnstableDevWorker | undefined;
-  public globalUrl: string | undefined;
-
-  constructor(
-    private readonly workerEntry: string,
-    private readonly workerOption: UnstableDevOptions,
-    private readonly option: { name: string; silent?: boolean },
-  ) {}
-
-  public async start(tunnel = false) {
-    this.worker = await unstable_dev(this.workerEntry, this.workerOption);
-
-    if (tunnel) await this.startTunnel();
-    else
-      this.print("success", `${this.option.name} is running at`, this.localUrl);
-  }
-
-  public async restart(tunnel = false) {
-    this.print("info", `Restarting ${this.option.name}...`);
-
-    await this.worker?.stop();
-    this.worker = await unstable_dev(this.workerEntry, {
-      ...this.workerOption,
-      port: this.worker?.port ?? this.workerOption.port,
-    });
-
-    this.print("success", `${this.option.name} is restarted`);
-  }
-
-  private async startTunnel() {
-    const tunnel = await startTunnel({ url: this.localUrl });
-
-    this.print("info", `Waiting for ${this.option.name} tunnel URL...`);
-
-    this.globalUrl = await tunnel!.getURL();
-    this.print(
-      "success",
-      `${this.option.name} is tunneling at`,
-      this.globalUrl,
-    );
-  }
-
-  public get localUrl() {
-    if (!this.worker) throw new Error(`${this.option.name} is not up yet.`);
-
-    return `http://${this.worker.address}:${this.worker.port}`;
-  }
-
-  private print(level: "info" | "success", ...message: string[]) {
-    if (this.option.silent) return;
-    const prefix = level === "info" ? `\x1b[34mℹ\x1b[0m` : `\x1b[32m✔\x1b[0m`;
-    console.log(prefix, ...message);
-  }
-}
 
 program.parse(process.argv);
 

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "vite build",
     "preview": "portable prepare && portable preview -c ./vite.portable.config.ts",
-    "preview:global": "npx portable prepare && portable preview -c ./vite.portable.config.ts -g",
+    "preview:global": "npx portable prepare && portable preview -c ./vite.portable.config.ts -t",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },
