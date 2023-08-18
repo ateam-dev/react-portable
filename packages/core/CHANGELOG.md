@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.7.0-next.4
+
+### Patch Changes
+
+- [#97](https://github.com/ateam-dev/react-portable/pull/97) [`86a43ad`](https://github.com/ateam-dev/react-portable/commit/86a43adcd8d6443f2efebe2c74dd2538998cfb65) Thanks [@aiji42](https://github.com/aiji42)! - fix preview worker config when restarting
+
 ## 0.7.0-next.3
 
 ### Patch Changes
