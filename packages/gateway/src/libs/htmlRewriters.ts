@@ -1,7 +1,8 @@
 import { ReactPortable } from "@react-portable/client/web-components";
 import { CLASS_NAME_FOR_GATEWAY_CACHE } from "./constants";
 import { FragmentMap } from "./fragments";
-import inline from "@react-portable/client/dist/browser.umd?raw";
+import inlineRegister from "@react-portable/client/dist/browser.umd?raw";
+import inlinePreviewButton from "../statics/preview-button?raw";
 
 // handler for <react-portable />
 export class ReactPortablePiercer {
@@ -75,9 +76,10 @@ export class FragmentBaseReplacer {
 
     element.setAttribute(
       attributeName,
-      this.assetPath
-        ? `${this.assetPath.replace(/\/$/, "")}${originalBasePath}`
-        : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`,
+      (this.assetPath
+        ? `${this.assetPath}${originalBasePath}`
+        : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
+      ).replace(/(?<!https?:)\/\//g, "/"),
     );
   }
 }
@@ -85,19 +87,10 @@ export class FragmentBaseReplacer {
 export class ActivateRpPreviewReplacer {
   public readonly selector = "head";
 
-  constructor(private readonly componentServer?: string | undefined) {}
-
   element(element: Element) {
-    element.append(`<script>${inline}</script>`, { html: true });
-    if (this.componentServer) {
-      element.append(
-        `<script>window._rpPreviewRemote = '${this.componentServer}'</script>`,
-        { html: true },
-      );
-      element.append(
-        `<script>rpPreview = () => Array.from(document.querySelectorAll('rp-preview')).forEach((el) => el.preview())</script>`,
-        { html: true },
-      );
-    }
+    element.append(`<script>${inlineRegister}</script>`, { html: true });
+    element.append(`<script type="module">${inlinePreviewButton}</script>`, {
+      html: true,
+    });
   }
 }

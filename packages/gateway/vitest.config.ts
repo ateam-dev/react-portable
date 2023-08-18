@@ -8,6 +8,7 @@ export default defineConfig({
       modules: true,
       bindings: {
         ORIGIN: "https://origin.com",
+        FRAGMENTS_ENDPOINT: "https://fragments.com",
         ALLOW_ORIGINS: "*",
         FRAGMENT_CONFIGS: JSON.stringify({
           f1: { endpoint: "https://f1.com", assetPath: "" },

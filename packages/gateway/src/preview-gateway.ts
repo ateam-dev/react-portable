@@ -8,11 +8,10 @@ import { originProxy } from "./gateway";
 const app = new Hono();
 
 let proxyOrigin: string;
-let componentServer: string | undefined;
+let fragmentsEndpoint: string;
 
-app.all("/_fragments/:remote/*", async (c) => {
-  const remote = c.req.param().remote;
-  const proxyRequest = fragmentProxy(c.req.raw, remote);
+app.all("/_fragments/*", async (c) => {
+  const proxyRequest = fragmentProxy(c.req.raw);
 
   const response = await fetch(proxyRequest);
 
@@ -22,11 +21,7 @@ app.all("/_fragments/:remote/*", async (c) => {
   )
     return response;
 
-  const baseReplacer = new FragmentBaseReplacer(
-    encodeURIComponent(remote),
-    null,
-    null,
-  );
+  const baseReplacer = new FragmentBaseReplacer("", null, null);
   const rewriter = new HTMLRewriter().on(baseReplacer.selector, baseReplacer);
 
   return rewriter.transform(response);
@@ -43,34 +38,25 @@ app.all("*", async (c) => {
   )
     return response;
 
-  const activator = new ActivateRpPreviewReplacer(componentServer);
+  const activator = new ActivateRpPreviewReplacer();
   return new HTMLRewriter()
     .on(activator.selector, activator)
     .transform(response);
 });
 
-const fragmentProxy = (request: Request, _remote: string): Request => {
-  const url = new URL(request.url);
+const fragmentProxy = (request: Request): Request => {
+  const remote = new URL(fragmentsEndpoint);
+  remote.pathname = new URL(request.url).pathname.replace(/^\/_fragments/, "");
 
-  const remote = new URL(_remote);
-
-  url.host = remote.host;
-  url.port = remote.port;
-  url.protocol = remote.protocol;
-  url.pathname = url.pathname.replace(
-    `/_fragments/${encodeURIComponent(_remote)}`,
-    "",
-  );
-
-  return new Request(url, request);
+  return new Request(remote, request);
 };
 
 export const previewGateway = (config: {
   proxy: string;
-  componentServer?: string;
+  fragmentsEndpoint: string;
 }) => {
   proxyOrigin = config.proxy;
-  componentServer = config.componentServer;
+  fragmentsEndpoint = config.fragmentsEndpoint;
 
   return app.fetch;
 };

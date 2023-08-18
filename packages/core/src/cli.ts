@@ -6,12 +6,6 @@ import * as chokidar from "chokidar";
 import * as path from "node:path";
 import { Worker } from "./worker";
 
-// override console log and add prefix
-const originalConsoleLog = console.log;
-console.log = (...args) => {
-  originalConsoleLog("\x1b[90m%s\x1b[0m", `[react-portable]`, ...args);
-};
-
 type Color = "cyan" | "yellow" | "green";
 const displayLog = (...messages: (string | [Color, string])[]) => {
   const formatted = messages.map((msg) => {
@@ -125,9 +119,6 @@ program
 
       const devWorker = new Worker(serverEntry, {
         site: clientEntry,
-        experimental: {
-          disableExperimentalWarning: true,
-        },
       });
 
       await buildClient(config);
@@ -141,20 +132,16 @@ program
         {
           vars: {
             ORIGIN: origin,
-            REMOTE: devWorker.localUrl,
+            FRAGMENTS_ENDPOINT: devWorker.localUrl,
           },
           port: port ? Number(port) : undefined,
-          experimental: {
-            disableExperimentalWarning: true,
-          },
         },
       );
       await gateway.start(tunnel);
       displayLog(
-        "🟢 Previewing",
+        "🟢 Previewing at",
         gateway.globalUrl ?? gateway.localUrl,
-        "~>",
-        origin,
+        `(proxy ~> ${origin})`,
       );
 
       if (watch) {
@@ -163,7 +150,7 @@ program
           persistent: true,
           ignoreInitial: true,
         });
-        watcher.on("all", async (event) => {
+        watcher.on("all", async () => {
           displayLog(`♻️ Rebuilding component assets...`);
           await buildClient(config);
           await buildServer(false, config);
