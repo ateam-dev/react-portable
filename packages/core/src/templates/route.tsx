@@ -28,7 +28,7 @@ const qwikifyOption =
         eagerness: undefined,
         event: undefined,
       };
-const QComponent__sanitized__ = qwikify$(Entry, qwikifyOption);
+const QComponent__sanitized__ = qwikify$(Entry.__original, qwikifyOption);
 const getProps = routeLoader$(async ({ request, error }) => {
   try {
     if (request.method === "POST") return await request.json();

@@ -4,7 +4,7 @@ export default {
   fetch: (request, env, ctx) => {
     return previewGateway({
       proxy: env.ORIGIN,
-      componentServer: env.REMOTE,
+      fragmentsEndpoint: env.FRAGMENTS_ENDPOINT,
     })(request, env, ctx);
   },
 };

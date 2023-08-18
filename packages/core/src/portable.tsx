@@ -19,6 +19,7 @@ export interface PortableComponent<T extends Record<string, unknown> = {}>
   __code: string;
   __strategy: undefined | Strategy;
   __loader: undefined | Loader<T>;
+  __original: FunctionComponent<T>;
 }
 
 type InferProps<T> = T extends FunctionComponent<infer U>
@@ -68,6 +69,7 @@ export const portable = <
   Wrapped.__code = code;
   Wrapped.__loader = loader;
   Wrapped.__strategy = strategy;
+  Wrapped.__original = Component;
 
   return Wrapped;
 };

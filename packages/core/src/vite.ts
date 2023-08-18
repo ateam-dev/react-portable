@@ -82,7 +82,6 @@ export const portablePreparePlugin = (): PluginOption => {
         const code = await getPortableCode(importer);
         if (code) {
           const destPath = path.resolve(coreDir, "routes", code, "index.tsx");
-          console.log("router:", `/${code} => ${destPath}`);
           await copyAndReplace(
             path.resolve(currentDir(), "../src/templates", "route.tsx"),
             destPath,

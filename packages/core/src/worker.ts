@@ -11,7 +11,15 @@ export class Worker {
   ) {}
 
   public async start(tunnel = false) {
-    this.worker = await unstable_dev(this.workerEntry, this.workerOption);
+    this.worker = await unstable_dev(this.workerEntry, {
+      compatibilityDate: "2023-07-24",
+      logLevel: "info",
+      ...this.workerOption,
+      experimental: {
+        ...this.workerOption.experimental,
+        disableExperimentalWarning: true,
+      },
+    });
 
     if (tunnel) await this.startTunnel();
   }

@@ -44,6 +44,10 @@ describe("portable", () => {
     });
     expect(Component.__loader).toBe(loader);
   });
+  test("__original", () => {
+    const Component = portable(Sample, "foo");
+    expect(Component.__original).toBe(Sample);
+  });
 
   test("the component will be wrapped by rp-preview", () => {
     const Component = portable(Sample, "foo");
