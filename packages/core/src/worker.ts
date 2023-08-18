@@ -11,23 +11,15 @@ export class Worker {
   ) {}
 
   public async start(tunnel = false) {
-    this.worker = await unstable_dev(this.workerEntry, {
-      compatibilityDate: "2023-07-24",
-      logLevel: "info",
-      ...this.workerOption,
-      experimental: {
-        ...this.workerOption.experimental,
-        disableExperimentalWarning: true,
-      },
-    });
+    this.worker = await unstable_dev(this.workerEntry, this.config);
 
     if (tunnel) await this.startTunnel();
   }
 
-  public async restart(tunnel = false) {
+  public async restart() {
     await this.worker?.stop();
     this.worker = await unstable_dev(this.workerEntry, {
-      ...this.workerOption,
+      ...this.config,
       port: this.worker?.port ?? this.workerOption.port,
     });
   }
@@ -42,5 +34,17 @@ export class Worker {
     if (!this.worker) throw new Error(`worker is not up yet.`);
 
     return `http://${this.worker.address}:${this.worker.port}`;
+  }
+
+  private get config(): UnstableDevOptions {
+    return {
+      compatibilityDate: "2023-07-24",
+      logLevel: "info",
+      ...this.workerOption,
+      experimental: {
+        ...this.workerOption.experimental,
+        disableExperimentalWarning: true,
+      },
+    };
   }
 }
