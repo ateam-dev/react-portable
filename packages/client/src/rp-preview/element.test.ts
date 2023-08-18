@@ -13,9 +13,9 @@ import { setupServer } from "msw/node";
 import { register } from "./register";
 
 const restSpy = vi.fn();
-const restHandlers = [rest.post(`/_fragments/:remote/:code`, restSpy)];
+const restHandlers = [rest.post(`/_fragments/:code`, restSpy)];
 restSpy.mockImplementation((req, res, ctx) => {
-  const { remote, code } = req.params;
+  const { code } = req.params;
 
   if (code === "404") return res(ctx.status(404));
 
@@ -23,13 +23,13 @@ restSpy.mockImplementation((req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.text(
-        `<rp-fragment>${remote} ${code} ${req.body} <rp-slot></rp-slot></rp-fragment>`,
+        `<rp-fragment>${code} ${req.body} <rp-slot></rp-slot></rp-fragment>`,
       ),
     );
 
   return res(
     ctx.status(200),
-    ctx.text(`<rp-fragment>${remote} ${code} ${req.body}</rp-fragment>`),
+    ctx.text(`<rp-fragment>${code} ${req.body}</rp-fragment>`),
   );
 });
 
@@ -50,9 +50,9 @@ describe("rp-preview", () => {
 
     element.props = { foo: "bar" };
     // preview
-    await element.preview("https://example.com");
+    await element.preview();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code1 {"foo":"bar"}</rp-fragment>',
+      '<rp-fragment>code1 {"foo":"bar"}</rp-fragment>',
     );
     expect(restSpy).toBeCalledTimes(1);
 
@@ -60,7 +60,7 @@ describe("rp-preview", () => {
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code1 {"foo":"baz"}</rp-fragment>',
+      '<rp-fragment>code1 {"foo":"baz"}</rp-fragment>',
     );
     expect(restSpy).toBeCalledTimes(2);
 
@@ -69,26 +69,12 @@ describe("rp-preview", () => {
     expect(restSpy).toBeCalledTimes(2);
 
     // If preview is called, the request is forced regardless of props
-    await element.preview("https://example.com");
+    await element.preview();
     expect(restSpy).toBeCalledTimes(3);
 
     // If true is passed to the rerender argument, it is forced to request
     await element.rerender(true);
     expect(restSpy).toBeCalledTimes(4);
-  });
-
-  test("The preview argument can be omitted when `window._rpPreviewRemote` is set.", async () => {
-    window._rpPreviewRemote = "https://example2.com";
-
-    document.body.innerHTML = `<rp-preview code="code1">original content</rp-preview>`;
-
-    const element = document.querySelector<RpPreview>(`rp-preview`)!;
-
-    // preview without arguments
-    await element.preview();
-    expect(element.innerHTML).toBe(
-      "<rp-fragment>https://example2.com code1 {}</rp-fragment>",
-    );
   });
 
   test("preview with functional props", async () => {
@@ -104,9 +90,9 @@ describe("rp-preview", () => {
 
     element.props = { foo: "bar", onClick: onClickMock };
     // preview
-    await element.preview("https://example.com");
+    await element.preview();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code {"foo":"bar","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
+      '<rp-fragment>code {"foo":"bar","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
     );
 
     // dispatch event from previewing component
@@ -127,7 +113,7 @@ describe("rp-preview", () => {
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com code {"foo":"baz","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
+      '<rp-fragment>code {"foo":"baz","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
     );
 
     // dispatch event from previewing component
@@ -152,16 +138,16 @@ describe("rp-preview", () => {
 
     element.props = { foo: "bar" };
     // preview
-    await element.preview("https://example.com");
+    await element.preview();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com with-children {"foo":"bar"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
+      '<rp-fragment>with-children {"foo":"bar"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
     );
 
     element.props = { foo: "baz" };
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>https://example.com with-children {"foo":"baz"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
+      '<rp-fragment>with-children {"foo":"baz"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
     );
   });
 
@@ -179,7 +165,7 @@ describe("rp-preview", () => {
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
 
     element.props = { foo: "bar" };
-    await expect(element.preview("https://example.com")).rejects.toThrowError(
+    await expect(element.preview()).rejects.toThrowError(
       "rp-preview: Failed to retrieve fragment",
     );
   });

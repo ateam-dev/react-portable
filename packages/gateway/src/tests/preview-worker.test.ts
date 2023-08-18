@@ -10,7 +10,7 @@ const dummyOriginBody = `<!DOCTYPE html>
   </head>
   <body>
     <h1>dummy page</h1>
-    <react-portable-prereview code="code1">component #1</react-portable-prereview>
+    <rp-prereview code="code1">component #1</rp-prereview>
   </body>
 </html>`;
 
@@ -30,7 +30,7 @@ const prepareOriginMock = () => {
     });
 
   // fragment
-  const fragmentOrigin = fetchMock.get("https://fragment.com");
+  const fragmentOrigin = fetchMock.get("https://fragments.com");
   fragmentOrigin
     .intercept({ method: "GET", path: "/build/index.js" })
     .reply(200, "console.log('this is mocked')", {
@@ -39,7 +39,7 @@ const prepareOriginMock = () => {
   fragmentOrigin.intercept({ method: "POST", path: "/code1" }).reply(() => {
     return {
       statusCode: 200,
-      data: `<rp-fragment q:base="/build/"><react-portable-prereview code="code1">modified component #1</react-portable-prereview></rp-fragment>`,
+      data: `<rp-fragment q:base="/build/">modified component #1</rp-fragment>`,
       responseOptions: {
         headers: { "Content-Type": "text/html; charset=UTF-8" },
       },
@@ -47,8 +47,7 @@ const prepareOriginMock = () => {
   });
 };
 
-describe("POST request to /_fragments/:remote", () => {
-  const encodedFragmentOrigin = encodeURIComponent("https://fragment.com");
+describe("POST request to /_fragments/*", () => {
   let ctx: ExecutionContext;
   beforeEach(() => {
     ctx = new ExecutionContext();
@@ -56,11 +55,7 @@ describe("POST request to /_fragments/:remote", () => {
   });
   test("If Content-Type is not HTML, it responds as is", async () => {
     const res = await workers.fetch(
-      new Request(
-        `http://localhost/_fragments/${encodeURIComponent(
-          "https://fragment.com",
-        )}/build/index.js`,
-      ),
+      new Request(`http://localhost/_fragments/build/index.js`),
       bindings,
       ctx,
     );
@@ -71,16 +66,13 @@ describe("POST request to /_fragments/:remote", () => {
   });
   test("q:base of <rp-fragment> is replaced", async () => {
     const res = await workers.fetch(
-      new Request(
-        `http://localhost/_fragments/${encodedFragmentOrigin}/code1`,
-        { method: "POST" },
-      ),
+      new Request(`http://localhost/_fragments/code1`, { method: "POST" }),
       bindings,
       ctx,
     );
 
     expect(await res.text()).toBe(
-      `<rp-fragment q:base="/_fragments/${encodedFragmentOrigin}/build/"><react-portable-prereview code="code1">modified component #1</react-portable-prereview></rp-fragment>`,
+      `<rp-fragment q:base="/_fragments/build/">modified component #1</rp-fragment>`,
     );
   });
 });
@@ -113,28 +105,10 @@ describe("Request to the proxied origin", () => {
 <html>
   <head>
     <title>dummy page title</title>
-  <script>activate script</script></head>
+  <script>activate script</script><script type="module">preview button</script></head>
   <body>
     <h1>dummy page</h1>
-    <react-portable-prereview code="code1">component #1</react-portable-prereview>
-  </body>
-</html>`);
-  });
-  test("Additional scripts are appended to the head when a component server is specified.", async () => {
-    const res = await workers.fetch(
-      new Request("http://localhost/"),
-      { ...bindings, COMPONENT_SERVER: "https://component.server.com" },
-      ctx,
-    );
-
-    expect(await res.text()).toBe(`<!DOCTYPE html>
-<html>
-  <head>
-    <title>dummy page title</title>
-  <script>activate script</script><script>window._rpPreviewRemote = 'https://component.server.com'</script><script>rpPreview = () => Array.from(document.querySelectorAll('rp-preview')).forEach((el) => el.preview())</script></head>
-  <body>
-    <h1>dummy page</h1>
-    <react-portable-prereview code="code1">component #1</react-portable-prereview>
+    <rp-prereview code="code1">component #1</rp-prereview>
   </body>
 </html>`);
   });

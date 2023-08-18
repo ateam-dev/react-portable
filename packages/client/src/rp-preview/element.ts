@@ -7,9 +7,9 @@ if (typeof globalThis.HTMLElement === "undefined") {
 }
 
 export class RpPreview extends HTMLElement {
+  public previewing = false;
   private uuid = "";
   private code = "";
-  private remote = "";
   public props: Record<string, unknown> = {};
   private outlet: Node | null = null;
   private fetching = false;
@@ -33,17 +33,17 @@ export class RpPreview extends HTMLElement {
     this.removeHandlerProxy();
   }
 
-  public async preview(remote?: string) {
-    this.remote = remote ?? window._rpPreviewRemote ?? "";
+  public async preview() {
+    this.previewing = true;
 
-    return this.render(this.remote, true);
+    return this.render(true);
   }
 
   public async rerender(force = false) {
-    if (this.remote) return this.render(this.remote, force);
+    if (this.previewing) return this.render(force);
   }
 
-  private async render(remote: string, force = false) {
+  private async render(force = false) {
     if (this.fetching) return;
 
     const requestBody = JSON.stringify(this.props, serialize(this.uuid));
@@ -53,7 +53,7 @@ export class RpPreview extends HTMLElement {
       try {
         this.storeOutlet();
 
-        const fragment = await this.fetchFragmentStream(remote, requestBody);
+        const fragment = await this.fetchFragmentStream(requestBody);
         if (!fragment.body || !fragment.ok) {
           throw new Error(`rp-preview: Failed to retrieve fragment`);
         }
@@ -68,10 +68,8 @@ export class RpPreview extends HTMLElement {
     this.previousRequestBody = requestBody;
   }
 
-  private async fetchFragmentStream(remote: string, body: string) {
-    const url = `${window.location.origin}/_fragments/${encodeURIComponent(
-      remote,
-    )}/${this.code}`;
+  private async fetchFragmentStream(body: string) {
+    const url = `${window.location.origin}/_fragments/${this.code}`;
     const request = new Request(url);
 
     return fetch(request, {
@@ -142,8 +140,5 @@ declare global {
       "rp-outlet": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
       "rp-slot": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
     }
-  }
-  interface Window {
-    _rpPreviewRemote?: string;
   }
 }

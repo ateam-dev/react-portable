@@ -233,21 +233,7 @@ describe("htmlRewriters", () => {
 <html>
   <head>
     <title>dummy page title</title>
-  <script>activate script</script></head>
-  <body></body>
-</html>
-`);
-    });
-
-    test("When specifying the origin of the component server", async () => {
-      const activator = new ActivateRpPreviewReplacer("https://example.com");
-      const rewriter = new HTMLRewriter().on(activator.selector, activator);
-
-      expect(await rewriter.transform(response).text()).toBe(`<!DOCTYPE html>
-<html>
-  <head>
-    <title>dummy page title</title>
-  <script>activate script</script><script>window._rpPreviewRemote = 'https://example.com'</script><script>rpPreview = () => Array.from(document.querySelectorAll('rp-preview')).forEach((el) => el.preview())</script></head>
+  <script>activate script</script><script type="module">preview button</script></head>
   <body></body>
 </html>
 `);
