@@ -1,5 +1,11 @@
 # @react-portable/client
 
+## 0.5.0-next.2
+
+### Minor Changes
+
+- [#94](https://github.com/ateam-dev/react-portable/pull/94) [`0e59614`](https://github.com/ateam-dev/react-portable/commit/0e59614807f7d55dbd98f33942d1f9f49e4381f4) Thanks [@aiji42](https://github.com/aiji42)! - delete preview remote specification at gateway and client
+
 ## 0.5.0-next.1
 
 ### Minor Changes

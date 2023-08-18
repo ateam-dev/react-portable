@@ -1,5 +1,16 @@
 # @react-portable/core
 
+## 0.7.0-next.2
+
+### Patch Changes
+
+- [#94](https://github.com/ateam-dev/react-portable/pull/94) [`0e59614`](https://github.com/ateam-dev/react-portable/commit/0e59614807f7d55dbd98f33942d1f9f49e4381f4) Thanks [@aiji42](https://github.com/aiji42)! - remove rp-preview included in fragment
+
+- [#91](https://github.com/ateam-dev/react-portable/pull/91) [`b8e336b`](https://github.com/ateam-dev/react-portable/commit/b8e336b4f5717b4c69f1aaf0e82e3836e78959eb) Thanks [@aiji42](https://github.com/aiji42)! - beautify cli logs
+
+- Updated dependencies [[`0e59614`](https://github.com/ateam-dev/react-portable/commit/0e59614807f7d55dbd98f33942d1f9f49e4381f4)]:
+  - @react-portable/gateway@0.5.0-next.2
+
 ## 0.7.0-next.1
 
 ### Minor Changes

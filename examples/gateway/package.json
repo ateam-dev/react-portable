@@ -13,6 +13,6 @@
     "wrangler": "^3.2.0"
   },
   "dependencies": {
-    "@react-portable/gateway": "0.5.0-next.1"
+    "@react-portable/gateway": "0.5.0-next.2"
   }
 }
