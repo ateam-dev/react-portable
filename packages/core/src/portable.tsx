@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useEffect, useRef } from "react";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useRef,
+  isValidElement,
+  ComponentProps,
+} from "react";
 import { RpPreview } from "@react-portable/client/web-components";
 import { RequestEventCommon } from "@builder.io/qwik-city/middleware/request-handler";
 
@@ -56,12 +62,21 @@ export const portable = <
 
     if (disablePreview) return <Component {...(props as any)} />;
 
+    const newProps = Object.fromEntries(
+      Object.entries(props).map(([k, v]) => {
+        if (
+          isValidElement(v) ||
+          (Array.isArray(v) && v.length > 0 && v.every(isValidElement))
+        )
+          return [k, <rp-outlet _key={k} children={v} />];
+
+        return [k, v];
+      }),
+    ) as ComponentProps<T>;
+
     return (
       <rp-preview ref={ref} code={code}>
-        <Component
-          {...(props as any)}
-          children={<rp-outlet>{props.children}</rp-outlet>}
-        />
+        <Component {...newProps} />
       </rp-preview>
     );
   };

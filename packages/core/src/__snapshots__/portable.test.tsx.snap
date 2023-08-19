@@ -17,6 +17,45 @@ exports[`portable > children will be wrapped by rp-outlet 1`] = `
 </DocumentFragment>
 `;
 
+exports[`portable > elements will be wrapped by <rp-outlet> 1`] = `
+<DocumentFragment>
+  <rp-preview
+    code="foo"
+  >
+    <div>
+      <rp-outlet
+        _key="children"
+      >
+        <div>
+          children
+        </div>
+      </rp-outlet>
+      <rp-outlet
+        _key="fragment"
+      >
+        <div>
+          inner fragment 1
+        </div>
+        <div>
+          inner fragment 2
+        </div>
+      </rp-outlet>
+      <rp-outlet
+        _key="arrayElement"
+      >
+        <div>
+          array element 1
+        </div>
+        <div>
+          array element 2
+        </div>
+      </rp-outlet>
+      foo
+    </div>
+  </rp-preview>
+</DocumentFragment>
+`;
+
 exports[`portable > the component will NOT be wrapped by rp-preview when \`disablePreview\` is specified true 1`] = `
 <DocumentFragment>
   <div>

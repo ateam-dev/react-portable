@@ -23,7 +23,7 @@ restSpy.mockImplementation((req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.text(
-        `<rp-fragment>${code} ${req.body} <rp-slot></rp-slot></rp-fragment>`,
+        `<rp-fragment>${code} ${req.body} <rp-slot _key="children"></rp-slot></rp-fragment>`,
       ),
     );
 
@@ -131,8 +131,8 @@ describe("rp-preview", () => {
     expect(onClickMock).toBeCalledTimes(2);
   });
 
-  test("preview with children", async () => {
-    document.body.innerHTML = `<rp-preview code="with-children">original content<rp-outlet>original children</rp-outlet></rp-preview>`;
+  test("preview with rp-outlet", async () => {
+    document.body.innerHTML = `<rp-preview code="with-children">original content<rp-outlet _key="children">original children</rp-outlet></rp-preview>`;
 
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
 
@@ -140,14 +140,14 @@ describe("rp-preview", () => {
     // preview
     await element.preview();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>with-children {"foo":"bar"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
+      '<rp-fragment>with-children {"foo":"bar"} <rp-slot _key="children"><rp-outlet _key="children">original children</rp-outlet></rp-slot></rp-fragment>',
     );
 
     element.props = { foo: "baz" };
     // rerender
     await element.rerender();
     expect(element.innerHTML).toBe(
-      '<rp-fragment>with-children {"foo":"baz"} <rp-slot><rp-outlet>original children</rp-outlet></rp-slot></rp-fragment>',
+      '<rp-fragment>with-children {"foo":"baz"} <rp-slot _key="children"><rp-outlet _key="children">original children</rp-outlet></rp-slot></rp-fragment>',
     );
   });
 

@@ -8,7 +8,7 @@ import {
   RpPreview,
   reactPortableRegister,
 } from "@react-portable/client/web-components";
-import { ReactNode } from "react";
+import { ReactNode, ReactNodeArray } from "react";
 
 const Sample = () => <div>sample</div>;
 
@@ -92,5 +92,50 @@ describe("portable", () => {
     rerender(<Component foo="baz" />);
 
     expect(element!.props).toStrictEqual({ foo: "baz" });
+  });
+
+  test("elements will be wrapped by <rp-outlet>", () => {
+    const SampleWithProps = ({
+      children,
+      fragment,
+      arrayElement,
+      primitiveBoolean,
+      primitiveString,
+    }: {
+      children: ReactNode;
+      fragment: ReactNode;
+      arrayElement: ReactNodeArray;
+      primitiveString: string;
+      primitiveBoolean: boolean;
+    }) => (
+      <div>
+        {children}
+        {fragment}
+        {arrayElement}
+        {primitiveString}
+        {primitiveBoolean}
+      </div>
+    );
+
+    const Component = portable(SampleWithProps, "foo");
+    const { asFragment } = render(
+      <Component
+        fragment={
+          <>
+            <div>inner fragment 1</div>
+            <div>inner fragment 2</div>
+          </>
+        }
+        arrayElement={[1, 2].map((i) => (
+          <div key={i}>array element {i}</div>
+        ))}
+        primitiveString="foo"
+        primitiveBoolean
+      >
+        <div>children</div>
+      </Component>,
+    );
+
+    expect(asFragment()).toMatchSnapshot();
   });
 });

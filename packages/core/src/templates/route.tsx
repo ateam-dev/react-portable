@@ -44,27 +44,29 @@ export default component$(() => {
   const props = Object.fromEntries(
     Object.entries(getProps().value).map(([key, val]) => {
       if (typeof val !== "string") return [key, val];
-      const match = val.match(/__function__:(.*):(.*)/);
-      if (!match) return [key, val];
+      const [, uuid, path] = val.match(/__function__:(.*):(.*)/) ?? [];
+      if (uuid && path) {
+        return [
+          `${key}$`,
+          $((...args: unknown[]) => {
+            window.dispatchEvent(
+              new CustomEvent("rp-preview-message", {
+                detail: { uuid, path, args },
+              }),
+            );
+          }),
+        ];
+      }
 
-      return [
-        `${key}$`,
-        $((...args: unknown[]) => {
-          window.dispatchEvent(
-            new CustomEvent("rp-preview-message", {
-              detail: {
-                uuid: match[1],
-                path: match[2],
-                args,
-              },
-            }),
-          );
-        }),
-      ];
+      // TODO: support keys other than `children`
+      if (val === "__outlet__" && key === "children")
+        return [key, <rp-slot _key={key} />];
+
+      return [key, val];
     }),
   );
 
-  return <QComponent__sanitized__ {...props} children={<rp-slot />} />;
+  return <QComponent__sanitized__ {...props} />;
 });
 
 export const onRequest: RequestHandler = async (requestEvent) => {
