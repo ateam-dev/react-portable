@@ -11,7 +11,7 @@ export class RpPreview extends HTMLElement {
   private uuid = "";
   private code = "";
   public props: Record<string, unknown> = {};
-  private outlet: Node | null = null;
+  private outlets: Record<string, HTMLElement> | null = null;
   private fetching = false;
   private previousRequestBody = "";
   private handlerProxyListener: VoidFunction | EventListener = () => {};
@@ -51,7 +51,7 @@ export class RpPreview extends HTMLElement {
     if (requestBody !== this.previousRequestBody || force) {
       this.fetching = true;
       try {
-        this.storeOutlet();
+        this.storeOutlets();
 
         const fragment = await this.fetchFragmentStream(requestBody);
         if (!fragment.body || !fragment.ok) {
@@ -59,7 +59,7 @@ export class RpPreview extends HTMLElement {
         }
         await this.piercing(fragment.body);
 
-        this.restoreOutletToSlot();
+        this.restoreOutletsToSlots();
       } finally {
         this.fetching = false;
       }
@@ -86,13 +86,23 @@ export class RpPreview extends HTMLElement {
       .pipeTo(new WritableDOM(this));
   }
 
-  private storeOutlet() {
-    this.outlet ||= this.querySelector("rp-outlet");
+  private storeOutlets() {
+    this.outlets ||= Object.fromEntries(
+      Array.from(this.querySelectorAll<HTMLElement>("rp-outlet")).map((el) => [
+        el.getAttribute("_key"),
+        el,
+      ]),
+    );
   }
 
-  private restoreOutletToSlot() {
-    const slot = this.querySelector("rp-slot");
-    if (slot && this.outlet) slot.appendChild(this.outlet);
+  private restoreOutletsToSlots() {
+    Array.from(this.querySelectorAll<HTMLElement>("rp-slot")).forEach(
+      (slot) => {
+        if (!this.outlets) return;
+        const outlet = this.outlets[slot.getAttribute("_key")!];
+        if (outlet) slot.appendChild(outlet);
+      },
+    );
   }
 
   private addHandlerProxy() {
@@ -119,11 +129,22 @@ export class RpPreview extends HTMLElement {
 }
 
 const serialize = (id: string) => (key: string, val: unknown) => {
-  if (key === "children") return undefined;
+  if (isRpOutletProps(val)) {
+    return `__outlet__`;
+  }
   if (typeof val === "function") {
     return `__function__:${id}:${key}`;
   }
   return val;
+};
+
+const isRpOutletProps = (value: unknown) => {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    "type" in value &&
+    "props" in value
+  );
 };
 
 interface RpPreviewAttributes {
@@ -137,8 +158,14 @@ declare global {
         HTMLAttributes<HTMLElement> & RpPreviewAttributes,
         RpPreview
       >;
-      "rp-outlet": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
-      "rp-slot": DetailedHTMLProps<HTMLAttributes<HTMLElement>, RpPreview>;
+      "rp-outlet": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement> & { _key: string },
+        HTMLElement
+      >;
+      "rp-slot": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement> & { _key: string },
+        HTMLElement
+      >;
     }
   }
 }
