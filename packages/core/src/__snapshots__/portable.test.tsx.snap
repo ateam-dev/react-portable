@@ -7,7 +7,9 @@ exports[`portable > children will be wrapped by rp-outlet 1`] = `
   >
     <div>
       sample with children:
-      <rp-outlet>
+      <rp-outlet
+        _key="children"
+      >
         <p>
           this is children
         </p>
