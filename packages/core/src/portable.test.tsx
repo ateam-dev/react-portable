@@ -1,11 +1,22 @@
 /**
  * @vitest-environment jsdom
  */
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 import { portable } from "./portable";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
 import { rpPreviewRegister } from "@react-portable/client/web-components";
 import { MouseEventHandler, ReactNode } from "react";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 
 const Sample = ({
   onClick,
@@ -31,13 +42,41 @@ const SampleWithChildren = ({
   </div>
 );
 
+const server = setupServer(
+  rest.post(`http://http://192.0.0.1:3000/_fragments/foo`, (req, res, ctx) => {
+    return res(ctx.status(200), ctx.text(``));
+  }),
+);
+
+const dispatchPreview = () => {
+  act(() => window.rpPreviewDispatchers!.forEach(([, dispatch]) => dispatch()));
+  vi.advanceTimersByTime(500);
+};
+
 describe("portable", () => {
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.spyOn(crypto, "randomUUID").mockReturnValueOnce(
       "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
     );
     cleanup();
     rpPreviewRegister();
+    Object.defineProperty(window, "location", {
+      value: {
+        origin: "http://192.0.0.1:3000",
+      },
+      writable: true,
+    });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    server.resetHandlers();
+  });
+  afterAll(() => {
+    server.close();
   });
 
   test("__code", () => {
@@ -89,14 +128,12 @@ describe("portable", () => {
       const Component = portable(Sample, "foo");
       const { asFragment } = render(<Component />);
 
-      act(() =>
-        window.rpPreviewDispatchers!.forEach(([, dispatch]) => dispatch()),
-      );
+      dispatchPreview();
 
       expect(asFragment()).toMatchSnapshot();
     });
 
-    test("Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called", async () => {
+    test("Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called", () => {
       const Component = portable(SampleWithChildren, "foo");
       const { container } = render(
         <Component
@@ -105,9 +142,7 @@ describe("portable", () => {
         />,
       );
 
-      act(() =>
-        window.rpPreviewDispatchers!.forEach(([, dispatch]) => dispatch()),
-      );
+      dispatchPreview();
 
       expect(container).toMatchSnapshot();
     });
@@ -134,9 +169,7 @@ describe("portable", () => {
         />,
       );
 
-      act(() =>
-        window.rpPreviewDispatchers!.forEach(([, dispatch]) => dispatch()),
-      );
+      dispatchPreview();
 
       fireEvent.click(rendered.getByTestId("clickable"));
 
