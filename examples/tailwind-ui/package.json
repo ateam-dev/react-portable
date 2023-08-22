@@ -23,7 +23,6 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@react-portable/storybook": "5.0.0-next.5",
     "@storybook/addon-essentials": "^7.0.26",
     "@storybook/addon-interactions": "^7.0.26",
     "@storybook/addon-links": "^7.0.26",

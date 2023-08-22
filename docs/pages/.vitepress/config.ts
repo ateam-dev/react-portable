@@ -36,15 +36,6 @@ export default defineConfig({
           },
         ],
       },
-      {
-        text: "Integrations",
-        items: [
-          {
-            text: "Storybook",
-            link: "/integrations/storybook",
-          },
-        ],
-      },
     ],
 
     socialLinks: [

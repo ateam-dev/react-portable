@@ -6,7 +6,6 @@ const config: StorybookConfig = {
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
-    "@react-portable/storybook",
     "@storybook/addon-styling",
   ],
   framework: {
