@@ -15,7 +15,7 @@ import {
   PhoneIcon,
   PlayCircleIcon,
 } from "@heroicons/react/20/solid";
-import { portable } from "@react-portable/core";
+import { previewify } from "@react-portable/core";
 
 const products = [
   {
@@ -204,7 +204,7 @@ function Header() {
                         <ChevronDownIcon
                           className={classNames(
                             open ? "rotate-180" : "",
-                            "h-5 w-5 flex-none"
+                            "h-5 w-5 flex-none",
                           )}
                           aria-hidden="true"
                         />
@@ -259,4 +259,4 @@ function Header() {
   );
 }
 
-export default portable(Header, "header");
+export default previewify(Header, "header");

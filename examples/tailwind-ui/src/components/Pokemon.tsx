@@ -1,9 +1,9 @@
 import { FC, MouseEventHandler, ReactNode } from "react";
-import { portable } from "@react-portable/core";
+import { previewify } from "@react-portable/core";
 
 type Props = {
   imgSrc?: string;
-  name?: string;
+  name?: string | ReactNode;
   types?: string[];
   onClick?: MouseEventHandler<HTMLDivElement>;
   children?: ReactNode;
@@ -18,7 +18,7 @@ const Component: FC<Props> = ({ imgSrc, name, types, onClick, children }) => {
       <div className="flex justify-center -mt-16">
         <img
           className="w-20 h-20 object-cover rounded-full border border-gray-200 bg-white"
-          alt={name}
+          alt=""
           src={imgSrc}
         />
       </div>
@@ -31,24 +31,4 @@ const Component: FC<Props> = ({ imgSrc, name, types, onClick, children }) => {
   );
 };
 
-export const Pokemon = portable(Component, "pokemon", {
-  loader: async (req, ctx) => {
-    const search = new URL(req.url).searchParams;
-    const id = search.get("id") ?? "1";
-    const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      return {
-        imgSrc: data.sprites.front_default,
-        name: data.name,
-        types: data.types.map(
-          ({ type }: { type: { name: string } }) => type.name,
-        ),
-      };
-    } catch (e) {
-      throw ctx.error(500, e instanceof Error ? e.message : "unknown error");
-    }
-  },
-  // strategy: { revalidate: 60, hydrate: "onIdle" },
-});
+export const Pokemon = previewify(Component, "pokemon");
