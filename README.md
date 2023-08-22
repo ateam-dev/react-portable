@@ -3,7 +3,7 @@
 
 # React Portable
 
-React Portable enhances the use of React components, enabling direct use across any website and allowing for immediate updates without the need for bundling.
+React Portable is a project to increase the portability and ease of distribution of React components.
 
 ## Documentation
 
