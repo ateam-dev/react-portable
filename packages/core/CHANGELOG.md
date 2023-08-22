@@ -1,5 +1,18 @@
 # @react-portable/core
 
+## 0.7.0-next.5
+
+### Minor Changes
+
+- [#102](https://github.com/ateam-dev/react-portable/pull/102) [`4486e6c`](https://github.com/ateam-dev/react-portable/commit/4486e6c8ddfb0a2eaa8447a3dd620f28ca5a6807) Thanks [@aiji42](https://github.com/aiji42)! - support rendering react elements passed by props
+
+### Patch Changes
+
+- [#100](https://github.com/ateam-dev/react-portable/pull/100) [`c845c6d`](https://github.com/ateam-dev/react-portable/commit/c845c6dfbd862af50b3b8ff8a4358de8933859f5) Thanks [@aiji42](https://github.com/aiji42)! - prepare for supporting to preview ReactElement props
+
+- Updated dependencies [[`4486e6c`](https://github.com/ateam-dev/react-portable/commit/4486e6c8ddfb0a2eaa8447a3dd620f28ca5a6807)]:
+  - @react-portable/gateway@0.5.0-next.3
+
 ## 0.7.0-next.4
 
 ### Patch Changes

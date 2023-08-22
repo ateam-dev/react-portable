@@ -1,5 +1,12 @@
 # @react-portable/storybook
 
+## 5.0.0-next.5
+
+### Patch Changes
+
+- Updated dependencies [[`4486e6c`](https://github.com/ateam-dev/react-portable/commit/4486e6c8ddfb0a2eaa8447a3dd620f28ca5a6807), [`c845c6d`](https://github.com/ateam-dev/react-portable/commit/c845c6dfbd862af50b3b8ff8a4358de8933859f5)]:
+  - @react-portable/core@0.7.0-next.5
+
 ## 5.0.0-next.4
 
 ### Patch Changes
