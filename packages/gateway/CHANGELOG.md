@@ -1,5 +1,11 @@
 # @react-portable/gateway
 
+## 0.5.0-next.4
+
+### Patch Changes
+
+- [#105](https://github.com/ateam-dev/react-portable/pull/105) [`74e5597`](https://github.com/ateam-dev/react-portable/commit/74e5597cc8971bae4487a6459bc795677c434139) Thanks [@aiji42](https://github.com/aiji42)! - update style of preview button
+
 ## 0.5.0-next.3
 
 ### Minor Changes
