@@ -1,30 +1,24 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`portable > children will be wrapped by rp-outlet 1`] = `
-<DocumentFragment>
+exports[`portable > Component > Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called 1`] = `
+<div>
   <rp-preview
     code="foo"
+    id="dummy-uuid"
   >
-    <div>
-      sample with children:
-      <rp-outlet
-        _key="children"
-      >
-        <p>
-          this is children
-        </p>
-      </rp-outlet>
-    </div>
-  </rp-preview>
-</DocumentFragment>
-`;
-
-exports[`portable > elements will be wrapped by <rp-outlet> 1`] = `
-<DocumentFragment>
-  <rp-preview
-    code="foo"
-  >
-    <div>
+    <rp-preview-area>
+      <div>
+        sample with children:
+        <div>
+          children
+        </div>
+         
+        <div>
+          element
+        </div>
+      </div>
+    </rp-preview-area>
+    <template>
       <rp-outlet
         _key="children"
       >
@@ -33,47 +27,44 @@ exports[`portable > elements will be wrapped by <rp-outlet> 1`] = `
         </div>
       </rp-outlet>
       <rp-outlet
-        _key="fragment"
+        _key="element"
       >
         <div>
-          inner fragment 1
-        </div>
-        <div>
-          inner fragment 2
+          element
         </div>
       </rp-outlet>
-      <rp-outlet
-        _key="arrayElement"
-      >
-        <div>
-          array element 1
-        </div>
-        <div>
-          array element 2
-        </div>
-      </rp-outlet>
-      foo
-    </div>
+    </template>
   </rp-preview>
-</DocumentFragment>
+</div>
 `;
 
-exports[`portable > the component will NOT be wrapped by rp-preview when \`disablePreview\` is specified true 1`] = `
-<DocumentFragment>
-  <div>
-    sample
-  </div>
-</DocumentFragment>
-`;
-
-exports[`portable > the component will be wrapped by rp-preview 1`] = `
+exports[`portable > Component > It will be wrapped by <rp-preview /> when rpPreviewDispatchers will be called 1`] = `
 <DocumentFragment>
   <rp-preview
     code="foo"
+    id="dummy-uuid"
   >
-    <div>
-      sample
-    </div>
+    <rp-preview-area>
+      <div>
+        sample
+      </div>
+    </rp-preview-area>
+    <template />
   </rp-preview>
+</DocumentFragment>
+`;
+
+exports[`portable > Component.__forQwik > \`__outlet__\` is converted to <rp-outlet /> and rendered 1`] = `
+<DocumentFragment>
+  <div>
+    sample with children:
+    <rp-slot
+      _key="children"
+    />
+     
+    <rp-slot
+      _key="element"
+    />
+  </div>
 </DocumentFragment>
 `;

@@ -44,28 +44,26 @@ afterAll(() => server.close());
 
 describe("rp-preview", () => {
   test("preview and rerender", async () => {
-    document.body.innerHTML = `<rp-preview code="code1">original content</rp-preview>`;
+    document.body.innerHTML = `<rp-preview code="code1"><rp-preview-area>original content</rp-preview-area></rp-preview>`;
 
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
 
-    element.props = { foo: "bar" };
     // preview
-    await element.preview();
+    await element.preview({ foo: "bar" });
     expect(element.innerHTML).toBe(
-      '<rp-fragment>code1 {"foo":"bar"}</rp-fragment>',
+      '<rp-preview-area><rp-fragment>code1 {"foo":"bar"}</rp-fragment></rp-preview-area>',
     );
     expect(restSpy).toBeCalledTimes(1);
 
-    element.props = { foo: "baz" };
     // rerender
-    await element.rerender();
+    await element.rerender({ foo: "baz" });
     expect(element.innerHTML).toBe(
-      '<rp-fragment>code1 {"foo":"baz"}</rp-fragment>',
+      '<rp-preview-area><rp-fragment>code1 {"foo":"baz"}</rp-fragment></rp-preview-area>',
     );
     expect(restSpy).toBeCalledTimes(2);
 
     // If props do not change, requests are suppressed
-    await element.rerender();
+    await element.rerender({ foo: "baz" });
     expect(restSpy).toBeCalledTimes(2);
 
     // If preview is called, the request is forced regardless of props
@@ -73,7 +71,7 @@ describe("rp-preview", () => {
     expect(restSpy).toBeCalledTimes(3);
 
     // If true is passed to the rerender argument, it is forced to request
-    await element.rerender(true);
+    await element.rerender(undefined, true);
     expect(restSpy).toBeCalledTimes(4);
   });
 
@@ -82,25 +80,23 @@ describe("rp-preview", () => {
       "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
     );
 
-    document.body.innerHTML = `<rp-preview code="code">original content</rp-preview>`;
+    document.body.innerHTML = `<rp-preview code="code"><rp-preview-area>original content</rp-preview-area></rp-preview>`;
 
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
 
     const onClickMock = vi.fn();
 
-    element.props = { foo: "bar", onClick: onClickMock };
     // preview
-    await element.preview();
+    await element.preview({ foo: "bar", onClick: onClickMock });
     expect(element.innerHTML).toBe(
-      '<rp-fragment>code {"foo":"bar","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
+      '<rp-preview-area><rp-fragment>code {"foo":"bar","onClick":"__function__#dummy-uuid#rp-preview-event"}</rp-fragment></rp-preview-area>',
     );
 
     // dispatch event from previewing component
-    window.dispatchEvent(
-      new CustomEvent("rp-preview-message", {
+    element.dispatchEvent(
+      new CustomEvent("rp-preview-event", {
         detail: {
-          uuid: "dummy-uuid",
-          path: "onClick",
+          key: "onClick",
           args: ["foo", "bar"],
         },
       }),
@@ -109,19 +105,17 @@ describe("rp-preview", () => {
     expect(onClickMock).toHaveBeenLastCalledWith("foo", "bar");
     expect(onClickMock).toBeCalledTimes(1);
 
-    element.props = { foo: "baz", onClick: onClickMock };
     // rerender
-    await element.rerender();
+    await element.rerender({ foo: "baz", onClick: onClickMock });
     expect(element.innerHTML).toBe(
-      '<rp-fragment>code {"foo":"baz","onClick":"__function__:dummy-uuid:onClick"}</rp-fragment>',
+      '<rp-preview-area><rp-fragment>code {"foo":"baz","onClick":"__function__#dummy-uuid#rp-preview-event"}</rp-fragment></rp-preview-area>',
     );
 
     // dispatch event from previewing component
-    window.dispatchEvent(
-      new CustomEvent("rp-preview-message", {
+    element.dispatchEvent(
+      new CustomEvent("rp-preview-event", {
         detail: {
-          uuid: "dummy-uuid",
-          path: "onClick",
+          key: "onClick",
           args: ["foo", "baz"],
         },
       }),
@@ -132,41 +126,46 @@ describe("rp-preview", () => {
   });
 
   test("preview with rp-outlet", async () => {
-    document.body.innerHTML = `<rp-preview code="with-children">original content<rp-outlet _key="children">original children</rp-outlet></rp-preview>`;
+    document.body.innerHTML = `<rp-preview code="with-children"><rp-preview-area>original content</rp-preview-area><rp-outlet _key="children">original children</rp-outlet></rp-preview>`;
 
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
 
-    element.props = { foo: "bar" };
     // preview
-    await element.preview();
+    await element.preview({ foo: "bar", children: { type: "", props: {} } });
     expect(element.innerHTML).toBe(
-      '<rp-fragment>with-children {"foo":"bar"} <rp-slot _key="children"><rp-outlet _key="children">original children</rp-outlet></rp-slot></rp-fragment>',
+      '<rp-preview-area><rp-fragment>with-children {"foo":"bar","children":"__outlet__"} <rp-slot _key="children"><rp-outlet _key="children">original children</rp-outlet></rp-slot></rp-fragment></rp-preview-area>',
     );
 
-    element.props = { foo: "baz" };
     // rerender
-    await element.rerender();
+    await element.rerender({ foo: "baz", children: { type: "", props: {} } });
     expect(element.innerHTML).toBe(
-      '<rp-fragment>with-children {"foo":"baz"} <rp-slot _key="children"><rp-outlet _key="children">original children</rp-outlet></rp-slot></rp-fragment>',
+      '<rp-preview-area><rp-fragment>with-children {"foo":"baz","children":"__outlet__"} <rp-slot _key="children"><rp-outlet _key="children">original children</rp-outlet></rp-slot></rp-fragment></rp-preview-area>',
     );
   });
 
   test("the code is not set", async () => {
     const log = vi.spyOn(console, "error").mockImplementationOnce(() => {});
 
-    document.body.innerHTML = `<rp-preview>original content</rp-preview>`;
+    document.body.innerHTML = `<rp-preview><rp-preview-area>original content</rp-preview-area></rp-preview>`;
 
     expect(log).toBeCalledWith("rp-preview: The code is not set.");
   });
 
   test("failed on fetching a fragment", async () => {
-    document.body.innerHTML = `<rp-preview code="404">original content</rp-preview>`;
+    document.body.innerHTML = `<rp-preview code="404"><rp-preview-area>original content</rp-preview-area></rp-preview>`;
 
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
 
-    element.props = { foo: "bar" };
-    await expect(element.preview()).rejects.toThrowError(
+    await expect(element.preview({ foo: "bar" })).rejects.toThrowError(
       "rp-preview: Failed to retrieve fragment",
     );
+  });
+
+  test("<rp-preview-area /> is not set", async () => {
+    const log = vi.spyOn(console, "error").mockImplementationOnce(() => {});
+
+    document.body.innerHTML = `<rp-preview>original content</rp-preview>`;
+
+    expect(log).toBeCalledWith("rp-preview: <rp-preview-area /> is not set.");
   });
 });
