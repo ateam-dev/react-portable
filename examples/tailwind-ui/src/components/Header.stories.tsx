@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import Header from "./Header";
-import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {
   title: "Header",
@@ -9,4 +8,4 @@ const meta: Meta = {
 
 export default meta;
 
-export const Default = reactPortableStory(Header);
+export const Default = {};

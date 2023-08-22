@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import Hero from "./Hero";
-import { reactPortableStory } from "@react-portable/storybook";
 
 const meta: Meta = {
   title: "ec/Hero",
@@ -9,4 +8,4 @@ const meta: Meta = {
 
 export default meta;
 
-export const Default = reactPortableStory(Hero);
+export const Default = {};

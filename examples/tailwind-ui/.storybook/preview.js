@@ -10,10 +10,6 @@ const preview = {
         date: /Date$/,
       },
     },
-    reactPortable: {
-      gateway: "http://127.0.0.1:8787",
-      code: "tailwind-ui",
-    },
   },
 };
 
