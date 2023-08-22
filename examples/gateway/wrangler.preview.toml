@@ -1,6 +1,0 @@
-name = "preview-gateway"
-main = "src/preview-worker.ts"
-compatibility_date = "2023-05-30"
-
-[vars]
-ORIGIN = "https://0.0.0.0"
