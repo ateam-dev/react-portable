@@ -1,8 +1,8 @@
-const { previewGateway } = require("@react-portable/gateway");
+const { gateway } = require("@react-portable/gateway");
 
 export default {
   fetch: (request, env, ctx) => {
-    return previewGateway({
+    return gateway({
       proxy: env.ORIGIN,
       fragmentsEndpoint: env.FRAGMENTS_ENDPOINT,
     })(request, env, ctx);
