@@ -13,19 +13,25 @@ background-color: black;
 color: white;
 border-radius: 5px;
 padding: 10px;
+height: 40px;
 font-size: 16px;
 border: solid 1px black;
 box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+line-height: 100%;
 `;
 
 const inputStyle = `
 margin-right: 2px;
 padding: 10px;
+height: 40px;
 width: 186px;
 font-size: 16px;
 border: solid 1px #464646;
 border-radius: 5px;
 box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+line-height: 100%;
+vertical-align: baseline;
+box-sizing: border-box;
 `;
 
 const infoStyle = `
@@ -37,6 +43,7 @@ font-size: 16px;
 border-radius: 5px;
 margin-bottom: 8px;
 box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+line-height: 100%;
 `;
 
 const Container = () => {
