@@ -28,7 +28,7 @@ const qwikifyOption =
         eagerness: undefined,
         event: undefined,
       };
-const QComponent__sanitized__ = qwikify$(Entry.__original, qwikifyOption);
+const QComponent__sanitized__ = qwikify$(Entry.__forQwik, qwikifyOption);
 const getProps = routeLoader$(async ({ request, error }) => {
   try {
     if (request.method === "POST") return await request.json();
@@ -41,32 +41,7 @@ const getProps = routeLoader$(async ({ request, error }) => {
   }
 });
 export default component$(() => {
-  const props = Object.fromEntries(
-    Object.entries(getProps().value).map(([key, val]) => {
-      if (typeof val !== "string") return [key, val];
-      const [, uuid, path] = val.match(/__function__:(.*):(.*)/) ?? [];
-      if (uuid && path) {
-        return [
-          `${key}$`,
-          $((...args: unknown[]) => {
-            window.dispatchEvent(
-              new CustomEvent("rp-preview-message", {
-                detail: { uuid, path, args },
-              }),
-            );
-          }),
-        ];
-      }
-
-      // TODO: support keys other than `children`
-      if (val === "__outlet__" && key === "children")
-        return [key, <rp-slot _key={key} />];
-
-      return [key, val];
-    }),
-  );
-
-  return <QComponent__sanitized__ {...props} />;
+  return <QComponent__sanitized__ {...getProps().value} />;
 });
 
 export const onRequest: RequestHandler = async (requestEvent) => {

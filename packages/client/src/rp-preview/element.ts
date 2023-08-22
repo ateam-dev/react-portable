@@ -6,18 +6,47 @@ if (typeof globalThis.HTMLElement === "undefined") {
   globalThis.HTMLElement = class {};
 }
 
+export class RpSlot extends HTMLElement {
+  connectedCallback() {
+    const parentRpPreview = this.closest<RpPreview>("rp-preview");
+    if (parentRpPreview) {
+      const key = this.getAttribute("_key")!;
+      const outlet = parentRpPreview.outlets?.[key];
+      if (outlet) this.appendChild(outlet);
+    }
+  }
+}
+
+export class RpOutlet extends HTMLElement {
+  connectedCallback() {
+    const parentRpPreview = this.closest<RpPreview>("rp-preview");
+    if (parentRpPreview) {
+      const key = this.getAttribute("_key")!;
+      parentRpPreview.outlets[key] = this;
+    }
+  }
+}
+
 export class RpPreview extends HTMLElement {
   public previewing = false;
   private uuid = "";
   private code = "";
   public props: Record<string, unknown> = {};
-  private outlets: Record<string, HTMLElement> | null = null;
+  public outlets: Record<string, RpOutlet> = {};
   private fetching = false;
   private previousRequestBody = "";
-  private handlerProxyListener: VoidFunction | EventListener = () => {};
+  private readonly customEventName = "rp-preview-event";
+  private previewArea = document.createElement("pr-preview-area");
 
   private connectedCallback() {
     this.uuid ||= crypto.randomUUID();
+    this.setAttribute("id", this.uuid);
+    const area = this.querySelector<HTMLElement>("rp-preview-area");
+    if (!area) {
+      console.error("rp-preview: <rp-preview-area /> is not set.");
+      return;
+    }
+    this.previewArea = area;
 
     const code = this.getAttribute("code");
     if (!code) {
@@ -33,33 +62,35 @@ export class RpPreview extends HTMLElement {
     this.removeHandlerProxy();
   }
 
-  public async preview() {
+  public async preview(props?: Record<string, unknown>) {
     this.previewing = true;
+    if (props) this.props = props;
 
     return this.render(true);
   }
 
-  public async rerender(force = false) {
+  public async rerender(props?: Record<string, unknown>, force = false) {
+    if (props) this.props = props;
+
     if (this.previewing) return this.render(force);
   }
 
   private async render(force = false) {
     if (this.fetching) return;
 
-    const requestBody = JSON.stringify(this.props, serialize(this.uuid));
+    const requestBody = JSON.stringify(
+      this.props,
+      this.serializeProps.bind(this),
+    );
 
     if (requestBody !== this.previousRequestBody || force) {
       this.fetching = true;
       try {
-        this.storeOutlets();
-
         const fragment = await this.fetchFragmentStream(requestBody);
         if (!fragment.body || !fragment.ok) {
           throw new Error(`rp-preview: Failed to retrieve fragment`);
         }
         await this.piercing(fragment.body);
-
-        this.restoreOutletsToSlots();
       } finally {
         this.fetching = false;
       }
@@ -79,73 +110,47 @@ export class RpPreview extends HTMLElement {
   }
 
   private async piercing(fragmentStream: ReadableStream) {
-    this.innerHTML = "";
+    if (!this.previewArea) return;
+    this.previewArea.innerHTML = "";
 
     await fragmentStream
       .pipeThrough(new TextDecoderStream())
-      .pipeTo(new WritableDOM(this));
-  }
-
-  private storeOutlets() {
-    this.outlets ||= Object.fromEntries(
-      Array.from(this.querySelectorAll<HTMLElement>("rp-outlet")).map((el) => [
-        el.getAttribute("_key"),
-        el,
-      ]),
-    );
-  }
-
-  private restoreOutletsToSlots() {
-    Array.from(this.querySelectorAll<HTMLElement>("rp-slot")).forEach(
-      (slot) => {
-        if (!this.outlets) return;
-        const outlet = this.outlets[slot.getAttribute("_key")!];
-        if (outlet) slot.appendChild(outlet);
-      },
-    );
+      .pipeTo(new WritableDOM(this.previewArea));
   }
 
   private addHandlerProxy() {
-    this.handlerProxyListener = (e: Event) => {
-      if (!("detail" in e)) return;
-
-      const { uuid, path, args } = e.detail as {
-        uuid: string;
-        path: string;
-        args: unknown[];
-      };
-
-      if (this.uuid === uuid) {
-        const receiver = this.props[path];
-        if (typeof receiver === "function") receiver(...args);
-      }
-    };
-    window.addEventListener("rp-preview-message", this.handlerProxyListener);
+    this.addEventListener(this.customEventName, this.handlerProxyListener);
   }
 
   private removeHandlerProxy() {
-    window.removeEventListener("rp-preview-message", this.handlerProxyListener);
+    this.removeEventListener(this.customEventName, this.handlerProxyListener);
+  }
+
+  private handlerProxyListener(e: Event) {
+    if (!("detail" in e)) return;
+
+    const { key, args } = e.detail as {
+      key: string;
+      args: unknown[];
+    };
+
+    const receiver = this.props[key];
+    if (typeof receiver === "function") receiver(...args);
+  }
+
+  private serializeProps(_: string, val: unknown) {
+    const isElementProps =
+      val != null && typeof val === "object" && "type" in val && "props" in val;
+
+    if (isElementProps) {
+      return `__outlet__`;
+    }
+    if (typeof val === "function") {
+      return `__function__#${this.uuid}#${this.customEventName}`;
+    }
+    return val;
   }
 }
-
-const serialize = (id: string) => (key: string, val: unknown) => {
-  if (isRpOutletProps(val)) {
-    return `__outlet__`;
-  }
-  if (typeof val === "function") {
-    return `__function__:${id}:${key}`;
-  }
-  return val;
-};
-
-const isRpOutletProps = (value: unknown) => {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    "type" in value &&
-    "props" in value
-  );
-};
 
 interface RpPreviewAttributes {
   code: string;
@@ -158,13 +163,17 @@ declare global {
         HTMLAttributes<HTMLElement> & RpPreviewAttributes,
         RpPreview
       >;
+      "rp-preview-area": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement>,
+        HTMLElement
+      >;
       "rp-outlet": DetailedHTMLProps<
         HTMLAttributes<HTMLElement> & { _key: string },
-        HTMLElement
+        RpOutlet
       >;
       "rp-slot": DetailedHTMLProps<
         HTMLAttributes<HTMLElement> & { _key: string },
-        HTMLElement
+        RpSlot
       >;
     }
   }

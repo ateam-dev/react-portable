@@ -85,17 +85,17 @@ const Input = (state) => {
   });
 };
 
-const preview = (code) => {
-  const selector =
-    !code || code === "*"
-      ? `rp-preview`
-      : code
-          .split(" ")
-          .map((c) => `rp-preview[code="${c}"]`)
-          .join(",");
-  const targets = Array.from(document.querySelectorAll(selector));
-  if (targets.length) targets.forEach((el) => el.preview());
-  return targets.length;
+const preview = (codes) => {
+  const selectors = !codes || codes === "*" ? [] : code.split(" ");
+  let counter = 0;
+  window.rpPreviewDispatchers.forEach(([code, dispatcher]) => {
+    if (selectors.length > 0 && !selectors.includes(code)) return;
+
+    dispatcher();
+    counter++;
+  });
+
+  return counter;
 };
 
 const storeCode = (code) => {
