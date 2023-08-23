@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.7.0-next.7
+
+### Minor Changes
+
+- [#111](https://github.com/ateam-dev/react-portable/pull/111) [`b7a3142`](https://github.com/ateam-dev/react-portable/commit/b7a3142df26d30a6ba0275df1798d65647c75db3) Thanks [@aiji42](https://github.com/aiji42)! - Enable automatic loading of previewify.config.ts
+
 ## 0.7.0-next.6
 
 ### Minor Changes
