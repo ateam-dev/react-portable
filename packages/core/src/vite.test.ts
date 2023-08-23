@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { portablePreparePlugin, portablePlugin } from "./vite";
 import { ConfigEnv, Plugin, UserConfig } from "vite";
@@ -82,7 +83,7 @@ describe("portablePreparePlugin", () => {
     });
   });
 
-  test("Install the route file if `previewify` id called in the file", async () => {
+  test("Install the route file if `previewify` is called in the file", async () => {
     await (plugin.resolveId as ResolveIdFunction)(
       "@react-portable/core",
       "/working-dir/src/components/sample.tsx",
