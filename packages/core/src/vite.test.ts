@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { portablePreparePlugin, portablePlugin } from "./vite";
 import { ConfigEnv, Plugin, UserConfig } from "vite";
@@ -21,15 +22,10 @@ type TransformFunction = (code: string, id: string) => string;
 
 type ResolveIdFunction = (source: string, importer?: string) => Promise<void>;
 
-const sampleComponentFilePortable = `
-import { portable } from '@react-portable/core'
-const Component = () => <div></div>
-export const Sample = portable(Component, 'sample/foo-bar')`;
-
 const sampleComponentFilePreviewify = `
 import { previewify } from '@react-portable/core'
 const Component = () => <div></div>
-export const Sample2 = previewify(Component, 'sample/foo-baz')`;
+export const Sample = previewify(Component, 'sample/foo-bar')`;
 
 const routeFileDummy = `
 import { PortableComponent } from "../portable";
@@ -52,8 +48,7 @@ describe("portablePreparePlugin", () => {
         "console.log('worker.ts')",
       "/working-dir/node_modules/@react-portable/core/src/templates/route.tsx":
         routeFileDummy,
-      "/working-dir/src/components/sample.tsx": sampleComponentFilePortable,
-      "/working-dir/src/components/sample2.tsx": sampleComponentFilePreviewify,
+      "/working-dir/src/components/sample.tsx": sampleComponentFilePreviewify,
       "/working-dir/src/style.css": "body {}",
     });
     // @ts-ignore
@@ -88,14 +83,10 @@ describe("portablePreparePlugin", () => {
     });
   });
 
-  test("Install the route file if `portable` or `previewify` are called in the file", async () => {
+  test("Install the route file if `previewify` is called in the file", async () => {
     await (plugin.resolveId as ResolveIdFunction)(
       "@react-portable/core",
       "/working-dir/src/components/sample.tsx",
-    );
-    await (plugin.resolveId as ResolveIdFunction)(
-      "@react-portable/core",
-      "/working-dir/src/components/sample2.tsx",
     );
 
     expect(
@@ -111,21 +102,6 @@ const Entry = Object.values(Entries).find((module) => {
     return module.__code === "sample/foo-bar";
 }) as PortableComponent;
 const QComponentsample_foo_bar = qwikify$(Entry, qwikifyOption);`,
-    });
-
-    expect(
-      vol.toJSON(
-        "/working-dir/node_modules/.portable/routes/sample/foo-baz/index.tsx",
-      ),
-    ).toStrictEqual({
-      "/working-dir/node_modules/.portable/routes/sample/foo-baz/index.tsx": `
-import { PortableComponent } from "@react-portable/core";
-import * as Entries from "/working-dir/src/components/sample2.tsx";
-const Entry = Object.values(Entries).find((module) => {
-  if (typeof module === "function" && "__code" in module)
-    return module.__code === "sample/foo-baz";
-}) as PortableComponent;
-const QComponentsample_foo_baz = qwikify$(Entry, qwikifyOption);`,
     });
   });
 });

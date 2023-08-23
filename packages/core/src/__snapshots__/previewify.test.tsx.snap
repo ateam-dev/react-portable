@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`portable > Component > Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called 1`] = `
+exports[`previewify > Component > Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called 1`] = `
 <div>
   <rp-preview
     code="foo"
@@ -38,7 +38,7 @@ exports[`portable > Component > Elements of type ReactElement will be also rende
 </div>
 `;
 
-exports[`portable > Component > It will be wrapped by <rp-preview /> when rpPreviewDispatchers will be called 1`] = `
+exports[`previewify > Component > It will be wrapped by <rp-preview /> when rpPreviewDispatchers will be called 1`] = `
 <DocumentFragment>
   <rp-preview
     code="foo"
@@ -54,7 +54,7 @@ exports[`portable > Component > It will be wrapped by <rp-preview /> when rpPrev
 </DocumentFragment>
 `;
 
-exports[`portable > Component.__forQwik > \`__outlet__\` is converted to <rp-outlet /> and rendered 1`] = `
+exports[`previewify > Component.__forQwik > \`__outlet__\` is converted to <rp-slot /> and rendered 1`] = `
 <DocumentFragment>
   <div>
     sample with children:

@@ -1,6 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
 import {
   afterAll,
   afterEach,
@@ -11,9 +8,9 @@ import {
   test,
   vi,
 } from "vitest";
-import { portable } from "./portable";
+import { previewify } from "./previewify";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
-import { rpPreviewRegister } from "@react-portable/client/web-components";
+import { register } from "@react-portable/client/web-components";
 import { MouseEventHandler, ReactNode } from "react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -43,7 +40,7 @@ const SampleWithChildren = ({
 );
 
 const server = setupServer(
-  rest.post(`http://http://192.0.0.1:3000/_fragments/foo`, (req, res, ctx) => {
+  rest.post(`https://basepage.com/_fragments/:code`, (req, res, ctx) => {
     return res(ctx.status(200), ctx.text(``));
   }),
 );
@@ -53,59 +50,33 @@ const dispatchPreview = () => {
   vi.advanceTimersByTime(500);
 };
 
-describe("portable", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.spyOn(crypto, "randomUUID").mockReturnValueOnce(
-      "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
-    );
-    cleanup();
-    rpPreviewRegister();
-    Object.defineProperty(window, "location", {
-      value: {
-        origin: "http://192.0.0.1:3000",
-      },
-      writable: true,
-    });
-  });
-  afterEach(() => {
-    vi.useRealTimers();
-    server.resetHandlers();
-  });
-  afterAll(() => {
-    server.close();
-  });
+beforeAll(() => {
+  vi.useFakeTimers();
+  server.listen({ onUnhandledRequest: "error" });
+});
+beforeEach(() => {
+  vi.spyOn(crypto, "randomUUID").mockReturnValueOnce(
+    "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
+  );
+  cleanup();
+  register();
+});
+afterEach(() => {
+  server.resetHandlers();
+});
+afterAll(() => {
+  server.close();
+});
 
+describe("previewify", () => {
   test("__code", () => {
-    const Component = portable(Sample, "foo");
+    const Component = previewify(Sample, "foo");
     expect(Component.__code).toBe("foo");
-  });
-  test("__strategy", () => {
-    const Component = portable(Sample, "foo", {
-      strategy: { hydrate: "onUse", revalidate: 60 },
-    });
-    expect(Component.__strategy).toStrictEqual({
-      hydrate: "onUse",
-      revalidate: 60,
-    });
-  });
-  test("__loader", () => {
-    const loader = () => {
-      console.log("loader");
-      return {};
-    };
-    const Component = portable(Sample, "foo", {
-      loader,
-    });
-    expect(Component.__loader).toBe(loader);
   });
 
   describe("Component", () => {
     test("It is same as the original component when initial", () => {
-      const Component = portable(Sample, "foo");
+      const Component = previewify(Sample, "foo");
       const wrapped = render(<Component />);
       const original = render(<Sample />);
 
@@ -113,7 +84,7 @@ describe("portable", () => {
     });
 
     test("Dispatchers are added to rpPreviewDispatchers when rendered and removed when unmounted", () => {
-      const Component = portable(Sample, "foo");
+      const Component = previewify(Sample, "foo");
       const { unmount } = render(<Component />);
       render(<Component />);
 
@@ -125,7 +96,7 @@ describe("portable", () => {
     });
 
     test("It will be wrapped by <rp-preview /> when rpPreviewDispatchers will be called", () => {
-      const Component = portable(Sample, "foo");
+      const Component = previewify(Sample, "foo");
       const { asFragment } = render(<Component />);
 
       dispatchPreview();
@@ -134,7 +105,7 @@ describe("portable", () => {
     });
 
     test("Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called", () => {
-      const Component = portable(SampleWithChildren, "foo");
+      const Component = previewify(SampleWithChildren, "foo");
       const { container } = render(
         <Component
           children={<div>children</div>}
@@ -149,8 +120,8 @@ describe("portable", () => {
   });
 
   describe("Component.__forQwik", () => {
-    test("`__outlet__` is converted to <rp-outlet /> and rendered", () => {
-      const Component = portable(SampleWithChildren, "foo");
+    test("`__outlet__` is converted to <rp-slot /> and rendered", () => {
+      const Component = previewify(SampleWithChildren, "foo");
       const { asFragment } = render(
         <Component.__forQwik children="__outlet__" element="__outlet__" />,
       );
@@ -159,7 +130,7 @@ describe("portable", () => {
     });
     test("`__function__` is converted into a function that delegates the original handler", () => {
       const onClickSpy = vi.fn();
-      const Component = portable(Sample, "foo");
+      const Component = previewify(Sample, "foo");
       const rendered = render(<Component onClick={onClickSpy} />);
       render(
         <Component.__forQwik

@@ -1,4 +1,4 @@
-import { portable } from "@react-portable/core";
+import { previewify } from "@react-portable/core";
 
 function Hero() {
   return (
@@ -96,4 +96,4 @@ function Hero() {
   );
 }
 
-export default portable(Hero, "hero");
+export default previewify(Hero, "hero");

@@ -34,6 +34,14 @@ export default function Home() {
   return (
     <Pokemon
       {...pokemon}
+      name={
+        <span
+          className="text-red-500"
+          onClick={() => console.log("clicked name")}
+        >
+          {pokemon.name}
+        </span>
+      }
       onClick={() => {
         console.log("clicked parent");
       }}

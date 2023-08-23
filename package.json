@@ -1,7 +1,7 @@
 {
   "name": "react-portable",
   "version": "0.0.0",
-  "description": "React Portable enhances the use of React components, enabling direct use across any website and allowing for immediate updates without the need for bundling.",
+  "description": "React Portable is a project to increase the portability and ease of distribution of React components.",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "scripts": {

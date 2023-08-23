@@ -15,7 +15,7 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["hono", "@react-portable/client"],
+      external: ["hono"],
     },
   },
 });

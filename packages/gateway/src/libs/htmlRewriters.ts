@@ -1,55 +1,5 @@
-import { ReactPortable } from "@react-portable/client/web-components";
-import { CLASS_NAME_FOR_GATEWAY_CACHE } from "./constants";
-import { FragmentMap } from "./fragments";
 import inlineRegister from "@react-portable/client/dist/browser.umd?raw";
 import inlinePreviewButton from "../statics/preview-button?raw";
-
-// handler for <react-portable />
-export class ReactPortablePiercer {
-  public fragmentIds: Set<string> = new Set();
-  public readonly selector = "react-portable";
-
-  constructor(private readonly fragments: FragmentMap) {}
-
-  async element(element: Element) {
-    const entry = element.getAttribute("entry");
-    const gateway = element.getAttribute("gateway");
-
-    if (!entry) return;
-
-    const fragmentId = ReactPortable.createFragmentId(entry, gateway);
-    this.fragmentIds.add(fragmentId);
-
-    const fragment = this.fragments.get(fragmentId);
-    if (!fragment) return;
-
-    if (fragment.ok) {
-      element.setInnerContent(fragment.body, { html: true });
-      element.setAttribute("pierced", "succeed");
-    } else {
-      element.setAttribute("pierced", "failed");
-    }
-  }
-}
-
-// append fragment templates to <head />
-export class FragmentTemplatesAppender {
-  public readonly selector = "head";
-
-  constructor(private readonly fragments: FragmentMap) {}
-
-  element(element: Element) {
-    for (const [fragmentId, fragment] of this.fragments) {
-      if (!fragment.ok) continue;
-      element.append(
-        `<template id="${fragmentId}" class="${CLASS_NAME_FOR_GATEWAY_CACHE}" >${fragment.body}</template>`,
-        {
-          html: true,
-        },
-      );
-    }
-  }
-}
 
 export class FragmentBaseReplacer {
   public readonly selector = `rp-fragment,rp-fragment>link[rel="stylesheet"],rp-fragment>link[rel="modulepreload"]`;

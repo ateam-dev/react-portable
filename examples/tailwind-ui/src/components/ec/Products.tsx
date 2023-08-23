@@ -1,6 +1,6 @@
 import QwikView, { Props } from "../../components/ec/QwikView";
 import { useState } from "react";
-import { portable } from "@react-portable/core";
+import { previewify } from "@react-portable/core";
 
 const products_: Props["product"][] = [
   {
@@ -111,7 +111,7 @@ const products_: Props["product"][] = [
 
 function Products() {
   const [selectedProduct, setSelectProduct] = useState<Props["product"] | null>(
-    null
+    null,
   );
 
   return (
@@ -161,4 +161,4 @@ function Products() {
   );
 }
 
-export default portable(Products, "products");
+export default previewify(Products, "products");
