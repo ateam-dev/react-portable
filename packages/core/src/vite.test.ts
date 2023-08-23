@@ -1,6 +1,12 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { portablePreparePlugin, portablePlugin } from "./vite";
+import {
+  preparePlugin,
+  portablePlugin,
+  qwikPlugins,
+  previewifyPlugin,
+  resetConfig,
+} from "./vite";
 import { ConfigEnv, Plugin, UserConfig } from "vite";
 import { fs, vol } from "memfs";
 import * as fsPro from "node:fs/promises";
@@ -36,8 +42,8 @@ const Entry = Object.values(Entries).find((module) => {
 }) as PortableComponent;
 const QComponent__sanitized__ = qwikify$(Entry, qwikifyOption);`;
 
-describe("portablePreparePlugin", () => {
-  const plugin = portablePreparePlugin() as Plugin;
+describe("preparePlugin", () => {
+  const plugin = preparePlugin() as Plugin;
   beforeEach(() => {
     vol.fromJSON({
       "/working-dir/node_modules/@react-portable/core/src/templates/root.tsx":
@@ -107,7 +113,10 @@ const QComponentsample_foo_bar = qwikify$(Entry, qwikifyOption);`,
 });
 
 describe("portablePlugin", () => {
-  const [plugin] = portablePlugin({ css: "./src/style.css" }) as [Plugin];
+  afterEach(() => {
+    resetConfig();
+  });
+  const [plugin] = portablePlugin() as [Plugin];
 
   test("`name` and `enforce`", () => {
     expect(plugin.name).toBe("react-portable-build");
@@ -155,6 +164,7 @@ describe("portablePlugin", () => {
   });
 
   test("css path inserted by `transform` on root.tsx", () => {
+    previewifyPlugin({ css: "./src/style.css" });
     expect(
       (plugin.transform as TransformFunction)(
         "base",
