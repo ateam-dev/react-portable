@@ -1,5 +1,18 @@
 # @react-portable/core
 
+## 0.7.0-next.6
+
+### Minor Changes
+
+- [#110](https://github.com/ateam-dev/react-portable/pull/110) [`63e1780`](https://github.com/ateam-dev/react-portable/commit/63e17803701284e8bfa3eb4915d4000122dc8122) Thanks [@aiji42](https://github.com/aiji42)! - the CLI commands have been improved: portable prepare is no longer needed and is completed with a single portable previewify.
+
+- [#107](https://github.com/ateam-dev/react-portable/pull/107) [`b305d76`](https://github.com/ateam-dev/react-portable/commit/b305d76900ff4b53bf647bb89e21ac128475018d) Thanks [@aiji42](https://github.com/aiji42)! - 'remove features for portable'
+
+### Patch Changes
+
+- Updated dependencies [[`b305d76`](https://github.com/ateam-dev/react-portable/commit/b305d76900ff4b53bf647bb89e21ac128475018d)]:
+  - @react-portable/gateway@0.5.0-next.5
+
 ## 0.7.0-next.5
 
 ### Minor Changes

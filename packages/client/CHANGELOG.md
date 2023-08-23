@@ -1,5 +1,11 @@
 # @react-portable/client
 
+## 0.5.0-next.4
+
+### Minor Changes
+
+- [#107](https://github.com/ateam-dev/react-portable/pull/107) [`b305d76`](https://github.com/ateam-dev/react-portable/commit/b305d76900ff4b53bf647bb89e21ac128475018d) Thanks [@aiji42](https://github.com/aiji42)! - 'remove features for portable'
+
 ## 0.5.0-next.3
 
 ### Minor Changes
