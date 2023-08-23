@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 import * as vite from "vite";
 import { program } from "commander";
-import { portablePlugin, portablePreparePlugin } from "./vite";
+import {
+  portableConfig,
+  portablePlugin,
+  preparePlugin,
+  qwikPlugins,
+} from "./vite";
 import * as chokidar from "chokidar";
 import * as path from "node:path";
 import { Worker } from "./worker";
@@ -22,33 +27,35 @@ const displayLog = (...messages: (string | [Color, string])[]) => {
 };
 
 const prepare = async (configFile?: string | null) => {
-  return vite.build(
-    configFile
-      ? { configFile, clearScreen: false }
-      : {
-          plugins: [portablePreparePlugin()],
-          clearScreen: false,
-        },
-  );
+  return vite.build({
+    configFile: configFile || false,
+    plugins: [preparePlugin()],
+    build: {
+      emptyOutDir: true,
+      outDir: path.resolve(portableConfig.coreDir, "tmp"),
+      lib: {
+        entry: portableConfig.entry,
+        formats: ["es"],
+      },
+      rollupOptions: {
+        external: /.*\/node_modules\/.*/,
+      },
+    },
+    clearScreen: false,
+  });
 };
 
 const buildClient = async (configFile?: string | null) => {
-  return vite.build(
-    configFile
-      ? { configFile }
-      : {
-          plugins: [portablePlugin()],
-        },
-  );
+  return vite.build({
+    configFile: configFile || false,
+    plugins: [portablePlugin(), qwikPlugins()],
+  });
 };
 
 const buildServer = async (emptyOutDir = true, configFile?: string | null) => {
   return vite.build({
-    ...(configFile
-      ? { configFile }
-      : {
-          plugins: [portablePlugin()],
-        }),
+    configFile: configFile || false,
+    plugins: [portablePlugin(), qwikPlugins()],
     build: {
       emptyOutDir,
       ssr: true,
@@ -57,34 +64,7 @@ const buildServer = async (emptyOutDir = true, configFile?: string | null) => {
 };
 
 program
-  .command("prepare")
-  .description("Place the configuration files in the project.")
-  .option(
-    "-c --config <path>",
-    "Specifying the path of the config file will overwrite the settings.",
-  )
-  .action(async ({ config }) => {
-    if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
-
-    await prepare(config);
-  });
-
-program
-  .command("build")
-  .description("Build the scripts for react portable.")
-  .option(
-    "-c --config <path>",
-    "Specifying the path of the config file of vite will overwrite the settings for build.",
-  )
-  .action(async ({ config }) => {
-    if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
-
-    await buildClient(config);
-    await buildServer(true, config);
-  });
-
-program
-  .command("preview")
+  .command("previewify")
   .argument("<origin>", "Specify the origin of the proxy destination.")
   .description("Start the server for preview.")
   .option("-p --port <port>", "The gateway server port.")
@@ -118,12 +98,18 @@ program
     ) => {
       if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
 
+      // Step1: prepare (setup routing files)
+      await prepare(config);
+
       const devWorker = new Worker(serverEntry, {
         site: clientEntry,
       });
 
+      // Step2: build client and server code for qwik
       await buildClient(config);
       await buildServer(true, config);
+
+      // Step3: start components server (worker)
       await devWorker.start();
       displayLog("📁 Serving static files from", ["cyan", clientEntry]);
       displayLog("🚀 Loading server entry", ["cyan", serverEntry]);
@@ -138,6 +124,8 @@ program
           port: port ? Number(port) : undefined,
         },
       );
+
+      // Step4: start gateway server (worker)
       await gateway.start(tunnel);
       displayLog(
         "🟢 Previewing at",

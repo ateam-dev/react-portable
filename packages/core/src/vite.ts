@@ -60,9 +60,7 @@ const getPortableCode = async (fileName: string) => {
   if (sourceFile) return findPortableFunctionCalls(sourceFile);
 };
 
-const coreDir = path.resolve(appRootPath.path, "node_modules", ".portable");
-
-export const portablePreparePlugin = (): PluginOption => {
+export const preparePlugin = (): PluginOption => {
   return {
     name: "react-portable-prepare",
     enforce: "pre",
@@ -71,7 +69,7 @@ export const portablePreparePlugin = (): PluginOption => {
         ["root.tsx", "entry.ssr.tsx", "worker.ts"].map((file) => {
           return copyAndReplace(
             path.resolve(currentDir(), "../src/templates", file),
-            path.resolve(coreDir, file),
+            path.resolve(portableConfig.coreDir, file),
           );
         }),
       );
@@ -81,7 +79,12 @@ export const portablePreparePlugin = (): PluginOption => {
       if (importer && source === "@react-portable/core") {
         const code = await getPortableCode(importer);
         if (code) {
-          const destPath = path.resolve(coreDir, "routes", code, "index.tsx");
+          const destPath = path.resolve(
+            portableConfig.coreDir,
+            "routes",
+            code,
+            "index.tsx",
+          );
           await copyAndReplace(
             path.resolve(currentDir(), "../src/templates", "route.tsx"),
             destPath,
@@ -101,13 +104,35 @@ export const portablePreparePlugin = (): PluginOption => {
   };
 };
 
-export const portablePlugin = ({
-  outDir = ".portable",
+type Config = {
+  css: string | undefined;
+  outDir: string;
+  coreDir: string;
+  entry: string;
+};
+const initialConfig: Config = {
+  css: undefined,
+  outDir: ".portable",
+  coreDir: path.resolve(appRootPath.path, "node_modules", ".portable"),
+  entry: "./src",
+};
+export let portableConfig = initialConfig;
+
+export const previewifyPlugin = ({
   css,
-}: {
-  outDir?: string;
-  css?: string;
-} = {}): PluginOption => {
+  outDir,
+  entry,
+}: Partial<Config> = {}): PluginOption => {
+  if (css) portableConfig.css = css;
+  if (outDir) portableConfig.outDir = outDir;
+  if (entry) portableConfig.entry = entry;
+
+  return [];
+};
+
+export const resetConfig = () => (portableConfig = initialConfig);
+
+export const portablePlugin = (): PluginOption => {
   return [
     {
       name: "react-portable-build",
@@ -117,7 +142,10 @@ export const portablePlugin = ({
           return {
             build: {
               rollupOptions: {
-                input: [path.resolve(coreDir, "worker.ts"), "@qwik-city-plan"],
+                input: [
+                  path.resolve(portableConfig.coreDir, "worker.ts"),
+                  "@qwik-city-plan",
+                ],
               },
             },
           };
@@ -125,29 +153,37 @@ export const portablePlugin = ({
         return config;
       },
       transform: (code: string, id: string) => {
-        if (id === path.resolve(coreDir, "root.tsx") && css) {
-          return `${code}\nimport '${path.resolve(css)}'`;
+        if (
+          id === path.resolve(portableConfig.coreDir, "root.tsx") &&
+          portableConfig.css
+        ) {
+          return `${code}\nimport '${path.resolve(portableConfig.css)}'`;
         }
 
         if (
-          !id.includes(coreDir) &&
+          !id.includes(portableConfig.coreDir) &&
           (id.endsWith(".tsx") || id.endsWith(".jsx"))
         ) {
           return `/** @jsxImportSource react */\n${code}`;
         }
       },
     },
+  ];
+};
+
+export const qwikPlugins = (): PluginOption => {
+  return [
     qwikCity({
-      routesDir: path.resolve(coreDir, "routes"),
+      routesDir: path.resolve(portableConfig.coreDir, "routes"),
       trailingSlash: false,
     }),
     qwikVite({
-      srcDir: coreDir,
+      srcDir: portableConfig.coreDir,
       client: {
-        outDir: path.resolve(outDir, "client"),
+        outDir: path.resolve(portableConfig.outDir, "client"),
       },
       ssr: {
-        outDir: path.resolve(outDir, "server"),
+        outDir: path.resolve(portableConfig.outDir, "server"),
       },
       // vendorRoots: [
       //   path.dirname(require.resolve("@builder.io/qwik-city")),
