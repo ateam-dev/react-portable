@@ -9,6 +9,7 @@ import {
 } from "./vite";
 import * as chokidar from "chokidar";
 import * as path from "node:path";
+import * as fs from "node:fs";
 import { Worker } from "./worker";
 import { BuildQueue } from "./buildQueue";
 
@@ -75,6 +76,7 @@ program
   .option(
     "-c --config <path>",
     "Specifying the path of the config file of vite will overwrite the settings for build.",
+    "./previewify.config.ts",
   )
   .option(
     "-t --tunnel",
@@ -96,7 +98,8 @@ program
       origin,
       { watch, config, port, tunnel, serverEntry, clientEntry },
     ) => {
-      if (config) displayLog(`⚙️ Loading config`, ["cyan", config]);
+      if (fs.existsSync(config))
+        displayLog(`⚙️ Loading config`, ["cyan", config]);
 
       // Step1: prepare (setup routing files)
       await prepare(config);
