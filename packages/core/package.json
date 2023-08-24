@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/core",
-  "version": "0.7.0-next.7",
+  "version": "0.7.0-next.8",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "bin": {
@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@hono/qwik-city": "^0.0.3",
-    "@react-portable/gateway": "^0.5.0-next.5",
+    "@react-portable/gateway": "^0.5.0-next.6",
     "app-root-path": "^3.1.0",
     "chokidar": "^3.5.3",
     "commander": "^11.0.0",

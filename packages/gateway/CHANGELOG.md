@@ -1,5 +1,11 @@
 # @react-portable/gateway
 
+## 0.5.0-next.6
+
+### Minor Changes
+
+- [#114](https://github.com/ateam-dev/react-portable/pull/114) [`2c03663`](https://github.com/ateam-dev/react-portable/commit/2c036632ecfc01827f5ee3fcc33f09eb7c80de87) Thanks [@aiji42](https://github.com/aiji42)! - Add support for hot reloading
+
 ## 0.5.0-next.5
 
 ### Minor Changes

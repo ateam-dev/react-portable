@@ -1,5 +1,16 @@
 # @react-portable/core
 
+## 0.7.0-next.8
+
+### Minor Changes
+
+- [#114](https://github.com/ateam-dev/react-portable/pull/114) [`2c03663`](https://github.com/ateam-dev/react-portable/commit/2c036632ecfc01827f5ee3fcc33f09eb7c80de87) Thanks [@aiji42](https://github.com/aiji42)! - Add support for hot reloading
+
+### Patch Changes
+
+- Updated dependencies [[`2c03663`](https://github.com/ateam-dev/react-portable/commit/2c036632ecfc01827f5ee3fcc33f09eb7c80de87)]:
+  - @react-portable/gateway@0.5.0-next.6
+
 ## 0.7.0-next.7
 
 ### Minor Changes
