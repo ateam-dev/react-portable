@@ -1070,23 +1070,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@builder.io/qwik-city@1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-1.2.6.tgz#a162fbbda251b6a5c777ee2d2a821cca84098b19"
-  integrity sha512-/uo58NysxpdsiEwuuKo8HDM9UYYAofrniupor2v5vci3Dr6PTXcvKAFJ1Z+SdJGv2uxr5hvKsbVohnVYa9jxYg==
-  dependencies:
-    "@mdx-js/mdx" "2.3.0"
-    "@types/mdx" "2.0.5"
-    source-map "0.7.4"
-    svgo "^3.0.2"
-    vfile "5.3.7"
-    vite-imagetools "^5.0.4"
-    zod "^3.21.4"
-
-"@builder.io/qwik-city@1.2.7":
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-1.2.7.tgz#e5a5bbbdd80c6dde265222eb09287e3a8e80dd6a"
-  integrity sha512-L5zykrLcvQ8wo2UO9SBIw3R7f07Mp3S5YHoEWir/9s4kJfrunyyyjEXwqhWbUo7GqPZL+o3R6fi5iXuc2Fg4rQ==
+"@builder.io/qwik-city@1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-1.2.8.tgz#9e5f0a3b4b2631af8587293970d5c635552ca058"
+  integrity sha512-Y0VJ8a08+DGgr8C5GmzJfBFtw+oPjqtfOmewLxFKdyQNAAIiCMkZg9y7DApj5uIDhf954/faw0k5vG4G+GSyfw==
   dependencies:
     "@mdx-js/mdx" "2.3.0"
     "@types/mdx" "2.0.5"
@@ -1101,17 +1088,10 @@
   resolved "https://registry.yarnpkg.com/@builder.io/qwik-react/-/qwik-react-0.5.0.tgz#bbc536abc6a556a0e5df48051ed901409dbac8ba"
   integrity sha512-JdJWQWOJGv7ddQqEZwzR8wPh0IoCQZwD9qo75+reiQaLp6eH+Pjsm/kn1LaMQt6u72pCCNjnj5kEn/bnbfnIjQ==
 
-"@builder.io/qwik@1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.6.tgz#010d8dcb39414fe6ea0e482d940fb5eaca86bc40"
-  integrity sha512-Cm1sLAimML55I5T1RI80R1lLgI4cnSeQt5obQtcMKa8wMmf2/luEyQaEkeN2fV3sp/gaVXCfAuKaddXK6ONdww==
-  dependencies:
-    csstype "^3.1.2"
-
-"@builder.io/qwik@1.2.7":
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.7.tgz#672b069ab84f25bb7056615602b2c6362dab24fc"
-  integrity sha512-jTaJ/LaifUD7UvvSg1JGSySiUl/RxQaul/QrXVr+jbky+hpa6jk0HHQ9Hv21MptAqwU+EPKL81Wqfws4CsHkaQ==
+"@builder.io/qwik@1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.8.tgz#019d258cce0d33c6b54d971b754c9c94fb39209f"
+  integrity sha512-I9bQ6flHeic5pI8ChXx1xAvMyjNOIcOdI7VY6sneiYcVLjW3JtdHKKcdk2QMtrMuIIljN6j/xiyn9MBB2Vxqxg==
   dependencies:
     csstype "^3.1.2"
 
@@ -11471,7 +11451,7 @@ vfile-message@^4.0.0:
     "@types/unist" "^3.0.0"
     unist-util-stringify-position "^4.0.0"
 
-vfile@5.3.7, vfile@^5.0.0:
+vfile@^5.0.0:
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/vfile/-/vfile-5.3.7.tgz#de0677e6683e3380fafc46544cfe603118826ab7"
   integrity sha512-r7qlzkgErKjobAmyNIkkSpizsFPYiUPuJb5pNW1RB4JcYVZhs4lIbVqk8XPk033CV/1z8ss5pkax8SuhGpcG8g==
@@ -11490,7 +11470,7 @@ vfile@^6.0.1:
     unist-util-stringify-position "^4.0.0"
     vfile-message "^4.0.0"
 
-vite-imagetools@^5.0.4, vite-imagetools@^5.0.5:
+vite-imagetools@^5.0.5:
   version "5.0.8"
   resolved "https://registry.yarnpkg.com/vite-imagetools/-/vite-imagetools-5.0.8.tgz#b38375903658ef993de806bea52889f4097b9c40"
   integrity sha512-oFNfc58iLz1lHFsIKQy+wp0RNcZjiaDeHYTexYowpf4RYx9tZ97eWEcw8lQ1jDT8AnOso6XZi5iGjLNAeTR9Tw==
