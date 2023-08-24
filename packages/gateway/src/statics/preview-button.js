@@ -1,11 +1,19 @@
 import van from "https://cdn.jsdelivr.net/gh/vanjs-org/van/public/van-1.0.2.min.js";
 
-const { button, input, form, p } = van.tags;
+const { button, div, p } = van.tags;
 
 const containerStyle = `
-position: fixed;
-bottom: 20px;
-right: 20px;
+position: sticky;
+bottom: 0;
+left: 0;
+width: 100%;
+height: 50px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 0 10px;
+background-color: rgba(0, 0, 0, 50%);
+backdrop-filter: blur(10px);
 `;
 
 const buttonStyle = `
@@ -16,101 +24,75 @@ padding: 10px;
 height: 40px;
 font-size: 16px;
 border: solid 1px black;
-box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+box-shadow: 2px 2px 5px rgba(0, 0, 0, 20%);
 line-height: 100%;
-`;
-
-const inputStyle = `
-margin-right: 2px;
-padding: 10px;
-height: 40px;
-width: 186px;
-font-size: 16px;
-border: solid 1px #464646;
-border-radius: 5px;
-box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-line-height: 100%;
-vertical-align: baseline;
-box-sizing: border-box;
+cursor: pointer;
 `;
 
 const infoStyle = `
-width: 100%;
-background-color: #ececec;
-color: black;
-padding: 10px;
 font-size: 16px;
-border-radius: 5px;
-margin-bottom: 8px;
-box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+color: white;
 line-height: 100%;
 `;
 
+let isPreviewing = false;
+const statusMessage = van.state("🟠 Waiting for connection to server...");
+
+const socket = new WebSocket(
+  `${window.location.protocol === "https:" ? "wss:" : "ws"}//${
+    window.location.host
+  }`,
+);
+socket.addEventListener("open", function (event) {
+  statusMessage.val = "🔵 Ready for preview.";
+});
+socket.addEventListener("message", function (event) {
+  if (event.data === "reload") {
+    if (isPreviewing) preview();
+    else statusMessage.val = "🔵 Ready for preview.";
+  }
+  if (event.data === "rebuilding") statusMessage.val = "🟠 Rebuilding...";
+});
+socket.addEventListener("error", function (event) {
+  console.error("WebSocket Error:", event);
+});
+socket.addEventListener("close", function () {
+  statusMessage.val = `🔴 Disconnected from preview server.`;
+});
+
 const Container = () => {
-  const code = van.state(restoreCode() ?? "*");
-  const dom = form(
+  return div(
     {
       style: containerStyle,
-      onsubmit: (e) => {
-        e.preventDefault();
-        storeCode(code.val);
-
-        const elements = preview(code.val);
-        if (elements) {
-          const info = Info(elements);
-          dom.prepend(info);
-          setTimeout(() => info.remove(), 3000);
-        }
-      },
     },
-    Input(code),
+    Info(),
     button(
       {
         style: buttonStyle,
-        type: "submit",
+        type: "button",
+        onclick: () => {
+          isPreviewing = true;
+          preview();
+        },
       },
       "Preview",
     ),
   );
-
-  return dom;
 };
 
-const Info = (elements) => {
-  return p({ style: infoStyle }, "Previewing ", elements, " element(s)");
+const Info = () => {
+  return p({ style: infoStyle }, statusMessage);
 };
 
-const Input = (state) => {
-  return input({
-    style: inputStyle,
-    type: "text",
-    placeholder: "input code to preview",
-    title:
-      'To preview multiple codes, input them separated by a space, or input "*" to preview them all at once.',
-    value: state,
-    onchange: (e) => (state.val = e.target.value),
-  });
-};
-
-const preview = (codes) => {
-  const selectors = !codes || codes === "*" ? [] : code.split(" ");
-  let counter = 0;
-  window.rpPreviewDispatchers.forEach(([code, dispatcher]) => {
-    if (selectors.length > 0 && !selectors.includes(code)) return;
-
+const preview = () => {
+  window.rpPreviewDispatchers?.forEach(([, dispatcher]) => {
     dispatcher();
-    counter++;
   });
 
-  return counter;
-};
-
-const storeCode = (code) => {
-  localStorage.setItem("rp-preview-selector-code", code);
-};
-
-const restoreCode = () => {
-  return localStorage.getItem("rp-preview-selector-code");
+  statusMessage.val =
+    window.rpPreviewDispatchers?.length > 0
+      ? `🟢 Previewing ${window.rpPreviewDispatchers.length} element(s)`
+      : `🟠 No elements for preview.`;
 };
 
 van.add(document.body, Container());

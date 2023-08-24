@@ -12,6 +12,8 @@ import * as path from "node:path";
 import * as fs from "node:fs";
 import { Worker } from "./worker";
 import { BuildQueue } from "./buildQueue";
+import { startWS } from "./ws";
+import { AddressInfo } from "ws";
 
 type Color = "cyan" | "yellow" | "green";
 const displayLog = (...messages: (string | [Color, string])[]) => {
@@ -104,31 +106,37 @@ program
       // Step1: prepare (setup routing files)
       await prepare(config);
 
-      const devWorker = new Worker(serverEntry, {
-        site: clientEntry,
-      });
-
       // Step2: build client and server code for qwik
       await buildClient(config);
       await buildServer(true, config);
 
       // Step3: start components server (worker)
+      const devWorker = new Worker(serverEntry, {
+        site: clientEntry,
+      });
       await devWorker.start();
       displayLog("📁 Serving static files from", ["cyan", clientEntry]);
       displayLog("🚀 Loading server entry", ["cyan", serverEntry]);
 
+      // Step4: start websocket server for hot reload
+      const wsPort = await (await import("get-port")).default();
+      const wss = startWS({
+        port: wsPort,
+      });
+      const wssAddress = wss.address() as AddressInfo;
+
+      // Step5: start gateway server (worker)
       const gateway = new Worker(
-        path.resolve(__dirname, "../src/templates/preview-gateway.js"),
+        path.resolve(__dirname, "../src/templates/gateway.js"),
         {
           vars: {
             ORIGIN: origin,
             FRAGMENTS_ENDPOINT: devWorker.localUrl,
+            WS_ENDPOINT: `http://[${wssAddress.address}]:${wssAddress.port}`,
           },
           port: port ? Number(port) : undefined,
         },
       );
-
-      // Step4: start gateway server (worker)
       await gateway.start(tunnel);
       displayLog(
         "🟢 Previewing at",
@@ -141,17 +149,24 @@ program
         const watcher = chokidar.watch(watch, {
           persistent: true,
           ignoreInitial: true,
-          interval: 100,
         });
         const queue = new BuildQueue();
         watcher.on("all", async () => {
           queue.enqueue(async () => {
+            wss.clients.forEach((client) => {
+              client.send("rebuilding");
+            });
+
             displayLog(`♻️ Rebuilding component assets...`);
             await buildClient(config);
             await buildServer(false, config);
             displayLog(`♻️ Restarting components server...`);
             await devWorker.restart();
             displayLog(`🟢 Restarted components server`);
+
+            wss.clients.forEach((client) => {
+              client.send("reload");
+            });
           });
         });
       }
