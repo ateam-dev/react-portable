@@ -1751,10 +1751,10 @@
   resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-2.0.18.tgz#f80301907c243df03c7e9fd76c0286e95361f7c1"
   integrity sha512-7TyMjRrZZMBPa+/5Y8lN0iyvUU/01PeMGX2+RE7cQWpEUIcb4QotzUObFkJDejj/HUH4qjP/eQ0gzzKs2f+6Yw==
 
-"@hono/qwik-city@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@hono/qwik-city/-/qwik-city-0.0.3.tgz#f684cf5bbad8fb4016eaa25ec29b4bc4bd4e05ef"
-  integrity sha512-+s6O09kyeffwZT3nbtBcPCJqTwKn4eERHrAfmBFQnimsvyTDKC6c59nLixX65n98yys+p6+8olmGqqc+xj//EA==
+"@hono/qwik-city@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@hono/qwik-city/-/qwik-city-0.0.4.tgz#9684fa166048c54ebacf4b5df323dd9730a5bad8"
+  integrity sha512-+YORzUu/3A+J9nIgPsy067pCroD59jFvV1cHFYKz3RbwqVx3+ZGJ8pFpmAALSnrKz/2msYcQzMFugl54Aqi1qA==
 
 "@iarna/toml@^2.2.5":
   version "2.2.5"
