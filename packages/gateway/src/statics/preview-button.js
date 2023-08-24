@@ -39,7 +39,7 @@ let isPreviewing = false;
 const statusMessage = van.state("🟠 Waiting for connection to server...");
 
 const socket = new WebSocket(
-  `${window.location.protocol === "https:" ? "wss:" : "ws"}//${
+  `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${
     window.location.host
   }`,
 );
