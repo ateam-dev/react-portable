@@ -60,22 +60,22 @@
     "vitest": "^0.33.0"
   },
   "peerDependencies": {
-    "@builder.io/qwik": ">=1.2.0",
-    "@builder.io/qwik-city": ">=1.2.0",
-    "@builder.io/qwik-react": ">=0.5.0",
+    "@builder.io/qwik": "1.2.7",
+    "@builder.io/qwik-city": "1.2.7",
+    "@builder.io/qwik-react": "0.5.0",
     "react": ">=18.0.1",
     "react-dom": ">=18.0.0",
     "typescript": ">=4",
     "vite": ">=4"
   },
   "dependencies": {
-    "@hono/qwik-city": "^0.0.3",
+    "@hono/qwik-city": "^0.0.4",
     "@react-portable/gateway": "^0.5.0-next.6",
     "app-root-path": "^3.1.0",
     "chokidar": "^3.5.3",
     "commander": "^11.0.0",
     "get-port": "^7.0.0",
-    "hono": "^3.3.0",
+    "hono": "^3.5.4",
     "untun": "^0.1.1",
     "wrangler": "^3.2.0",
     "ws": "^8.13.0"

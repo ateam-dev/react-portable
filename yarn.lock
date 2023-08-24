@@ -1083,6 +1083,19 @@
     vite-imagetools "^5.0.4"
     zod "^3.21.4"
 
+"@builder.io/qwik-city@1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-1.2.7.tgz#e5a5bbbdd80c6dde265222eb09287e3a8e80dd6a"
+  integrity sha512-L5zykrLcvQ8wo2UO9SBIw3R7f07Mp3S5YHoEWir/9s4kJfrunyyyjEXwqhWbUo7GqPZL+o3R6fi5iXuc2Fg4rQ==
+  dependencies:
+    "@mdx-js/mdx" "2.3.0"
+    "@types/mdx" "2.0.5"
+    source-map "0.7.4"
+    svgo "^3.0.2"
+    vfile "^6.0.1"
+    vite-imagetools "^5.0.5"
+    zod "^3.21.4"
+
 "@builder.io/qwik-react@0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@builder.io/qwik-react/-/qwik-react-0.5.0.tgz#bbc536abc6a556a0e5df48051ed901409dbac8ba"
@@ -1092,6 +1105,13 @@
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.6.tgz#010d8dcb39414fe6ea0e482d940fb5eaca86bc40"
   integrity sha512-Cm1sLAimML55I5T1RI80R1lLgI4cnSeQt5obQtcMKa8wMmf2/luEyQaEkeN2fV3sp/gaVXCfAuKaddXK6ONdww==
+  dependencies:
+    csstype "^3.1.2"
+
+"@builder.io/qwik@1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.7.tgz#672b069ab84f25bb7056615602b2c6362dab24fc"
+  integrity sha512-jTaJ/LaifUD7UvvSg1JGSySiUl/RxQaul/QrXVr+jbky+hpa6jk0HHQ9Hv21MptAqwU+EPKL81Wqfws4CsHkaQ==
   dependencies:
     csstype "^3.1.2"
 
@@ -1751,10 +1771,10 @@
   resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-2.0.18.tgz#f80301907c243df03c7e9fd76c0286e95361f7c1"
   integrity sha512-7TyMjRrZZMBPa+/5Y8lN0iyvUU/01PeMGX2+RE7cQWpEUIcb4QotzUObFkJDejj/HUH4qjP/eQ0gzzKs2f+6Yw==
 
-"@hono/qwik-city@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@hono/qwik-city/-/qwik-city-0.0.3.tgz#f684cf5bbad8fb4016eaa25ec29b4bc4bd4e05ef"
-  integrity sha512-+s6O09kyeffwZT3nbtBcPCJqTwKn4eERHrAfmBFQnimsvyTDKC6c59nLixX65n98yys+p6+8olmGqqc+xj//EA==
+"@hono/qwik-city@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@hono/qwik-city/-/qwik-city-0.0.4.tgz#9684fa166048c54ebacf4b5df323dd9730a5bad8"
+  integrity sha512-+YORzUu/3A+J9nIgPsy067pCroD59jFvV1cHFYKz3RbwqVx3+ZGJ8pFpmAALSnrKz/2msYcQzMFugl54Aqi1qA==
 
 "@iarna/toml@^2.2.5":
   version "2.2.5"
@@ -3817,6 +3837,11 @@
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.7.tgz#5b06ad6894b236a1d2bd6b2f07850ca5c59cf4d6"
   integrity sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==
+
+"@types/unist@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/unist/-/unist-3.0.0.tgz#988ae8af1e5239e89f9fbb1ade4c935f4eeedf9a"
+  integrity sha512-MFETx3tbTjE7Uk6vvnWINA/1iJ7LuMdO4fcq8UfF0pRbj01aGLduVvQcRyswuACJdpnHgg8E3rQLhaRdNEJS0w==
 
 "@types/ws@^8.5.5":
   version "8.5.5"
@@ -6611,10 +6636,10 @@ headers-polyfill@^3.1.0, headers-polyfill@^3.1.2:
   resolved "https://registry.yarnpkg.com/headers-polyfill/-/headers-polyfill-3.1.2.tgz#9a4dcb545c5b95d9569592ef7ec0708aab763fbe"
   integrity sha512-tWCK4biJ6hcLqTviLXVR9DTRfYGQMXEIUj3gwJ2rZ5wO/at3XtkI4g8mCvFdUF9l1KMBNCfmNAdnahm1cgavQA==
 
-hono@^3.3.0:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/hono/-/hono-3.5.1.tgz#eea7ba4b071507146e73efc29037e4da4cc96a81"
-  integrity sha512-L31KJg1Qu1ZHYKlpHYymqyDPR9U5SOy+X6c6+HQxBOGMGrJFawd5BvfcP+0rrGcw1bN5xk61+k3oKW4jFWyUkw==
+hono@^3.5.4:
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-3.5.4.tgz#66057d4c1ee127faafa087168af6d569ab25f5e7"
+  integrity sha512-GrRBIJhZ+tG+8RtoyPQjvqPGwppERmayyTiPKano4egmpkJf1XiptESUYK5vKHICNaJksAKB9jzy1CmOdQENPA==
 
 hookable@^5.5.3:
   version "5.5.3"
@@ -11207,6 +11232,13 @@ unist-util-stringify-position@^3.0.0:
   dependencies:
     "@types/unist" "^2.0.0"
 
+unist-util-stringify-position@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/unist-util-stringify-position/-/unist-util-stringify-position-4.0.0.tgz#449c6e21a880e0855bf5aabadeb3a740314abac2"
+  integrity sha512-0ASV06AAoKCDkS2+xw5RXJywruurpbC4JZSm7nr7MOt1ojAzvyyaO+UxZf18j8FCF6kmzCZKcAgN/yu2gm2XgQ==
+  dependencies:
+    "@types/unist" "^3.0.0"
+
 unist-util-visit-parents@^3.0.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/unist-util-visit-parents/-/unist-util-visit-parents-3.1.1.tgz#65a6ce698f78a6b0f56aa0e88f13801886cdaef6"
@@ -11431,6 +11463,14 @@ vfile-message@^3.0.0:
     "@types/unist" "^2.0.0"
     unist-util-stringify-position "^3.0.0"
 
+vfile-message@^4.0.0:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/vfile-message/-/vfile-message-4.0.2.tgz#c883c9f677c72c166362fd635f21fc165a7d1181"
+  integrity sha512-jRDZ1IMLttGj41KcZvlrYAaI3CfqpLpfpf+Mfig13viT6NKvRzWZ+lXz0Y5D60w6uJIBAOGq9mSHf0gktF0duw==
+  dependencies:
+    "@types/unist" "^3.0.0"
+    unist-util-stringify-position "^4.0.0"
+
 vfile@5.3.7, vfile@^5.0.0:
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/vfile/-/vfile-5.3.7.tgz#de0677e6683e3380fafc46544cfe603118826ab7"
@@ -11441,7 +11481,16 @@ vfile@5.3.7, vfile@^5.0.0:
     unist-util-stringify-position "^3.0.0"
     vfile-message "^3.0.0"
 
-vite-imagetools@^5.0.4:
+vfile@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/vfile/-/vfile-6.0.1.tgz#1e8327f41eac91947d4fe9d237a2dd9209762536"
+  integrity sha512-1bYqc7pt6NIADBJ98UiG0Bn/CHIVOoZ/IyEkqIruLg0mE1BKzkOXY2D6CSqQIcKqgadppE5lrxgWXJmXd7zZJw==
+  dependencies:
+    "@types/unist" "^3.0.0"
+    unist-util-stringify-position "^4.0.0"
+    vfile-message "^4.0.0"
+
+vite-imagetools@^5.0.4, vite-imagetools@^5.0.5:
   version "5.0.8"
   resolved "https://registry.yarnpkg.com/vite-imagetools/-/vite-imagetools-5.0.8.tgz#b38375903658ef993de806bea52889f4097b9c40"
   integrity sha512-oFNfc58iLz1lHFsIKQy+wp0RNcZjiaDeHYTexYowpf4RYx9tZ97eWEcw8lQ1jDT8AnOso6XZi5iGjLNAeTR9Tw==
