@@ -2,8 +2,8 @@ import React, {
   FunctionComponent,
   isValidElement,
   ReactNode,
+  RefObject,
   useEffect,
-  useId,
   useReducer,
   useRef,
 } from "react";
@@ -30,8 +30,11 @@ export const previewify = <
   code: string,
 ): PreviewifyComponent<InferProps<T>> => {
   const Wrapped = (props: InferProps<T>) => {
-    const id = useId();
-    const [isPreviewing, dispatch] = useReducer(() => true, false);
+    const ref = useRef<RpPreview>(null);
+    const [isPreviewing, dispatch] = useReducer((status) => {
+      if (status) ref.current?.preview();
+      return true;
+    }, false);
     useEffect(() => {
       window.rpPreviewDispatchers ||= [];
       window.rpPreviewDispatchers.push([code, dispatch]);
@@ -43,7 +46,7 @@ export const previewify = <
     }, []);
 
     return isPreviewing ? (
-      <Previewify code={code} props={props}>
+      <Previewify code={code} props={props} rpRef={ref}>
         <Component {...props} />
       </Previewify>
     ) : (
@@ -68,22 +71,23 @@ export const previewify = <
 
 const Previewify = ({
   code,
+  rpRef,
   props,
   children,
 }: {
   code: string;
+  rpRef: RefObject<RpPreview>;
   children: ReactNode;
   props: Record<string, unknown>;
 }) => {
-  const ref = useRef<RpPreview>(null);
   useEffect(() => {
-    if (!ref.current) return;
-    if (ref.current.previewing) ref.current.rerender(props);
-    else ref.current.preview(props);
+    if (!rpRef.current) return;
+    if (rpRef.current.previewing) rpRef.current.rerender(props);
+    else rpRef.current.preview(props);
   }, [props]);
 
   return (
-    <rp-preview code={code} ref={ref}>
+    <rp-preview code={code} ref={rpRef}>
       <rp-preview-area>{children}</rp-preview-area>
       <template>{rpOutlets(props).map((el) => el)}</template>
     </rp-preview>
