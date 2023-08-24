@@ -1,5 +1,13 @@
 # @react-portable/gateway
 
+## 0.5.0-next.7
+
+### Patch Changes
+
+- [#119](https://github.com/ateam-dev/react-portable/pull/119) [`e17a3cf`](https://github.com/ateam-dev/react-portable/commit/e17a3cfefe76fbc9b0a0095dec9f068e6b6e28f3) Thanks [@aiji42](https://github.com/aiji42)! - bugfix for preview button bug
+
+- [#122](https://github.com/ateam-dev/react-portable/pull/122) [`a67179a`](https://github.com/ateam-dev/react-portable/commit/a67179a2ae0d7d200c788dcdd838b337291077e6) Thanks [@aiji42](https://github.com/aiji42)! - fix qwik dependencies verson
+
 ## 0.5.0-next.6
 
 ### Minor Changes
