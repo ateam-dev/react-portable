@@ -1,5 +1,14 @@
 # @react-portable/core
 
+## 0.7.0-next.10
+
+### Patch Changes
+
+- [#127](https://github.com/ateam-dev/react-portable/pull/127) [`1804dfa`](https://github.com/ateam-dev/react-portable/commit/1804dfa8e6fb18d5ce43714c22bfc4cac2404540) Thanks [@aiji42](https://github.com/aiji42)! - Optimize for better stability
+
+- Updated dependencies [[`1804dfa`](https://github.com/ateam-dev/react-portable/commit/1804dfa8e6fb18d5ce43714c22bfc4cac2404540)]:
+  - @react-portable/gateway@0.5.0-next.8
+
 ## 0.7.0-next.9
 
 ### Patch Changes
