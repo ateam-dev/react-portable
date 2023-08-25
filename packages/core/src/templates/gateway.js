@@ -2,7 +2,10 @@ const { gateway } = require("@react-portable/gateway");
 
 export default {
   fetch: (request, env, ctx) => {
-    if (request.headers.get("Upgrade") === "websocket") {
+    if (
+      request.url.endsWith("/_ws") &&
+      request.headers.get("Upgrade") === "websocket"
+    ) {
       const url = new URL(request.url);
       const origin = new URL(env.WS_ENDPOINT);
       url.host = origin.host;

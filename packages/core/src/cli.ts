@@ -13,7 +13,6 @@ import * as fs from "node:fs";
 import { Worker } from "./worker";
 import { BuildQueue } from "./buildQueue";
 import { startWS } from "./ws";
-import { AddressInfo } from "ws";
 
 type Color = "cyan" | "yellow" | "green";
 const displayLog = (...messages: (string | [Color, string])[]) => {
@@ -123,7 +122,6 @@ program
       const wss = startWS({
         port: wsPort,
       });
-      const wssAddress = wss.address() as AddressInfo;
 
       // Step5: start gateway server (worker)
       const gateway = new Worker(
@@ -132,7 +130,7 @@ program
           vars: {
             ORIGIN: origin,
             FRAGMENTS_ENDPOINT: devWorker.localUrl,
-            WS_ENDPOINT: `http://[${wssAddress.address}]:${wssAddress.port}`,
+            WS_ENDPOINT: `http://127.0.0.1:${wsPort}/_ws`,
           },
           port: port ? Number(port) : undefined,
         },

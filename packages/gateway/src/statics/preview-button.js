@@ -38,27 +38,39 @@ line-height: 100%;
 let isPreviewing = false;
 const statusMessage = van.state("🟠 Waiting for connection to server...");
 
-const socket = new WebSocket(
-  `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${
-    window.location.host
-  }`,
-);
-socket.addEventListener("open", function (event) {
-  statusMessage.val = "🔵 Ready for preview.";
-});
-socket.addEventListener("message", function (event) {
-  if (event.data === "reload") {
-    if (isPreviewing) preview();
-    else statusMessage.val = "🔵 Ready for preview.";
-  }
-  if (event.data === "rebuilding") statusMessage.val = "🟠 Rebuilding...";
-});
-socket.addEventListener("error", function (event) {
-  console.error("WebSocket Error:", event);
-});
-socket.addEventListener("close", function () {
-  statusMessage.val = `🔴 Disconnected from preview server.`;
-});
+let socket;
+const connectWS = () => {
+  socket = new WebSocket(
+    `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${
+      window.location.host
+    }/_ws`,
+  );
+  socket.addEventListener("open", function (event) {
+    statusMessage.val = isPreviewing
+      ? "🟢 Previewing"
+      : "🔵 Ready for preview.";
+  });
+  socket.addEventListener("message", function (event) {
+    if (event.data === "reload") {
+      if (isPreviewing) {
+        statusMessage.val = preview()
+          ? `🟢 Previewing`
+          : `🟠 No elements for preview.`;
+      } else statusMessage.val = "🔵 Ready for preview.";
+    }
+    if (event.data === "rebuilding") statusMessage.val = "🟠 Rebuilding...";
+  });
+  socket.addEventListener("error", function (event) {
+    console.error("WebSocket Error:", event);
+  });
+  socket.addEventListener("close", function () {
+    statusMessage.val = `🔴 Disconnected from preview server: trying to reconnect...`;
+
+    // try to re-connect
+    setTimeout(connectWS, 5000);
+  });
+};
+connectWS();
 
 const Container = () => {
   return div(
@@ -72,7 +84,9 @@ const Container = () => {
         type: "button",
         onclick: () => {
           isPreviewing = true;
-          preview();
+          statusMessage.val = preview()
+            ? `🟢 Previewing`
+            : `🟠 No elements for preview.`;
         },
       },
       "Preview",
@@ -89,10 +103,7 @@ const preview = () => {
     dispatcher();
   });
 
-  statusMessage.val =
-    window.rpPreviewDispatchers?.length > 0
-      ? `🟢 Previewing ${window.rpPreviewDispatchers.length} element(s)`
-      : `🟠 No elements for preview.`;
+  return window.rpPreviewDispatchers?.length > 0;
 };
 
 van.add(document.body, Container());
