@@ -68,3 +68,28 @@ exports[`previewify > Component.__forQwik > \`__outlet__\` is converted to <rp-s
   </div>
 </DocumentFragment>
 `;
+
+exports[`previewify > Component.__forQwik > Allow overriding props for previews 1`] = `
+<DocumentFragment>
+  <div
+    data-testid="overwritten-test-it"
+  >
+    sample
+  </div>
+</DocumentFragment>
+`;
+
+exports[`previewify > Component.__forQwik > Allow overriding props for previews 2`] = `
+<DocumentFragment>
+  <div>
+    sample with children:
+    <div>
+      overwritten children
+    </div>
+     
+    <div>
+      overwritten element
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -146,5 +146,34 @@ describe("previewify", () => {
 
       expect(onClickSpy).toBeCalled();
     });
+    test("Allow overriding props for previews", () => {
+      const ComponentSample = previewify(Sample, "foo", {
+        props: { testId: "overwritten-test-it" },
+      });
+      let rendered = render(<ComponentSample.__forQwik testId="test-id" />);
+
+      expect(rendered.asFragment()).toMatchSnapshot();
+
+      rendered.unmount();
+
+      const ComponentSampleWithChildren = previewify(
+        SampleWithChildren,
+        "foo",
+        {
+          props: {
+            children: <div>overwritten children</div>,
+            element: <div>overwritten element</div>,
+          },
+        },
+      );
+      rendered = render(
+        <ComponentSampleWithChildren.__forQwik
+          children="__outlet__"
+          element="__outlet__"
+        />,
+      );
+
+      expect(rendered.asFragment()).toMatchSnapshot();
+    });
   });
 });
