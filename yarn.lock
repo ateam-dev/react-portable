@@ -1088,6 +1088,13 @@
   resolved "https://registry.yarnpkg.com/@builder.io/qwik-react/-/qwik-react-0.5.0.tgz#bbc536abc6a556a0e5df48051ed901409dbac8ba"
   integrity sha512-JdJWQWOJGv7ddQqEZwzR8wPh0IoCQZwD9qo75+reiQaLp6eH+Pjsm/kn1LaMQt6u72pCCNjnj5kEn/bnbfnIjQ==
 
+"@builder.io/qwik@1.2.10":
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.10.tgz#7fec28388f028382aeeb7007f9c8d2d10353551e"
+  integrity sha512-UJDqEx3p32cmafT9zPk9G623wy0HeMp+T6IE12HKOZtC28T4VC4lwbzkxowPIPd+GuwTSXfWSQzwwgbnOBiPgg==
+  dependencies:
+    csstype "^3.1.2"
+
 "@builder.io/qwik@1.2.8":
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.8.tgz#019d258cce0d33c6b54d971b754c9c94fb39209f"
