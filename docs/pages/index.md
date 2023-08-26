@@ -1,10 +1,8 @@
-## 📚 Introduction
+## 🦄 What is Previewify?
 
-<video autoplay muted loop inline src="/previewify.mp4"></video>
+Previewify is a revolutionary tool aimed at streamlining the component library development process. If you've ever found yourself stuck in the time-consuming cycle of developing a component, testing it in Storybook, publishing it, installing it in an application, and then discovering it doesn't work as expected—Previewify is for you.
 
-### 🤔 What is Previewify?
-
-Previewify is a tool specifically designed to ease the development process of component libraries by allowing developers to preview how the components would look and behave in a deployed application. It aims to bridge the gap between component development and its actual implementation.
+This tool allows you to preview locally developed components directly in a live, deployed application, essentially cutting out the middle steps of publishing and reinstalling. No more worrying about style breaks or unexpected behaviors after deployment; see your changes in the actual environment where they will be used. Previewify aims to accelerate your development cycle and bridge the gap between component development and its real-world implementation.
 
 ### 🌟 Features
 
@@ -12,14 +10,26 @@ Previewify is a tool specifically designed to ease the development process of co
 - **🌐 Tunneling Support**: Provides globally accessible URLs via tunneling, making it easier to preview components on various devices, including mobile.
 - **🔋 Hot-Reload**: Automatically reflects any changes you make to your local components in real-time during the preview.
 
+## 🧠 Under the Hood
 
-## 📋 Prerequisites
+<video autoplay muted loop inline src="/previewify.mp4"></video>
+
+When you start Previewify, two servers get spun up: a component delivery server and a gateway proxy. Here's a simple step-by-step explanation of how it works:
+
+1. **Initialize Servers**: Running Previewify initializes two servers: a component delivery server for serving your local components and a gateway proxy for intercepting requests to the deployed application.
+2. **Access Through Gateway**: You open the deployed application through the gateway URL. At this stage, a script is injected via the proxy server, activating the preview mode on the application.
+3. **Enter Preview Mode**: Once preview mode is activated, the application starts requesting the components from the component delivery server.
+4. **Component Replacement**: The components in the live application are dynamically replaced with the ones from your local component delivery server, allowing you to preview how your local changes would appear in the deployed application.
+
+By understanding this mechanism, you can effectively utilize Previewify to speed up your development process.
+
+## 🍭 How to Use
+
+### 📋 Prerequisites
 
 - React v18 or higher
 - Written in Typescript
 - Built with Vite
-
-## 🛠️ How to Use
 
 ### ⬇️ Installation
 
@@ -35,9 +45,7 @@ yarn add -D @react-portable/core @builder.io/qwik@1.2.8 @builder.io/qwik-city@1.
 
 The `@react-portable/core` package contains Previewify, and `qwik` packages are necessary for its functionality.
 
-### 📝 Usage Steps
-
-#### 🎁 Importing and Wrapping Components
+### 🎁 Importing and Wrapping Components
 
 To start, you'll first need to import and wrap your component using Previewify's `previewify` function.
 
@@ -62,11 +70,11 @@ export const MyComponent = previewify(Component, "unique-code");
 
 In this example, the `previewify` function wraps `MyComponent`, and you provide a unique identifier code as the second argument. Make sure the identifier is unique across your project to avoid conflicts.
 
-#### 🚀 Deploying to Live Application
+### 🚀 Deploying to Live Application
 
 After you've wrapped your component with previewify, the next step is to import this wrapped component into your live application. Make sure to deploy these changes to your production or staging environment. This is essential for Previewify to be able to preview this component in an environment that closely mimics your live application.
 
-#### 🛠️ Custom Configuration
+### 🛠️ Custom Configuration
 
 You can customize Previewify's settings by placing a configuration file in your project root. Create `previewify.config.ts` at the root of your project.
 
@@ -91,13 +99,13 @@ export default defineConfig({
 ```
 :::
 
-##### 🎚️ Parameters for `previewifyPlugin`
+#### 🎚️ Parameters for `previewifyPlugin`
 
 - `entry` (Optional): Specify the entry file for your project if it is not located at `./src/index.(ts|js|tsx|jsx)`.
 - `css` (Optional): If you have a global CSS file (such as one for Tailwind CSS), specify its path here.
 
 
-#### 🌈 Starting Preview
+### 🏎️ Starting Preview
 
 Once the wrapped component is deployed in your live environment, you can now use Previewify's command-line utility to preview it:
 
@@ -131,13 +139,13 @@ You should see a preview button and status at the bottom of the page, similar to
 Clicking this button will initiate the preview, allowing you to see the component in the context of your live application.
 
 
-##### 🛠️ Command Line Options
+#### 🛠️ Command Line Options
 
 `npx portable previewify [options] <origin>`
 
-- `origin`: Specify the path to the source directory if you want to watch changes and automatically restart the server. Enabling this option allows hot-reloading of components during preview.
+- `origin`: Specify the origin (protocol + domain) of the page you want to preview. This should be the base URL (e.g., `https://example.com`) where you want to see your component previews.
 - `-p`, `--port <port>`: Specifies the port for the gateway server.
-- `-w`, `--watch <path>`: If you want to watch for file changes in a specific directory, provide the `<path>` here to automatically restart the server.
+- `-w`, `--watch <path>`:  If you want to watch for file changes in a specific directory, provide the `<path>` here to automatically restart the server. Enabling this option also allows hot-reloading of components during preview, making sure your changes are reflected in real-time.
 - `-t`, `--tunnel`: Use Cloudflared tunnel to make the local server globally accessible. Default is `false`.
 
 Usage
@@ -188,6 +196,20 @@ module.exports = {
 :::
 
 Setting `important` to `"rp-preview"` ensures that Tailwind styles are scoped to this specific area, avoiding global overrides that might interfere with your existing styles.
+
+### 🎛️ Overriding Props for Preview Purposes
+
+Sometimes, the props type of the component you are currently modifying locally may differ from the deployed component in production, making the preview unworkable. The `previewify` function accepts a third argument, `options`, that you can use to override props for such cases.
+
+```tsx
+export const MyComponent = previewify(Component, "unique-code", { 
+  props: { /* your overridden props here */ }
+});
+```
+
+::: info
+Overriding props in this manner is intended solely for previewing purposes. You don't need to specify this during the actual deployment to production.
+:::
 
 ### 🌐 When The Response from the Origin has a Content-Type of `br`
 
