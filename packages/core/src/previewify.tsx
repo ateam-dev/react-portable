@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  ComponentType,
   isValidElement,
   ReactNode,
   RefObject,
@@ -15,19 +16,18 @@ export interface PreviewifyComponent<T extends Record<string, unknown> = {}>
   __forQwik: FunctionComponent<T>;
 }
 
-type InferProps<T> = T extends FunctionComponent<infer U>
+type InferProps<T> = T extends ComponentType<infer U>
   ? U
   : T extends (props: infer U) => JSX.Element
   ? U
-  : T extends () => JSX.Element
-  ? {}
   : never;
 
 export const previewify = <
-  T extends FunctionComponent | ((props: any) => JSX.Element),
+  T extends ComponentType | ((props: any) => JSX.Element),
 >(
   Component: T,
   code: string,
+  option: { props?: InferProps<T> } = {},
 ): PreviewifyComponent<InferProps<T>> => {
   const Wrapped = (props: InferProps<T>) => {
     const ref = useRef<RpPreview>(null);
@@ -60,7 +60,11 @@ export const previewify = <
       dispatch();
     }, []);
 
-    return <Component {...qwikifyProps(props, isServer)} />;
+    return (
+      <Component
+        {...qwikifyProps(option.props ?? props, isServer, !!option.props)}
+      />
+    );
   };
 
   Wrapped.__code = code;
@@ -111,9 +115,11 @@ const rpOutlets = <T extends Record<string, unknown>>(
 const qwikifyProps = <T extends Record<string, unknown>>(
   props: T,
   ssr: boolean,
+  overwritten: boolean,
 ): T => {
   return Object.fromEntries(
     Object.entries(props).map(([key, val]) => {
+      if (overwritten) return [key, val];
       if (key === "children" || val === "__outlet__")
         return [key, ssr ? null : <rp-slot _key={key} />];
 
