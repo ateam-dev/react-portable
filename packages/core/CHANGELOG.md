@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.7.0-next.11
+
+### Minor Changes
+
+- [#130](https://github.com/ateam-dev/react-portable/pull/130) [`87ee8fe`](https://github.com/ateam-dev/react-portable/commit/87ee8fee3d9ce675c323530fe5cf9d12a02b8afd) Thanks [@aiji42](https://github.com/aiji42)! - add feature to allow overriding props for previews
+
 ## 0.7.0-next.10
 
 ### Patch Changes
