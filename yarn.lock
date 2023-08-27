@@ -1070,10 +1070,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@builder.io/qwik-city@1.2.8":
-  version "1.2.8"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-1.2.8.tgz#9e5f0a3b4b2631af8587293970d5c635552ca058"
-  integrity sha512-Y0VJ8a08+DGgr8C5GmzJfBFtw+oPjqtfOmewLxFKdyQNAAIiCMkZg9y7DApj5uIDhf954/faw0k5vG4G+GSyfw==
+"@builder.io/qwik-city@1.2.10":
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-1.2.10.tgz#c7dbb3ef373871decdec052f362d5a17f20b9103"
+  integrity sha512-IKo6NjT7dYtDYY1Y0hP56/jlbjcnK89NA0sHEBmNZJZJy+YnzvWLPWf9Ft9q30hIwK3azyW+XtJZpwIJIPEAFw==
   dependencies:
     "@mdx-js/mdx" "2.3.0"
     "@types/mdx" "2.0.5"
@@ -1088,10 +1088,10 @@
   resolved "https://registry.yarnpkg.com/@builder.io/qwik-react/-/qwik-react-0.5.0.tgz#bbc536abc6a556a0e5df48051ed901409dbac8ba"
   integrity sha512-JdJWQWOJGv7ddQqEZwzR8wPh0IoCQZwD9qo75+reiQaLp6eH+Pjsm/kn1LaMQt6u72pCCNjnj5kEn/bnbfnIjQ==
 
-"@builder.io/qwik@1.2.8":
-  version "1.2.8"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.8.tgz#019d258cce0d33c6b54d971b754c9c94fb39209f"
-  integrity sha512-I9bQ6flHeic5pI8ChXx1xAvMyjNOIcOdI7VY6sneiYcVLjW3JtdHKKcdk2QMtrMuIIljN6j/xiyn9MBB2Vxqxg==
+"@builder.io/qwik@1.2.10":
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-1.2.10.tgz#7fec28388f028382aeeb7007f9c8d2d10353551e"
+  integrity sha512-UJDqEx3p32cmafT9zPk9G623wy0HeMp+T6IE12HKOZtC28T4VC4lwbzkxowPIPd+GuwTSXfWSQzwwgbnOBiPgg==
   dependencies:
     csstype "^3.1.2"
 

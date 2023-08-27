@@ -37,10 +37,10 @@ Install the necessary packages using npm or Yarn as follows:
 
 ```bash
 # for npm
-npm install -D @react-portable/core @builder.io/qwik@1.2.8 @builder.io/qwik-city@1.2.8 @builder.io/qwik-react@0.5.0
+npm install -D @react-portable/core @builder.io/qwik @builder.io/qwik-city @builder.io/qwik-react
 
 # for yarn
-yarn add -D @react-portable/core @builder.io/qwik@1.2.8 @builder.io/qwik-city@1.2.8 @builder.io/qwik-react@0.5.0
+yarn add -D @react-portable/core @builder.io/qwik @builder.io/qwik-city @builder.io/qwik-react
 ```
 
 The `@react-portable/core` package contains Previewify, and `qwik` packages are necessary for its functionality.
