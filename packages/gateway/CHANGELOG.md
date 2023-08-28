@@ -1,5 +1,31 @@
 # @react-portable/gateway
 
+## 0.5.0
+
+### Minor Changes
+
+- [#102](https://github.com/ateam-dev/react-portable/pull/102) [`4486e6c`](https://github.com/ateam-dev/react-portable/commit/4486e6c8ddfb0a2eaa8447a3dd620f28ca5a6807) Thanks [@aiji42](https://github.com/aiji42)! - support rendering react elements passed by props
+
+- [#81](https://github.com/ateam-dev/react-portable/pull/81) [`5c5c595`](https://github.com/ateam-dev/react-portable/commit/5c5c595a90ecb0db06d487be8b69b0eb2b956eab) Thanks [@aiji42](https://github.com/aiji42)! - start and integrate the gateway and component servers for preview with a single command
+
+- [#76](https://github.com/ateam-dev/react-portable/pull/76) [`c3f2d4d`](https://github.com/ateam-dev/react-portable/commit/c3f2d4d8112fd8475b83d84245a88c7a4e6650c6) Thanks [@aiji42](https://github.com/aiji42)! - rename modules and web components for shortify
+
+- [#94](https://github.com/ateam-dev/react-portable/pull/94) [`0e59614`](https://github.com/ateam-dev/react-portable/commit/0e59614807f7d55dbd98f33942d1f9f49e4381f4) Thanks [@aiji42](https://github.com/aiji42)! - delete preview remote specification at gateway and client
+
+- [#107](https://github.com/ateam-dev/react-portable/pull/107) [`b305d76`](https://github.com/ateam-dev/react-portable/commit/b305d76900ff4b53bf647bb89e21ac128475018d) Thanks [@aiji42](https://github.com/aiji42)! - 'remove features for portable'
+
+- [#114](https://github.com/ateam-dev/react-portable/pull/114) [`2c03663`](https://github.com/ateam-dev/react-portable/commit/2c036632ecfc01827f5ee3fcc33f09eb7c80de87) Thanks [@aiji42](https://github.com/aiji42)! - Add support for hot reloading
+
+### Patch Changes
+
+- [#105](https://github.com/ateam-dev/react-portable/pull/105) [`74e5597`](https://github.com/ateam-dev/react-portable/commit/74e5597cc8971bae4487a6459bc795677c434139) Thanks [@aiji42](https://github.com/aiji42)! - update style of preview button
+
+- [#127](https://github.com/ateam-dev/react-portable/pull/127) [`1804dfa`](https://github.com/ateam-dev/react-portable/commit/1804dfa8e6fb18d5ce43714c22bfc4cac2404540) Thanks [@aiji42](https://github.com/aiji42)! - Optimize for better stability
+
+- [#119](https://github.com/ateam-dev/react-portable/pull/119) [`e17a3cf`](https://github.com/ateam-dev/react-portable/commit/e17a3cfefe76fbc9b0a0095dec9f068e6b6e28f3) Thanks [@aiji42](https://github.com/aiji42)! - bugfix for preview button bug
+
+- [#122](https://github.com/ateam-dev/react-portable/pull/122) [`a67179a`](https://github.com/ateam-dev/react-portable/commit/a67179a2ae0d7d200c788dcdd838b337291077e6) Thanks [@aiji42](https://github.com/aiji42)! - fix qwik dependencies verson
+
 ## 0.5.0-next.8
 
 ### Patch Changes
