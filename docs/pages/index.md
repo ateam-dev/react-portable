@@ -1,3 +1,5 @@
+![Previewify](/ogp.png)
+
 ## 🦄 What is Previewify?
 
 Previewify is a revolutionary tool aimed at streamlining the component library development process. If you've ever found yourself stuck in the time-consuming cycle of developing a component, testing it in Storybook, publishing it, installing it in an application, and then discovering it doesn't work as expected—Previewify is for you.
@@ -12,7 +14,7 @@ This tool allows you to preview locally developed components directly in a live,
 
 ## 🧠 Under the Hood
 
-<video autoplay muted loop inline src="/previewify.mp4"></video>
+<video autoplay muted loop playsinline src="/previewify.mp4" poster="/previewify-under-the-hood.png"></video>
 
 When you start Previewify, two servers get spun up: a component delivery server and a gateway proxy. Here's a simple step-by-step explanation of how it works:
 
