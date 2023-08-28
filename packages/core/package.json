@@ -4,7 +4,7 @@
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "bin": {
-    "portable": "./dist/cli.cjs"
+    "previewify": "./dist/cli.cjs"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
