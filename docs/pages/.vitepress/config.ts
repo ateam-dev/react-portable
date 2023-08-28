@@ -5,7 +5,13 @@ export default defineConfig({
   base: "/react-portable/",
   title: "Previewify - React Portable",
   head: [
-    ["meta", { property: "og:image", content: "/react-portable/ogp.png" }],
+    [
+      "meta",
+      {
+        property: "og:image",
+        content: "https://ateam-dev.github.io/react-portable/ogp.png",
+      },
+    ],
     [
       "link",
       {
