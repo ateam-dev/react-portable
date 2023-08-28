@@ -185,11 +185,27 @@ export const qwikPlugins = (): PluginOption => {
       ssr: {
         outDir: path.resolve(portableConfig.outDir, "server"),
       },
-      // vendorRoots: [
-      //   path.dirname(require.resolve("@builder.io/qwik-city")),
-      //   path.dirname(require.resolve("@builder.io/qwik-react")),
-      // ],
+      vendorRoots: [
+        path.dirname(require.resolve("@builder.io/qwik-city")),
+        path.dirname(require.resolve("@builder.io/qwik-react")),
+      ],
     }),
     qwikReact(),
+    {
+      name: "react-portable-qwik-resolve",
+      config: () => {
+        return {
+          ssr: {
+            noExternal: ["@builder.io/qwik-react", "@builder.io/qwik-city"],
+          },
+          resolve: {
+            dedupe: ["@builder.io/qwik-react", "@builder.io/qwik-city"],
+          },
+          optimizeDeps: {
+            exclude: ["@builder.io/qwik-react", "@builder.io/qwik-city"],
+          },
+        };
+      },
+    },
   ];
 };
