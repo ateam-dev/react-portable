@@ -66,7 +66,6 @@ const buildServer = async (emptyOutDir = true, configFile?: string | null) => {
 };
 
 program
-  .command("previewify")
   .argument("<origin>", "Specify the origin of the proxy destination.")
   .description("Start the server for preview.")
   .option("-p --port <port>", "The gateway server port.")

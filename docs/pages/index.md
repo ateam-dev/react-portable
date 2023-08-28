@@ -108,7 +108,7 @@ export default defineConfig({
 Once the wrapped component is deployed in your live environment, you can now use Previewify's command-line utility to preview it:
 
 ```bash
-npx portable prevewify 'https://your.page.com'
+npx prevewify 'https://your.page.com'
 ```
 
 Upon successful execution, you should see output similar to this:
@@ -139,7 +139,7 @@ Clicking this button will initiate the preview, allowing you to see the componen
 
 #### 🛠️ Command Line Options
 
-`npx portable previewify [options] <origin>`
+`npx previewify [options] <origin>`
 
 - `origin`: Specify the origin (protocol + domain) of the page you want to preview. This should be the base URL (e.g., `https://example.com`) where you want to see your component previews.
 - `-p`, `--port <port>`: Specifies the port for the gateway server.
@@ -149,7 +149,7 @@ Clicking this button will initiate the preview, allowing you to see the componen
 Usage
 
 ```bash
-npx portable previewify 'https://your.page.com' --watch ./src --tunnel
+npx previewify 'https://your.page.com' --watch ./src --tunnel
 ```
 
 ## 🎓 TIPs for Effective Use
@@ -216,7 +216,7 @@ If the response from the origin server has a `Content-Type: br` header, you must
 To enable tunneling mode, use the `--tunnel` flag when running the preview command:
 
 ```bash
-npx portable previewify 'https://your.page.com' --tunnel
+npx previewify 'https://your.page.com' --tunnel
 ```
 
 By using tunneling mode, Previewify will be able to handle br (Brotli) compressed content correctly, ensuring that your previews display as expected.
