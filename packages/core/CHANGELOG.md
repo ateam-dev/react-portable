@@ -1,5 +1,13 @@
 # @react-portable/core
 
+## 0.7.0-next.13
+
+### Minor Changes
+
+- [#137](https://github.com/ateam-dev/react-portable/pull/137) [`6589a65`](https://github.com/ateam-dev/react-portable/commit/6589a65d45590fd80bb0d241f8492d742c841a84) Thanks [@aiji42](https://github.com/aiji42)! - change command name from portable to previewify
+
+- [#136](https://github.com/ateam-dev/react-portable/pull/136) [`afe3352`](https://github.com/ateam-dev/react-portable/commit/afe3352db3b63072ea0a26f83b6b933feaa90c56) Thanks [@aiji42](https://github.com/aiji42)! - change @react-portable/core to include qwik, qwik-city and qwik-react
+
 ## 0.7.0-next.12
 
 ### Patch Changes
