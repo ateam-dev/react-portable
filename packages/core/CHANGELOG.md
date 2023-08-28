@@ -1,5 +1,13 @@
 # @react-portable/core
 
+## 0.7.0-next.12
+
+### Patch Changes
+
+- [#129](https://github.com/ateam-dev/react-portable/pull/129) [`f5b25dd`](https://github.com/ateam-dev/react-portable/commit/f5b25ddc21ce3af7dc2bc06b40ba4d0c0810946c) Thanks [@renovate](https://github.com/apps/renovate)! - Update dependency untun to v0.1.2
+
+- [#133](https://github.com/ateam-dev/react-portable/pull/133) [`5a563f9`](https://github.com/ateam-dev/react-portable/commit/5a563f9e8b9e19ad8c8b6910a1cbd749bc1fe118) Thanks [@aiji42](https://github.com/aiji42)! - bumpup qwik libraries
+
 ## 0.7.0-next.11
 
 ### Minor Changes
