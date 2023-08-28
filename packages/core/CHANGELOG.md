@@ -1,5 +1,62 @@
 # @react-portable/core
 
+## 0.7.0
+
+### Minor Changes
+
+- [#102](https://github.com/ateam-dev/react-portable/pull/102) [`4486e6c`](https://github.com/ateam-dev/react-portable/commit/4486e6c8ddfb0a2eaa8447a3dd620f28ca5a6807) Thanks [@aiji42](https://github.com/aiji42)! - support rendering react elements passed by props
+
+- [#81](https://github.com/ateam-dev/react-portable/pull/81) [`5c5c595`](https://github.com/ateam-dev/react-portable/commit/5c5c595a90ecb0db06d487be8b69b0eb2b956eab) Thanks [@aiji42](https://github.com/aiji42)! - start and integrate the gateway and component servers for preview with a single command
+
+- [#137](https://github.com/ateam-dev/react-portable/pull/137) [`6589a65`](https://github.com/ateam-dev/react-portable/commit/6589a65d45590fd80bb0d241f8492d742c841a84) Thanks [@aiji42](https://github.com/aiji42)! - change command name from portable to previewify
+
+- [#76](https://github.com/ateam-dev/react-portable/pull/76) [`c3f2d4d`](https://github.com/ateam-dev/react-portable/commit/c3f2d4d8112fd8475b83d84245a88c7a4e6650c6) Thanks [@aiji42](https://github.com/aiji42)! - rename modules and web components for shortify
+
+- [#111](https://github.com/ateam-dev/react-portable/pull/111) [`b7a3142`](https://github.com/ateam-dev/react-portable/commit/b7a3142df26d30a6ba0275df1798d65647c75db3) Thanks [@aiji42](https://github.com/aiji42)! - Enable automatic loading of previewify.config.ts
+
+- [#77](https://github.com/ateam-dev/react-portable/pull/77) [`4635d9e`](https://github.com/ateam-dev/react-portable/commit/4635d9e5cedb6a417c83fdc453c32fa1832262a9) Thanks [@aiji42](https://github.com/aiji42)! - export `previewify` as alias of `portable`
+
+- [#110](https://github.com/ateam-dev/react-portable/pull/110) [`63e1780`](https://github.com/ateam-dev/react-portable/commit/63e17803701284e8bfa3eb4915d4000122dc8122) Thanks [@aiji42](https://github.com/aiji42)! - the CLI commands have been improved: portable prepare is no longer needed and is completed with a single portable previewify.
+
+- [#136](https://github.com/ateam-dev/react-portable/pull/136) [`afe3352`](https://github.com/ateam-dev/react-portable/commit/afe3352db3b63072ea0a26f83b6b933feaa90c56) Thanks [@aiji42](https://github.com/aiji42)! - change @react-portable/core to include qwik, qwik-city and qwik-react
+
+- [#107](https://github.com/ateam-dev/react-portable/pull/107) [`b305d76`](https://github.com/ateam-dev/react-portable/commit/b305d76900ff4b53bf647bb89e21ac128475018d) Thanks [@aiji42](https://github.com/aiji42)! - 'remove features for portable'
+
+- [#130](https://github.com/ateam-dev/react-portable/pull/130) [`87ee8fe`](https://github.com/ateam-dev/react-portable/commit/87ee8fee3d9ce675c323530fe5cf9d12a02b8afd) Thanks [@aiji42](https://github.com/aiji42)! - add feature to allow overriding props for previews
+
+- [#78](https://github.com/ateam-dev/react-portable/pull/78) [`992c4a6`](https://github.com/ateam-dev/react-portable/commit/992c4a616d794c0432ba6db3f1ddddecaf141831) Thanks [@aiji42](https://github.com/aiji42)! - separate vite plugin and cli commands for build and preparation
+
+- [#114](https://github.com/ateam-dev/react-portable/pull/114) [`2c03663`](https://github.com/ateam-dev/react-portable/commit/2c036632ecfc01827f5ee3fcc33f09eb7c80de87) Thanks [@aiji42](https://github.com/aiji42)! - Add support for hot reloading
+
+### Patch Changes
+
+- [#79](https://github.com/ateam-dev/react-portable/pull/79) [`4bb0290`](https://github.com/ateam-dev/react-portable/commit/4bb0290f0d7aee0902c346cd768c330dd04de1ca) Thanks [@aiji42](https://github.com/aiji42)! - fix support `previewify`
+
+- [#95](https://github.com/ateam-dev/react-portable/pull/95) [`be9055f`](https://github.com/ateam-dev/react-portable/commit/be9055fcff8b38f827cdb6da3236235faad825d6) Thanks [@aiji42](https://github.com/aiji42)! - stabilize build task
+
+- [#94](https://github.com/ateam-dev/react-portable/pull/94) [`0e59614`](https://github.com/ateam-dev/react-portable/commit/0e59614807f7d55dbd98f33942d1f9f49e4381f4) Thanks [@aiji42](https://github.com/aiji42)! - remove rp-preview included in fragment
+
+- [#123](https://github.com/ateam-dev/react-portable/pull/123) [`77e1ea4`](https://github.com/ateam-dev/react-portable/commit/77e1ea41ab7c5634662f68221bc302f598ac0e3d) Thanks [@aiji42](https://github.com/aiji42)! - upgrade qwik version 1.2.8
+
+- [#97](https://github.com/ateam-dev/react-portable/pull/97) [`86a43ad`](https://github.com/ateam-dev/react-portable/commit/86a43adcd8d6443f2efebe2c74dd2538998cfb65) Thanks [@aiji42](https://github.com/aiji42)! - fix preview worker config when restarting
+
+- [#129](https://github.com/ateam-dev/react-portable/pull/129) [`f5b25dd`](https://github.com/ateam-dev/react-portable/commit/f5b25ddc21ce3af7dc2bc06b40ba4d0c0810946c) Thanks [@renovate](https://github.com/apps/renovate)! - Update dependency untun to v0.1.2
+
+- [#100](https://github.com/ateam-dev/react-portable/pull/100) [`c845c6d`](https://github.com/ateam-dev/react-portable/commit/c845c6dfbd862af50b3b8ff8a4358de8933859f5) Thanks [@aiji42](https://github.com/aiji42)! - prepare for supporting to preview ReactElement props
+
+- [`e49ccb6`](https://github.com/ateam-dev/react-portable/commit/e49ccb6aff5e111ae07035a43176a2285d02c72e) Thanks [@aiji42](https://github.com/aiji42)! - update peerDependencies qwik libraries
+
+- [#127](https://github.com/ateam-dev/react-portable/pull/127) [`1804dfa`](https://github.com/ateam-dev/react-portable/commit/1804dfa8e6fb18d5ce43714c22bfc4cac2404540) Thanks [@aiji42](https://github.com/aiji42)! - Optimize for better stability
+
+- [#91](https://github.com/ateam-dev/react-portable/pull/91) [`b8e336b`](https://github.com/ateam-dev/react-portable/commit/b8e336b4f5717b4c69f1aaf0e82e3836e78959eb) Thanks [@aiji42](https://github.com/aiji42)! - beautify cli logs
+
+- [#133](https://github.com/ateam-dev/react-portable/pull/133) [`5a563f9`](https://github.com/ateam-dev/react-portable/commit/5a563f9e8b9e19ad8c8b6910a1cbd749bc1fe118) Thanks [@aiji42](https://github.com/aiji42)! - bumpup qwik libraries
+
+- [#122](https://github.com/ateam-dev/react-portable/pull/122) [`a67179a`](https://github.com/ateam-dev/react-portable/commit/a67179a2ae0d7d200c788dcdd838b337291077e6) Thanks [@aiji42](https://github.com/aiji42)! - fix qwik dependencies verson
+
+- Updated dependencies [[`4486e6c`](https://github.com/ateam-dev/react-portable/commit/4486e6c8ddfb0a2eaa8447a3dd620f28ca5a6807), [`5c5c595`](https://github.com/ateam-dev/react-portable/commit/5c5c595a90ecb0db06d487be8b69b0eb2b956eab), [`c3f2d4d`](https://github.com/ateam-dev/react-portable/commit/c3f2d4d8112fd8475b83d84245a88c7a4e6650c6), [`0e59614`](https://github.com/ateam-dev/react-portable/commit/0e59614807f7d55dbd98f33942d1f9f49e4381f4), [`74e5597`](https://github.com/ateam-dev/react-portable/commit/74e5597cc8971bae4487a6459bc795677c434139), [`b305d76`](https://github.com/ateam-dev/react-portable/commit/b305d76900ff4b53bf647bb89e21ac128475018d), [`1804dfa`](https://github.com/ateam-dev/react-portable/commit/1804dfa8e6fb18d5ce43714c22bfc4cac2404540), [`e17a3cf`](https://github.com/ateam-dev/react-portable/commit/e17a3cfefe76fbc9b0a0095dec9f068e6b6e28f3), [`a67179a`](https://github.com/ateam-dev/react-portable/commit/a67179a2ae0d7d200c788dcdd838b337291077e6), [`2c03663`](https://github.com/ateam-dev/react-portable/commit/2c036632ecfc01827f5ee3fcc33f09eb7c80de87)]:
+  - @react-portable/gateway@0.5.0
+
 ## 0.7.0-next.13
 
 ### Minor Changes
