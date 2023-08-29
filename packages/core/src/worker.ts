@@ -1,5 +1,5 @@
 import { unstable_dev, UnstableDevOptions, UnstableDevWorker } from "wrangler";
-import { startTunnel } from "untun";
+import { tunnel } from "cloudflared";
 
 export class Worker {
   private worker: UnstableDevWorker | undefined;
@@ -10,10 +10,8 @@ export class Worker {
     private readonly workerOption: UnstableDevOptions,
   ) {}
 
-  public async start(tunnel = false) {
+  public async start() {
     this.worker = await unstable_dev(this.workerEntry, this.config);
-
-    if (tunnel) await this.startTunnel();
   }
 
   public async restart() {
@@ -24,10 +22,14 @@ export class Worker {
     });
   }
 
-  private async startTunnel() {
-    const tunnel = await startTunnel({ url: this.localUrl });
+  public async startTunnel(configPath?: string) {
+    const { url, connections } = tunnel({
+      ...(configPath ? { "--config": configPath, run: null } : {}),
+      "--url": this.localUrl,
+      "--no-tls-verify": "",
+    });
 
-    this.globalUrl = await tunnel!.getURL();
+    this.globalUrl = configPath ? "<Your tunnnel domain>" : await url;
   }
 
   public get localUrl() {
