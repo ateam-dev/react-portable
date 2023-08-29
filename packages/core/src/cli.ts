@@ -84,6 +84,10 @@ program
     false,
   )
   .option(
+    "--cloudflared-config <path>",
+    "Specifies a config file for tunneling by cloudflared in YAML format.",
+  )
+  .option(
     "--server-entry <path>",
     "Specify a custom entry file for the server.",
     ".portable/server/worker.mjs",
@@ -96,10 +100,20 @@ program
   .action(
     async (
       origin,
-      { watch, config, port, tunnel, serverEntry, clientEntry },
+      {
+        watch,
+        config,
+        port,
+        tunnel,
+        cloudflaredConfig,
+        serverEntry,
+        clientEntry,
+      },
     ) => {
       if (fs.existsSync(config))
         displayLog(`⚙️ Loading config`, ["cyan", config]);
+      if (cloudflaredConfig && !fs.existsSync(cloudflaredConfig))
+        throw new Error(`${cloudflaredConfig} dose not exist.`);
 
       // Step1: prepare (setup routing files)
       await prepare(config);
@@ -134,7 +148,11 @@ program
           port: port ? Number(port) : undefined,
         },
       );
-      await gateway.start(tunnel);
+      await gateway.start();
+      if (tunnel) {
+        displayLog("🌐 Waiting for tunneling to be completed...");
+        await gateway.startTunnel(cloudflaredConfig);
+      }
       displayLog(
         "🟢 Previewing at",
         gateway.globalUrl ?? gateway.localUrl,

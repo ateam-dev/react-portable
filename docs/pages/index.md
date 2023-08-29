@@ -147,6 +147,7 @@ Clicking this button will initiate the preview, allowing you to see the componen
 - `-p`, `--port <port>`: Specifies the port for the gateway server.
 - `-w`, `--watch <path>`:  If you want to watch for file changes in a specific directory, provide the `<path>` here to automatically restart the server. Enabling this option also allows hot-reloading of components during preview, making sure your changes are reflected in real-time.
 - `-t`, `--tunnel`: Use Cloudflared tunnel to make the local server globally accessible. Default is `false`.
+- `--cloudflared-config <path>`: Specify a Cloudflared configuration file in YAML format to use a fixed domain for the tunnel. This option is meant to be used in conjunction with the `-t` option. It's optional; if not specified, Cloudflared will automatically assign a domain for you. (See: [Fixing the domain for the tunnel](#🔮-fixing-the-domain-for-the-tunnel))
 
 Usage
 
@@ -223,7 +224,38 @@ npx previewify 'https://your.page.com' --tunnel
 
 By using tunneling mode, Previewify will be able to handle br (Brotli) compressed content correctly, ensuring that your previews display as expected.
 
-## 🔮 Future Features
-We have several features planned for future releases:
+### 🔮 Fixing the Domain for the Tunnel
 
-- Fixed domain during tunneling
+Prerequisites: Make sure you are using Cloudflare's authoritative DNS servers and have registered your own domain with Cloudflare.
+
+#### Steps
+1. **Login to Cloudflared:**
+```bash
+npx cloudflared tunnel login
+```
+After executing this command, your browser will open for you to log into your Cloudflare account. Select the domain you have registered. A certificate will be downloaded to your machine, usually to `~/.cloudflared/cert.pem`.
+
+2. **Create a Tunnel and Add CNAME Record:**
+```bash
+npx cloudflared tunnel create <tunnel-name>
+npx cloudflared tunnel route dns <tunnel-name> <hostname>
+```
+This will generate a credentials file for the tunnel, and add the CNAME record. Go to the DNS page on Cloudflare's dashboard to confirm that the corresponding CNAME has been created.
+
+3. **Configure Cloudflared:**  
+
+Place a configuration file at `~/.cloudflared/config.yaml` with the following settings:
+```yaml
+tunnel: <tunnel-name>
+credentials-file: /path/to/.cloudflared/<Tunnel-UUID>.json
+```
+
+::: info
+If you encounter any difficulties or have questions while following these steps, you can refer to the [Via the command line · Cloudflare Zero Trust docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/install-and-setup/tunnel-guide/local/).
+:::
+
+When you want to start Previewify, use the following command:
+```bash
+npx previewify <your origin page> -t --cloudflared-config ~/.cloudflared/config.yaml
+```
+By following these steps, you'll be able to set a fixed domain for your tunnel, making your development workflow more predictable.
