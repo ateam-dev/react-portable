@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.8.0
+
+### Minor Changes
+
+- [#143](https://github.com/ateam-dev/react-portable/pull/143) [`687ad52`](https://github.com/ateam-dev/react-portable/commit/687ad526aa80e19e5fca400a92565a4ae1c08e3c) Thanks [@aiji42](https://github.com/aiji42)! - change to allow fixing the domain for tunnels
+
 ## 0.7.0
 
 ### Minor Changes
