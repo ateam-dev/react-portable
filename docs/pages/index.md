@@ -157,9 +157,11 @@ npx previewify 'https://your.page.com' --watch ./src --tunnel
 
 ## 🎓 TIPs for Effective Use
 ### 🎨 Using Tailwind with Both Component Library and Application
-During previews, you don't need reset CSS. Prepare a separate CSS file that omits `@tailwind base;` specifically for Previewify and set its path in your `previewify.config.ts`.
+If you're using Tailwind CSS with Previewify, you can customize your styles specifically for the preview environment.
 
-Here is an example:
+1. **Create a separate CSS file for Preview:**
+
+You don't need reset styles (`@tailwind base;`) for Previewify. This is because the production application you are previewing against already includes these reset styles.
 
 ::: code-group
 ```css [./src/previewify.css]
@@ -171,20 +173,14 @@ Here is an example:
 @tailwind components;
 @tailwind utilities;
 ```
-```ts [./previewify.config.ts]
-import { defineConfig } from "vite";
-import { previewifyPlugin } from "@react-portable/core/vite";
-
-export default defineConfig({
-  plugins: [previewifyPlugin({ css: "./src/previewify.css" })],
-});
-```
 :::
 
-To avoid style conflicts due to CSS overrides, you can set the `important` option in your `tailwind.config.js`.
+2. **Configure a specific Tailwind config for Previewify:**
+
+Create a new file, `tailwind.previewify.config.js`, and set the `important` option to scope styles only to the preview environment. This ensures that the styles for your components do not overwrite those in your production application during preview.
 
 ::: code-group
-```js [tailwind.config.js]
+```js [tailwind.previewify.config.js]
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -196,7 +192,31 @@ module.exports = {
 ```
 :::
 
-Setting `important` to `"rp-preview"` ensures that Tailwind styles are scoped to this specific area, avoiding global overrides that might interfere with your existing styles.
+3. **Update your Previewify config:**
+
+Make sure that Previewify references this new Tailwind configuration.
+
+::: code-group
+```ts [./previewify.config.ts]
+import { defineConfig } from "vite";
+import { previewifyPlugin } from "@react-portable/core/vite";
+
+export default defineConfig({
+  plugins: [previewifyPlugin({ css: "./src/previewify.css" })],
+  css: {
+    postcss: {
+      plugins: [
+        require("tailwindcss")({
+          config: "./tailwind.previewify.config.js",
+        }),
+      ],
+    },
+  },
+});
+```
+:::
+
+By following these steps, you ensure that your Tailwind CSS styles are scoped specifically to Previewify, without affecting your regular builds.
 
 ### 🎛️ Overriding Props for Preview Purposes
 
