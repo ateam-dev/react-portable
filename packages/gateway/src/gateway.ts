@@ -1,71 +1,52 @@
-import { Hono } from "hono";
 import {
   ActivateRpPreviewReplacer,
   FragmentBaseReplacer,
+  OtherThanFragmentRemover,
 } from "./libs/htmlRewriters";
 
-const app = new Hono();
-
-let proxyOrigin: string;
-let fragmentsEndpoint: string;
-
-app.all("/_fragments/*", async (c) => {
-  const proxyRequest = fragmentProxy(c.req.raw);
-
-  const response = await fetch(proxyRequest);
-
-  if (
-    !response.headers.get("content-type")?.includes("text/html") ||
-    !response.ok
-  )
-    return response;
-
-  const baseReplacer = new FragmentBaseReplacer("", null, null);
-  const rewriter = new HTMLRewriter().on(baseReplacer.selector, baseReplacer);
-
-  return rewriter.transform(response);
-});
-
-app.all("*", async (c) => {
-  const proxyRequest = originProxy(c.req.raw, proxyOrigin);
-
-  const response = await fetch(proxyRequest);
-
-  if (
-    !response.headers.get("content-type")?.includes("text/html") ||
-    !response.ok
-  )
-    return response;
-
-  const activator = new ActivateRpPreviewReplacer();
-  return new HTMLRewriter()
-    .on(activator.selector, activator)
-    .transform(response);
-});
-
-const originProxy = (request: Request, _origin: string): Request => {
+const proxy = (request: Request, remote: string): Request => {
   const url = new URL(request.url);
-  const origin = new URL(_origin);
-  url.host = origin.host;
-  url.port = origin.port;
-  url.protocol = origin.protocol;
+  const { host, port, protocol } = new URL(remote);
+
+  url.host = host;
+  url.port = port;
+  url.protocol = protocol;
 
   return new Request(url, request);
 };
 
-const fragmentProxy = (request: Request): Request => {
-  const remote = new URL(fragmentsEndpoint);
-  remote.pathname = new URL(request.url).pathname.replace(/^\/_fragments/, "");
-
-  return new Request(remote, request);
+const isHTMLResponse = (res: Response) => {
+  return !res.headers.get("content-type")?.includes("text/html");
 };
 
-export const gateway = (config: {
-  proxy: string;
+export const gateway = ({
+  originEndpoint,
+  fragmentsEndpoint,
+}: {
+  originEndpoint: string;
   fragmentsEndpoint: string;
 }) => {
-  proxyOrigin = config.proxy;
-  fragmentsEndpoint = config.fragmentsEndpoint;
+  return async (req: Request) => {
+    const isFragmentReq = /^\/(_fragments|node_modules)\//.test(
+      new URL(req.url).pathname,
+    );
 
-  return app.fetch;
+    const remote = isFragmentReq ? fragmentsEndpoint : originEndpoint;
+    const proxyReq = proxy(req, remote);
+
+    const response = await fetch(proxyReq);
+
+    if (isHTMLResponse(response) || !response.ok) return response;
+
+    const rewriter = isFragmentReq
+      ? new HTMLRewriter()
+          .on(FragmentBaseReplacer.selector, new FragmentBaseReplacer())
+          .on(OtherThanFragmentRemover.selector, new OtherThanFragmentRemover())
+      : new HTMLRewriter().on(
+          ActivateRpPreviewReplacer.selector,
+          new ActivateRpPreviewReplacer(),
+        );
+
+    return rewriter.transform(response);
+  };
 };

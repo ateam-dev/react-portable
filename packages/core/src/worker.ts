@@ -2,7 +2,7 @@ import { unstable_dev, UnstableDevOptions, UnstableDevWorker } from "wrangler";
 import { tunnel } from "cloudflared";
 
 export class Worker {
-  private worker: UnstableDevWorker | undefined;
+  public worker: UnstableDevWorker | undefined;
   public globalUrl: string | undefined;
 
   constructor(
@@ -41,7 +41,7 @@ export class Worker {
   private get config(): UnstableDevOptions {
     return {
       compatibilityDate: "2023-07-24",
-      logLevel: "info",
+      logLevel: process.env.DEBUG ? "debug" : "info",
       ...this.workerOption,
       experimental: {
         ...this.workerOption.experimental,

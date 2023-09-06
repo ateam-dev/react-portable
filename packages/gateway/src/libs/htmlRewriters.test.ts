@@ -1,119 +1,46 @@
 import {
   ActivateRpPreviewReplacer,
   FragmentBaseReplacer,
+  OtherThanFragmentRemover,
 } from "./htmlRewriters";
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 describe("htmlRewriters", () => {
   describe("FragmentBaseReplacer", () => {
-    describe("rp-fragment q:base", () => {
-      let response: Response;
-      beforeEach(() => {
-        response = new Response(
-          '<rp-fragment q:base="/build/">this is fragment component</rp-fragment>',
-        );
-      });
-      test("no gateway, no assetPath", async () => {
-        const replacer = new FragmentBaseReplacer("code1");
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+    test("rp-fragment q:base", async () => {
+      const response = new Response(
+        '<rp-fragment q:base="/build/">this is fragment component</rp-fragment>',
+      );
 
-        expect(await rewriter.transform(response).text()).toBe(
-          '<rp-fragment q:base="/_fragments/code1/build/">this is fragment component</rp-fragment>',
-        );
-      });
+      const rewriter = new HTMLRewriter().on(
+        FragmentBaseReplacer.selector,
+        new FragmentBaseReplacer(),
+      );
 
-      test("having gateway", async () => {
-        const replacer = new FragmentBaseReplacer("code2", "https://gw.com");
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-
-        expect(await rewriter.transform(response).text()).toBe(
-          '<rp-fragment q:base="https://gw.com/_fragments/code2/build/">this is fragment component</rp-fragment>',
-        );
-      });
-
-      test("having assetPath", async () => {
-        const replacer = new FragmentBaseReplacer(
-          "code2",
-          "https://gw.com",
-          "https://asset.com/asset/",
-        );
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-
-        expect(await rewriter.transform(response).text()).toBe(
-          '<rp-fragment q:base="https://asset.com/asset/build/">this is fragment component</rp-fragment>',
-        );
-      });
-
-      test("rp-fragment does not have q:base", async () => {
-        const replacer = new FragmentBaseReplacer("code1");
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-        const response = new Response(
-          "<rp-fragment>this is fragment component</rp-fragment>",
-        );
-
-        await expect(
-          rewriter.transform(response).text(),
-        ).rejects.toThrowError();
-      });
+      expect(await rewriter.transform(response).text()).toBe(
+        '<rp-fragment q:base="/_fragments/build/">this is fragment component</rp-fragment>',
+      );
     });
 
-    describe("rp-fragment > link[rel=stylesheet], rp-fragment > link[rel=modulepreload]", () => {
-      let response: Response;
-      beforeEach(() => {
-        response = new Response(
-          '<rp-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component<link rel="modulepreload" href="/build/foo.js"></rp-fragment>',
-        );
-      });
+    test("rp-fragment > link[rel=stylesheet], rp-fragment > link[rel=modulepreload]", async () => {
+      const response = new Response(
+        '<rp-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component<link rel="modulepreload" href="/build/foo.js"></rp-fragment>',
+      );
 
-      test("no gateway, no assetPath", async () => {
-        const replacer = new FragmentBaseReplacer("code1");
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
+      const rewriter = new HTMLRewriter().on(
+        FragmentBaseReplacer.selector,
+        new FragmentBaseReplacer(),
+      );
 
-        expect(await rewriter.transform(response).text()).toBe(
-          '<rp-fragment q:base="/_fragments/code1/build/"><link rel="stylesheet" href="/_fragments/code1/build/style.css">this is fragment component<link rel="modulepreload" href="/_fragments/code1/build/foo.js"></rp-fragment>',
-        );
-      });
-
-      test("having gateway", async () => {
-        const replacer = new FragmentBaseReplacer("code2", "https://gw.com");
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-
-        expect(await rewriter.transform(response).text()).toBe(
-          '<rp-fragment q:base="https://gw.com/_fragments/code2/build/"><link rel="stylesheet" href="https://gw.com/_fragments/code2/build/style.css">this is fragment component<link rel="modulepreload" href="https://gw.com/_fragments/code2/build/foo.js"></rp-fragment>',
-        );
-      });
-
-      test("having assetPath", async () => {
-        const replacer = new FragmentBaseReplacer(
-          "code2",
-          "https://gw.com",
-          "https://asset.com/asset/",
-        );
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-
-        expect(await rewriter.transform(response).text()).toBe(
-          '<rp-fragment q:base="https://asset.com/asset/build/"><link rel="stylesheet" href="https://asset.com/asset/build/style.css">this is fragment component<link rel="modulepreload" href="https://asset.com/asset/build/foo.js"></rp-fragment>',
-        );
-      });
-
-      test("rp-fragment does not have q:base", async () => {
-        const replacer = new FragmentBaseReplacer("code1");
-        const rewriter = new HTMLRewriter().on(replacer.selector, replacer);
-        const response = new Response(
-          `<rp-fragment q:base="/build/"><link rel="stylesheet">this is fragment component</rp-fragment>`,
-        );
-
-        await expect(
-          rewriter.transform(response).text(),
-        ).rejects.toThrowError();
-      });
+      expect(await rewriter.transform(response).text()).toBe(
+        '<rp-fragment q:base="/_fragments/build/"><link rel="stylesheet" href="/_fragments/build/style.css">this is fragment component<link rel="modulepreload" href="/_fragments/build/foo.js"></rp-fragment>',
+      );
     });
   });
 
   describe("ActivateRpPreviewReplacer", () => {
-    let response: Response;
-    beforeEach(() => {
-      response = new Response(`<!DOCTYPE html>
+    test("insert the activate script for rp-preview", async () => {
+      const response = new Response(`<!DOCTYPE html>
 <html>
   <head>
     <title>dummy page title</title>
@@ -121,11 +48,11 @@ describe("htmlRewriters", () => {
   <body></body>
 </html>
 `);
-    });
 
-    test("insert the activate script for rp-preview", async () => {
-      const activator = new ActivateRpPreviewReplacer();
-      const rewriter = new HTMLRewriter().on(activator.selector, activator);
+      const rewriter = new HTMLRewriter().on(
+        ActivateRpPreviewReplacer.selector,
+        new ActivateRpPreviewReplacer(),
+      );
 
       expect(await rewriter.transform(response).text()).toBe(`<!DOCTYPE html>
 <html>
@@ -134,6 +61,24 @@ describe("htmlRewriters", () => {
   <script>activate script</script><script type="module">preview button</script></head>
   <body></body>
 </html>
+`);
+    });
+  });
+
+  describe("OtherThanFragmentRemover", () => {
+    test("All elements except rp-fragment are removed", async () => {
+      const response = new Response(
+        `<rp-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component<link rel="modulepreload" href="/build/foo.js"></rp-fragment>
+<script>console.log('for debug')</script><style>.for-debug {}</style>`,
+      );
+
+      const rewriter = new HTMLRewriter().on(
+        OtherThanFragmentRemover.selector,
+        new OtherThanFragmentRemover(),
+      );
+
+      expect(await rewriter.transform(response).text())
+        .toBe(`<rp-fragment q:base="/build/"><link rel="stylesheet" href="/build/style.css">this is fragment component<link rel="modulepreload" href="/build/foo.js"></rp-fragment>
 `);
     });
   });
