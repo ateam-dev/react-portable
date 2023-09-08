@@ -18,6 +18,9 @@
       "default": "./dist/web-components.mjs",
       "types": "./dist/web-components.d.ts"
     },
+    "./browser": {
+      "default": "./dist/browser.umd.js"
+    },
     "./*": "./*"
   },
   "typesVersions": {
@@ -32,10 +35,10 @@
   ],
   "scripts": {
     "build:main": "unbuild",
-    "build:browser": "vite build -c vite.browser.config.ts",
-    "build": "run-p build:*",
+    "build:browser": "vite build",
+    "build": "run-s build:browser build:main",
     "watch:main": "nodemon --ext ts,tsx --watch src -x 'npm run build:main'",
-    "watch:browser": "vite build --watch -c vite.browser.config.ts",
+    "watch:browser": "vite build --watch",
     "watch": "run-p watch:*",
     "preview": "vite preview --port 3003",
     "dev": "run-p watch preview",

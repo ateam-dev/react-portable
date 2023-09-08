@@ -4,27 +4,33 @@
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
+    "build": "unbuild",
+    "watch": "nodemon --ext ts,tsx --watch src -x 'npm run build'",
     "test": "NODE_NO_WARNINGS=1 vitest run",
     "test:coverage": "NODE_NO_WARNINGS=1 vitest run --coverage",
-    "build": "vite build",
-    "watch": "vite build --watch",
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "hono": "^3.5.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230710.0",
+    "@react-portable/client": "^0.5.0",
     "@vitest/coverage-v8": "^0.33.0",
+    "nodemon": "^3.0.1",
     "typescript": "^5.1.6",
-    "vite": "^4.4.3",
-    "vite-plugin-dts": "^3.2.0",
+    "unbuild": "^2.0.0",
     "vitest": "^0.33.0",
     "vitest-environment-miniflare": "^2.14.0",
     "wrangler": "^3.2.0"
