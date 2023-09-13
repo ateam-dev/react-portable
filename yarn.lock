@@ -4816,10 +4816,10 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-cloudflared@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/cloudflared/-/cloudflared-0.4.0.tgz#4eeb361a210f04c719e1ada5157793992a7b0c80"
-  integrity sha512-dVw3FcpL2LdpiVN6al0S3yG/hLCuwzPZ608a3173EfqWPQVf1v5MdQwQuzaqaB2LZ6nhi5rVRqIBRUjCyrz0JQ==
+cloudflared@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/cloudflared/-/cloudflared-0.5.0.tgz#90b316b8a6fb36ee46183a608bf6d2d3e5131b16"
+  integrity sha512-ILt34H2KNd15cbGm3VfLvswUHCJJ5vhDXN5M0u9BfEul4DLMQ/Y3ecOP5YUPFN9ERcVabfsMEcLbC0hN3AydTw==
 
 color-convert@^1.9.0:
   version "1.9.3"
