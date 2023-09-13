@@ -1,5 +1,16 @@
 # @react-portable/core
 
+## 0.9.0
+
+### Minor Changes
+
+- [#151](https://github.com/ateam-dev/react-portable/pull/151) [`6dd5316`](https://github.com/ateam-dev/react-portable/commit/6dd5316ced9dba468805fc193867a4b914c3d2df) Thanks [@aiji42](https://github.com/aiji42)! - speed up previewify builds and allow real-time changes to be previewed in the browser
+
+### Patch Changes
+
+- Updated dependencies [[`6dd5316`](https://github.com/ateam-dev/react-portable/commit/6dd5316ced9dba468805fc193867a4b914c3d2df)]:
+  - @react-portable/gateway@0.6.0
+
 ## 0.8.0
 
 ### Minor Changes
