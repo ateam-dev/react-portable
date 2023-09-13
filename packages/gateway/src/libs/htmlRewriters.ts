@@ -1,14 +1,8 @@
-import inlineRegister from "@react-portable/client/dist/browser.umd?raw";
+import inlineRegister from "@react-portable/client/browser?raw";
 import inlinePreviewButton from "../statics/preview-button?raw";
 
 export class FragmentBaseReplacer {
-  public readonly selector = `rp-fragment,rp-fragment>link[rel="stylesheet"],rp-fragment>link[rel="modulepreload"]`;
-
-  constructor(
-    private code: string,
-    private gateway?: string | null,
-    private assetPath?: string | null,
-  ) {}
+  static selector = `rp-fragment,rp-fragment>link[rel="stylesheet"],rp-fragment>link[rel="modulepreload"]`;
 
   element(element: Element) {
     const attributeName = element.tagName === "link" ? "href" : "q:base";
@@ -17,30 +11,33 @@ export class FragmentBaseReplacer {
       .getAttribute(attributeName)
       ?.replace(/^(?!\/)/, "/");
 
-    if (!originalBasePath)
-      throw new Error(
-        element.tagName === "link"
-          ? `rp-fragment > link has no href (code: ${this.code})`
-          : `rp-fragment has no q:base (code: ${this.code})`,
-      );
-
-    element.setAttribute(
-      attributeName,
-      (this.assetPath
-        ? `${this.assetPath}${originalBasePath}`
-        : `${this.gateway ?? ""}/_fragments/${this.code}${originalBasePath}`
-      ).replace(/(?<!https?:)\/\//g, "/"),
-    );
+    element.setAttribute(attributeName, `/_fragments${originalBasePath}`);
   }
 }
 
 export class ActivateRpPreviewReplacer {
-  public readonly selector = "head";
+  static selector = "head";
 
   element(element: Element) {
     element.append(`<script>${inlineRegister}</script>`, { html: true });
     element.append(`<script type="module">${inlinePreviewButton}</script>`, {
       html: true,
     });
+  }
+}
+
+export class OtherThanFragmentRemover {
+  static selector = "*";
+  private isOuterFragment = true;
+
+  element(element: Element) {
+    if (element.tagName === "rp-fragment") {
+      this.isOuterFragment = false;
+      element.onEndTag(() => {
+        this.isOuterFragment = true;
+      });
+    }
+
+    if (this.isOuterFragment) element.remove();
   }
 }

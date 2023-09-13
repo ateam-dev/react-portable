@@ -115,20 +115,15 @@ npx prevewify 'https://your.page.com'
 
 Upon successful execution, you should see output similar to this:
 
-
 ```bash
+$ npx prevewify 'https://your.page.com'
+vite v4.4.9 building for production...
+✓ 7 modules transformed.
 ...
-✓ built in 561ms
-[mf:inf] Ready on http://127.0.0.1:55349/
-📁 Serving static files from .portable/client
-🚀 Loading server entry .portable/server/worker.mjs
+✓ built in 206ms
 [mf:inf] Ready on http://127.0.0.1:8787/
-🟢 Previewing at http://127.0.0.1:8787 (proxy ~> https://your.page.com)
+  🌈 Previewing at http://127.0.0.1:8787
 ```
-
-::: info
-If your project's entry file is not located at `./src/index.(ts|js|tsx|jsx)`, starting the preview server as mentioned above will not work as expected. Please refer to the [Custom Configuration](#custom-configuration) section.
-:::
 
 Open the displayed URL in your web browser; in this example, it would be http://127.0.0.1:8787.
 
@@ -145,14 +140,13 @@ Clicking this button will initiate the preview, allowing you to see the componen
 
 - `origin`: Specify the origin (protocol + domain) of the page you want to preview. This should be the base URL (e.g., `https://example.com`) where you want to see your component previews.
 - `-p`, `--port <port>`: Specifies the port for the gateway server.
-- `-w`, `--watch <path>`:  If you want to watch for file changes in a specific directory, provide the `<path>` here to automatically restart the server. Enabling this option also allows hot-reloading of components during preview, making sure your changes are reflected in real-time.
 - `-t`, `--tunnel`: Use Cloudflared tunnel to make the local server globally accessible. Default is `false`.
 - `--cloudflared-config <path>`: Specify a Cloudflared configuration file in YAML format to use a fixed domain for the tunnel. This option is meant to be used in conjunction with the `-t` option. It's optional; if not specified, Cloudflared will automatically assign a domain for you. (See: [Fixing the domain for the tunnel](#🔮-fixing-the-domain-for-the-tunnel))
 
 Usage
 
 ```bash
-npx previewify 'https://your.page.com' --watch ./src --tunnel
+npx previewify 'https://your.page.com' --tunnel
 ```
 
 ## 🎓 TIPs for Effective Use

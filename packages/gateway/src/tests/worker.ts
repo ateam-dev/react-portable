@@ -6,10 +6,10 @@ export type Env = {
 };
 
 export default {
-  fetch: (request: Request, env: Env, ctx: ExecutionContext) => {
+  fetch: (request: Request, env: Env) => {
     return gateway({
-      proxy: env.ORIGIN,
+      originEndpoint: env.ORIGIN,
       fragmentsEndpoint: env.FRAGMENTS_ENDPOINT,
-    })(request, env, ctx);
+    })(request);
   },
 };

@@ -106,6 +106,7 @@ export class RpPreview extends HTMLElement {
     return fetch(request, {
       body,
       method: "POST",
+      headers: { accept: "text/html" },
     });
   }
 

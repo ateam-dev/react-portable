@@ -21,6 +21,12 @@
       "import": "./dist/vite.mjs",
       "node": "./dist/vite.cjs",
       "default": "./dist/vite.cjs"
+    },
+    "./gateway": {
+      "require": "./dist/gateway.cjs",
+      "import": "./dist/gateway.mjs",
+      "node": "./dist/gateway.cjs",
+      "default": "./dist/gateway.cjs"
     }
   },
   "typesVersions": {
@@ -30,12 +36,9 @@
       ]
     }
   },
-  "files": [
-    "dist",
-    "src/templates"
-  ],
+  "files": ["dist"],
   "scripts": {
-    "build": "retry -n 3 -- unbuild",
+    "build": "unbuild",
     "watch": "nodemon --ext ts,tsx --watch src -x 'npm run build'",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -51,7 +54,6 @@
     "memfs": "^4.2.0",
     "msw": "^1.2.2",
     "nodemon": "^3.0.1",
-    "retry-cli": "^0.7.0",
     "typescript": "5.2.2",
     "unbuild": "^2.0.0",
     "vitest": "^0.33.0"
@@ -66,16 +68,10 @@
     "@builder.io/qwik": "1.2.10",
     "@builder.io/qwik-city": "1.2.10",
     "@builder.io/qwik-react": "0.5.0",
-    "@hono/qwik-city": "^0.0.4",
     "@react-portable/gateway": "^0.5.0",
-    "app-root-path": "^3.1.0",
-    "chokidar": "^3.5.3",
     "cloudflared": "^0.4.0",
     "commander": "^11.0.0",
-    "get-port": "^7.0.0",
-    "hono": "^3.5.4",
-    "wrangler": "^3.2.0",
-    "ws": "^8.13.0"
+    "wrangler": "^3.2.0"
   },
   "engines": {
     "node": ">=15.0.0"
