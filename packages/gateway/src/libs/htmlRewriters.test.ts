@@ -58,8 +58,8 @@ describe("htmlRewriters", () => {
 <html>
   <head>
     <title>dummy page title</title>
-  <script>activate script</script><script type="module">preview button</script></head>
-  <body></body>
+  </head>
+  <body><script>activate script</script><script type="module">preview button</script></body>
 </html>
 `);
     });

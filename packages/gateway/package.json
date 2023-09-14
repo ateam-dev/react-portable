@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "watch": "nodemon --ext ts,tsx --watch src -x 'npm run build'",
+    "watch": "nodemon --ext ts,tsx,html --watch src -x 'npm run build'",
     "test": "NODE_NO_WARNINGS=1 vitest run",
     "test:coverage": "NODE_NO_WARNINGS=1 vitest run --coverage",
     "typecheck": "tsc --noEmit"

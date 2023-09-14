@@ -1,9 +1,9 @@
 import { vi } from "vitest";
 
-vi.mock("@react-portable/client/dist/browser.umd?raw", () => ({
+vi.mock("@react-portable/client/browser?raw", () => ({
   default: `activate script`,
 }));
 
-vi.mock("./src/statics/preview-button?raw", () => ({
-  default: `preview button`,
+vi.mock("./src/statics/previewify.html?raw", () => ({
+  default: `<script type="module">preview button</script>`,
 }));
