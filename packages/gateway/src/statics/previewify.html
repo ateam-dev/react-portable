@@ -1,0 +1,118 @@
+<div id="pr-bar"></div>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-type="module">
+  import React, { useReducer, useEffect } from "https://esm.sh/react@18.2.0";
+  import ReactDOM from "https://esm.sh/react-dom@18.2.0";
+
+  const initial = localStorage.getItem("previewify[active]") === 'true'
+
+  const preview = () => {
+    window.rpPreviewDispatchers?.forEach(([, dispatcher]) => {
+      dispatcher();
+    });
+  };
+
+
+  let socket
+  const previewActivate = () => {
+    socket = new WebSocket(
+      `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${
+        window.location.host
+      }/_ws`,
+    );
+    socket.addEventListener("open", preview)
+    socket.addEventListener("message", (event) => {
+      if (event.data === "reload") preview()
+    });
+    socket.addEventListener("error", (event) => {
+      console.error("WebSocket Error:", event);
+    });
+    socket.addEventListener("close", () => {
+      // try to re-connect
+      setTimeout(previewActivate, 5000);
+    });
+    return () => socket?.close?.()
+  };
+
+
+  const PreviewifyBar = () => {
+    const [isPreviewing, toggle] = useReducer((s) => {
+      const newState = !s
+      localStorage.setItem("previewify[active]", (newState).toString())
+      if (newState) preview()
+      return newState
+    }, initial)
+
+    useEffect(() => {
+      if (isPreviewing) return previewActivate()
+    }, [isPreviewing])
+
+    return (
+      <div className="rp-wrapper">
+        <div className="rp-logo" style={isPreviewing ? { color: '#4bd865' } : undefined}>♻️ Previewify</div>
+        <label className="rp-toggle-button">
+          <input type="checkbox" defaultChecked={initial} onChange={() => toggle()} checked={isPreviewing} />
+        </label>
+      </div>
+    );
+  };
+  ReactDOM.render(<PreviewifyBar />, document.getElementById('pr-bar'));
+</script>
+<style>
+    .rp-wrapper {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        background-color: rgba(0, 0, 0, 50%);
+        backdrop-filter: blur(10px);
+    }
+    .rp-logo {
+        font-weight: bold;
+        color: white;
+        font-family: ui-sans-serif;
+        font-size: 16px;
+    }
+    .rp-toggle-button {
+        display: inline-block;
+        position: relative;
+        width: 50px;
+        height: 25px;
+        border-radius: 50px;
+        border: 3px solid #f3f3f3;
+        box-sizing: content-box;
+        cursor: pointer;
+        transition: border-color .4s;
+    }
+
+    .rp-toggle-button:has(:checked) {
+        border-color: #4bd865;
+    }
+
+    .rp-toggle-button::after {
+        position: absolute;
+        top: 50%;
+        left: 2px;
+        transform: translateY(-50%);
+        width: 22.5px;
+        height: 22.5px;
+        border-radius: 50%;
+        background-color: #f3f3f3;
+        content: '';
+        transition: left .4s;
+    }
+
+    .rp-toggle-button:has(:checked)::after {
+        left: 26px;
+        background-color: #4bd865;
+    }
+
+    .rp-toggle-button input {
+        display: none;
+    }
+</style>

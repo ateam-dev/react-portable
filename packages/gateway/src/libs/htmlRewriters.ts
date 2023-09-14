@@ -1,5 +1,5 @@
 import inlineRegister from "@react-portable/client/browser?raw";
-import inlinePreviewButton from "../statics/preview-button?raw";
+import previewify from "../statics/previewify.html?raw";
 
 export class FragmentBaseReplacer {
   static selector = `rp-fragment,rp-fragment>link[rel="stylesheet"],rp-fragment>link[rel="modulepreload"]`;
@@ -16,13 +16,11 @@ export class FragmentBaseReplacer {
 }
 
 export class ActivateRpPreviewReplacer {
-  static selector = "head";
+  static selector = "body";
 
   element(element: Element) {
     element.append(`<script>${inlineRegister}</script>`, { html: true });
-    element.append(`<script type="module">${inlinePreviewButton}</script>`, {
-      html: true,
-    });
+    element.append(previewify, { html: true });
   }
 }
 

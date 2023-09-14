@@ -96,11 +96,11 @@ describe("Request to the proxied origin", () => {
 <html>
   <head>
     <title>dummy page title</title>
-  <script>activate script</script><script type="module">preview button</script></head>
+  </head>
   <body>
     <h1>dummy page</h1>
     <rp-prereview code="code1">component #1</rp-prereview>
-  </body>
+  <script>activate script</script><script type="module">preview button</script></body>
 </html>`);
   });
 });
