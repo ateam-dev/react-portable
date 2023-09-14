@@ -1,5 +1,11 @@
 # @react-portable/client
 
+## 0.6.1
+
+### Patch Changes
+
+- [#165](https://github.com/ateam-dev/react-portable/pull/165) [`c6ce4e3`](https://github.com/ateam-dev/react-portable/commit/c6ce4e328d99e5588c344a8dd490087bb4caa783) Thanks [@aiji42](https://github.com/aiji42)! - update previewify tool bar
+
 ## 0.6.0
 
 ### Minor Changes

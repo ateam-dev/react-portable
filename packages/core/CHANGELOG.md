@@ -1,5 +1,16 @@
 # @react-portable/core
 
+## 0.9.2
+
+### Patch Changes
+
+- [#165](https://github.com/ateam-dev/react-portable/pull/165) [`c6ce4e3`](https://github.com/ateam-dev/react-portable/commit/c6ce4e328d99e5588c344a8dd490087bb4caa783) Thanks [@aiji42](https://github.com/aiji42)! - update previewify tool bar
+
+- [#163](https://github.com/ateam-dev/react-portable/pull/163) [`c51ede4`](https://github.com/ateam-dev/react-portable/commit/c51ede4c3a7dbc24ec340a26c4921c651af64ff9) Thanks [@aiji42](https://github.com/aiji42)! - change the path of wrangler persist directory
+
+- Updated dependencies [[`c6ce4e3`](https://github.com/ateam-dev/react-portable/commit/c6ce4e328d99e5588c344a8dd490087bb4caa783)]:
+  - @react-portable/gateway@0.6.2
+
 ## 0.9.1
 
 ### Patch Changes

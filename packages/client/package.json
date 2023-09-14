@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/client",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "main": "./dist/index.mjs",
