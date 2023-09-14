@@ -26,21 +26,21 @@ jobs:
         run: yarn test:coverage
 
       - name: 📏Report coverage (gateway)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           working-directory: ./packages/gateway
           flags: gateway
 
       - name: 📏Report coverage (client)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           working-directory: ./packages/client
           flags: client
 
       - name: 📏Report coverage (core)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           working-directory: ./packages/core
