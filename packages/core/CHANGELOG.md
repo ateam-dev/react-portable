@@ -1,5 +1,14 @@
 # @react-portable/core
 
+## 0.9.1
+
+### Patch Changes
+
+- [#160](https://github.com/ateam-dev/react-portable/pull/160) [`ccd79df`](https://github.com/ateam-dev/react-portable/commit/ccd79df8f668fbc1d7e67db2ce3906eb45304162) Thanks [@aiji42](https://github.com/aiji42)! - bumpup dependencies
+
+- Updated dependencies [[`a7c50b9`](https://github.com/ateam-dev/react-portable/commit/a7c50b95a10b53e398fc12f587e87de9980fa055), [`ccd79df`](https://github.com/ateam-dev/react-portable/commit/ccd79df8f668fbc1d7e67db2ce3906eb45304162)]:
+  - @react-portable/gateway@0.6.1
+
 ## 0.9.0
 
 ### Minor Changes
