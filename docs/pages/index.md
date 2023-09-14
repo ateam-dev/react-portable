@@ -127,12 +127,13 @@ vite v4.4.9 building for production...
 
 Open the displayed URL in your web browser; in this example, it would be http://127.0.0.1:8787.
 
-You should see a preview button and status at the bottom of the page, similar to the image below:
+You should see a toggle button at the bottom of the page as shown in the image below:  
 
-![preview footer](/preview-button.png)
+![preview footer](/previewify-bar-inactive.png)
 
-Clicking this button will initiate the preview, allowing you to see the component in the context of your live application.
+Clicking this toggle button to activate it will initiate a preview, allowing you to see the component in the context of your live application.
 
+![preview footer](/previewify-bar-active.png)
 
 #### 🛠️ Command Line Options
 
