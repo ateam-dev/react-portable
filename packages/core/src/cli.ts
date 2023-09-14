@@ -87,6 +87,7 @@ program
           class_name: "HotReloadableGateway",
         },
       ],
+      persistTo: path.resolve(portableConfig.coreDir, ".wrangler"),
     });
     await gateway.start();
     if (tunnel) {
