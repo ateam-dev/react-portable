@@ -2,14 +2,14 @@
 
 exports[`preparePlugin > Install the route file if \`previewify\` is called in the file 1`] = `
 {
-  "/app/.portable/routes/sample/index.jsx": "import { qwikify$ } from \\"@builder.io/qwik-react\\";
+  "/app/.portable/routes/pfy-sample/index.jsx": "import { qwikify$ } from \\"@builder.io/qwik-react\\";
 import { component$ } from \\"@builder.io/qwik\\";
 import { routeLoader$ } from \\"@builder.io/qwik-city\\";
-import * as Entries from \\"/app/src/components/sample.tsx\\";
+import * as Entries from \\"/app/src/index.ts\\";
 
 const Entry = Object.values(Entries).find((module) => {
   if (typeof module === \\"function\\" && \\"__code\\" in module)
-    return module.__code === \\"sample\\";
+    return module.__code === \\"pfy-sample\\";
 });
 
 const QComponent = qwikify$(Entry.__forQwik, {

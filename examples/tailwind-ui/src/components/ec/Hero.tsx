@@ -96,4 +96,4 @@ function Hero() {
   );
 }
 
-export default previewify(Hero, "hero");
+export default previewify(Hero, "pfy-hero");

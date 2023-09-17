@@ -1,6 +1,5 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import * as ts from "typescript";
 import type { PluginOption } from "vite";
 import { qwikCity } from "@builder.io/qwik-city/vite";
 import { qwikVite } from "@builder.io/qwik/optimizer";
@@ -8,39 +7,7 @@ import { qwikReact } from "@builder.io/qwik-react/vite";
 import entrySSRRaw from "./statics/entry.ssr.jsx?raw";
 import routeRaw from "./statics/route.jsx?raw";
 
-const findPortableFunctionCalls = (node: ts.Node): string | null => {
-  if (
-    ts.isCallExpression(node) &&
-    ts.isIdentifier(node.expression) &&
-    node.expression.escapedText === "previewify"
-  ) {
-    const [, secondArg] = node.arguments;
-
-    if (ts.isStringLiteral(secondArg)) return secondArg.text;
-  }
-
-  let result = null;
-  ts.forEachChild(node, (child) => {
-    const childResult = findPortableFunctionCalls(child);
-    if (childResult) result = childResult;
-  });
-
-  return result;
-};
-
-const getPortableCode = async (fileName: string) => {
-  const script = await fs.readFile(fileName, "utf-8");
-  const sourceFile = ts.createSourceFile(
-    fileName,
-    script,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
-  if (sourceFile) return findPortableFunctionCalls(sourceFile);
-};
-
-const putRouteFile = async (code: string, importer: string) => {
+const putRouteFile = async (code: string) => {
   const destPath = path.resolve(
     portableConfig.coreDir,
     `routes/${code}/index.jsx`,
@@ -48,7 +15,9 @@ const putRouteFile = async (code: string, importer: string) => {
   await fs.mkdir(path.dirname(destPath), { recursive: true });
   await fs.writeFile(
     destPath,
-    routeRaw.replaceAll("__code__", code).replaceAll("__entryPath__", importer),
+    routeRaw
+      .replaceAll("__code__", code)
+      .replaceAll("__entryPath__", path.resolve(portableConfig.entry)),
     "utf-8",
   );
 };
@@ -57,21 +26,15 @@ export const preparePlugin = (): PluginOption => {
   return {
     name: "react-portable-prepare",
     enforce: "pre",
-    config: async (config) => {
+    config: async () => {
       const destPath = path.resolve(portableConfig.coreDir, "entry.ssr.jsx");
       await fs.mkdir(path.dirname(destPath), { recursive: true });
       await fs.writeFile(destPath, entrySSRRaw, "utf-8");
-
-      return config;
     },
-    resolveId: async (source, importer) => {
-      if (importer && source === "@react-portable/core") {
-        const code = await getPortableCode(importer);
-
-        if (!code) return;
-
-        await putRouteFile(code, importer);
-      }
+    transform: async (code) => {
+      const regex = new RegExp(`${portableConfig.prefix}[^\\s"'\`]+`, "g");
+      const matches = code.match(regex) ?? [];
+      await Promise.all(matches.map((code) => putRouteFile(code)));
     },
   };
 };
@@ -80,11 +43,13 @@ type Config = {
   css: string | undefined;
   coreDir: string;
   entry: string;
+  prefix: string;
 };
 const initialConfig: Config = {
   css: undefined,
   coreDir: path.resolve("node_modules", ".portable"),
   entry: "./src",
+  prefix: "pfy-",
 };
 export let portableConfig = initialConfig;
 
@@ -92,10 +57,12 @@ export const previewifyPlugin = ({
   css,
   entry,
   coreDir,
+  prefix,
 }: Partial<Config> = {}): PluginOption => {
   if (css) portableConfig.css = css;
   if (entry) portableConfig.entry = entry;
   if (coreDir) portableConfig.coreDir = coreDir;
+  if (prefix) portableConfig.prefix = prefix;
 
   return [];
 };

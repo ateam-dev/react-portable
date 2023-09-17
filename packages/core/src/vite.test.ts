@@ -23,13 +23,13 @@ type Plugin = {
   name: string;
   enforce: string;
   config: (opt: any) => void;
-  transform: (code: string, id: string) => string;
+  transform: (code: string, id: string) => Promise<string> | string;
   resolveId: (source: string, importer?: string) => Promise<void>;
 };
 
 describe("preparePlugin", () => {
   beforeEach(() => {
-    previewifyPlugin({ coreDir: "/app/.portable" });
+    previewifyPlugin({ coreDir: "/app/.portable", entry: "/app/src/index.ts" });
     vol.fromJSON({
       "/app/src/components/sample.tsx": `import { previewify } from '@react-portable/core';const Component = () => <></>;export const Sample = previewify(Component, 'sample')`,
     });
@@ -52,8 +52,8 @@ describe("preparePlugin", () => {
   });
 
   test("Install the route file if `previewify` is called in the file", async () => {
-    await plugin.resolveId(
-      "@react-portable/core",
+    await plugin.transform(
+      `import { previewify } from '@react-portable/core';const Component = () => <></>;export const Sample = previewify(Component, 'pfy-sample')`,
       "/app/src/components/sample.tsx",
     );
 

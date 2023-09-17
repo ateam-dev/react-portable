@@ -161,4 +161,4 @@ function Products() {
   );
 }
 
-export default previewify(Products, "products");
+export default previewify(Products, "pfy-products");

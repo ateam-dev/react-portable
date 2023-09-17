@@ -31,4 +31,4 @@ const Component: FC<Props> = ({ imgSrc, name, types, onClick, children }) => {
   );
 };
 
-export const Pokemon = previewify(Component, "pokemon");
+export const Pokemon = previewify(Component, "pfy-pokemon");
