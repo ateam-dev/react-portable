@@ -1,4 +1,4 @@
-import * as fs from "node:fs/promises";
+import * as fs from "node:fs";
 import * as path from "node:path";
 import type { PluginOption } from "vite";
 import { qwikCity } from "@builder.io/qwik-city/vite";
@@ -7,13 +7,13 @@ import { qwikReact } from "@builder.io/qwik-react/vite";
 import entrySSRRaw from "./statics/entry.ssr.jsx?raw";
 import routeRaw from "./statics/route.jsx?raw";
 
-const putRouteFile = async (code: string) => {
+const putRouteFile = (code: string) => {
   const destPath = path.resolve(
     portableConfig.coreDir,
     `routes/${code}/index.jsx`,
   );
-  await fs.mkdir(path.dirname(destPath), { recursive: true });
-  await fs.writeFile(
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  fs.writeFileSync(
     destPath,
     routeRaw
       .replaceAll("__code__", code)
@@ -26,15 +26,17 @@ export const preparePlugin = (): PluginOption => {
   return {
     name: "react-portable-prepare",
     enforce: "pre",
-    config: async () => {
+    config: () => {
       const destPath = path.resolve(portableConfig.coreDir, "entry.ssr.jsx");
-      await fs.mkdir(path.dirname(destPath), { recursive: true });
-      await fs.writeFile(destPath, entrySSRRaw, "utf-8");
+      // cleanup
+      fs.rmSync(path.dirname(destPath), { recursive: true, force: true });
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.writeFileSync(destPath, entrySSRRaw, "utf-8");
     },
-    transform: async (code) => {
+    transform: (code) => {
       const regex = new RegExp(`${portableConfig.prefix}[^\\s"'\`]+`, "g");
       const matches = code.match(regex) ?? [];
-      await Promise.all(matches.map((code) => putRouteFile(code)));
+      matches.forEach((code) => putRouteFile(code));
     },
   };
 };
