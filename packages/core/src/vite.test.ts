@@ -7,16 +7,16 @@ import {
   resetConfig,
 } from "./vite";
 import { fs, vol } from "memfs";
-import * as fsPro from "node:fs/promises";
+import * as fsOrg from "node:fs";
 
-vi.mock("node:fs/promises");
+vi.mock("node:fs");
 beforeEach(() => {
   // @ts-ignore
-  vi.spyOn(fsPro, "mkdir").mockImplementation(fs.promises.mkdir);
+  vi.spyOn(fsOrg, "mkdirSync").mockImplementation(fs.mkdirSync);
   // @ts-ignore
-  vi.spyOn(fsPro, "readFile").mockImplementation(fs.promises.readFile);
+  vi.spyOn(fsOrg, "writeFileSync").mockImplementation(fs.writeFileSync);
   // @ts-ignore
-  vi.spyOn(fsPro, "writeFile").mockImplementation(fs.promises.writeFile);
+  vi.spyOn(fsOrg, "rmSync").mockImplementation(fs.rmSync);
 });
 
 type Plugin = {
@@ -29,7 +29,7 @@ type Plugin = {
 
 describe("preparePlugin", () => {
   beforeEach(() => {
-    previewifyPlugin({ coreDir: "/app/.portable" });
+    previewifyPlugin({ coreDir: "/app/.portable", entry: "/app/src/index.ts" });
     vol.fromJSON({
       "/app/src/components/sample.tsx": `import { previewify } from '@react-portable/core';const Component = () => <></>;export const Sample = previewify(Component, 'sample')`,
     });
@@ -45,15 +45,15 @@ describe("preparePlugin", () => {
     expect(plugin.enforce).toBe("pre");
   });
 
-  test("when `config` will be called, `entry.ssr.jsx` will be placed", async () => {
-    await plugin.config({});
+  test("when `config` will be called, `entry.ssr.jsx` will be placed", () => {
+    plugin.config({});
 
     expect(vol.toJSON("/app/.portable")).toMatchSnapshot();
   });
 
-  test("Install the route file if `previewify` is called in the file", async () => {
-    await plugin.resolveId(
-      "@react-portable/core",
+  test("Install the route file if `previewify` is called in the file", () => {
+    plugin.transform(
+      `import { previewify } from '@react-portable/core';const Component = () => <></>;export const Sample = previewify(Component, 'pfy-sample')`,
       "/app/src/components/sample.tsx",
     );
 

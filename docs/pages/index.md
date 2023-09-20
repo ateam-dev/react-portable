@@ -64,11 +64,16 @@ const Component: FC<Props> = (props) => {
   // Your component code
 };
 
-export const MyComponent = previewify(Component, "unique-code");
+export const MyComponent = previewify(Component, "pfy-unique-code");
 ```
 :::
 
-In this example, the `previewify` function wraps `MyComponent`, and you provide a unique identifier code as the second argument. Make sure the identifier is unique across your project to avoid conflicts.
+In this example, the `previewify` function wraps `MyComponent`, and you provide a unique identifier code prefixed with `pfy-` as the second argument. Make sure the identifier is unique across your project to avoid conflicts.
+
+::: info
+Don't forget to prefix your code (`pfy-`); Previewify will search for strings with this prefix at build time.
+If you want to change the prefix, see [Custom Configuration](#🛠%EF%B8%8F-custom-configuration).
+:::
 
 ### 🚀 Deploying to Live Application
 
@@ -93,6 +98,7 @@ export default defineConfig({
     previewifyPlugin({ 
       entry: "./src/entry.ts",
       css: "./src/global.css",
+      prefix: 'custom-prefix-'
     }),
   ],
 });
@@ -103,6 +109,7 @@ export default defineConfig({
 
 - `entry` (Optional): Specify the entry file for your project if it is not located at `./src/index.(ts|js|tsx|jsx)`.
 - `css` (Optional): If you have a global CSS file (such as one for Tailwind CSS), specify its path here.
+- `prefix` (Optional): The prefix of the code to pass as the second argument to the `prewiewify` function. Default is `pfy-`.
 
 
 ### 🏎️ Starting Preview

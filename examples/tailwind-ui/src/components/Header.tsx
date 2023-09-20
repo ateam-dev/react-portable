@@ -259,4 +259,4 @@ function Header() {
   );
 }
 
-export default previewify(Header, "header");
+export default previewify(Header, "pfy-header");
