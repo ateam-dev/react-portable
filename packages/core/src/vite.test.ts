@@ -1,11 +1,6 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import {
-  preparePlugin,
-  portablePlugin,
-  previewifyPlugin,
-  resetConfig,
-} from "./vite";
+import { preparePlugin, portablePlugin } from "./vite";
 import { fs, vol } from "memfs";
 import * as fsOrg from "node:fs";
 
@@ -29,16 +24,18 @@ type Plugin = {
 
 describe("preparePlugin", () => {
   beforeEach(() => {
-    previewifyPlugin({ coreDir: "/app/.portable", entry: "/app/src/index.ts" });
     vol.fromJSON({
       "/app/src/components/sample.tsx": `import { previewify } from '@react-portable/core';const Component = () => <></>;export const Sample = previewify(Component, 'sample')`,
     });
   });
   afterEach(() => {
-    resetConfig();
     vol.reset();
   });
-  const plugin = preparePlugin() as Plugin;
+  const plugin = preparePlugin({
+    coreDir: "/app/.portable",
+    entry: "/app/src/index.ts",
+    prefix: "pfy-",
+  }) as Plugin;
 
   test("`name` and `enforce`", async () => {
     expect(plugin.name).toBe("react-portable-prepare");
@@ -62,10 +59,10 @@ describe("preparePlugin", () => {
 });
 
 describe("portablePlugin", () => {
-  afterEach(() => {
-    resetConfig();
-  });
-  const plugin = portablePlugin() as Plugin;
+  const plugin = portablePlugin({
+    css: "./src/style.css",
+    coreDir: "/app/.portable",
+  }) as Plugin;
 
   test("`name` and `enforce`", () => {
     expect(plugin.name).toBe("react-portable-build");
@@ -84,10 +81,6 @@ describe("portablePlugin", () => {
   });
 
   test("css path inserted by `transform` on entry.ssr.jsx", () => {
-    previewifyPlugin({
-      css: "./src/style.css",
-      coreDir: "/app/.portable",
-    });
     expect(plugin.transform("base", "/app/.portable/entry.ssr.jsx")).toMatch(
       /^base\nimport '\/.*\/src\/style\.css'$/,
     );
