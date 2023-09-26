@@ -154,7 +154,9 @@ export class RpPreview extends HTMLElement {
 }
 
 const randomId = () =>
-  Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
+  window.__previewifyDebug
+    ? "dummy-uuid"
+    : Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
 
 interface RpPreviewAttributes {
   code: string;
@@ -180,5 +182,8 @@ declare global {
         RpSlot
       >;
     }
+  }
+  interface Window {
+    __previewifyDebug?: boolean;
   }
 }
