@@ -7983,9 +7983,9 @@ media-typer@0.3.0:
   integrity sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==
 
 memfs@^4.2.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/memfs/-/memfs-4.3.0.tgz#56485c07978198817eee17e53479b0b868b902c7"
-  integrity sha512-bOMyYalKCLeEkd5l3sYv0XIsVPQW+2oGhYm8LwD1htXS637VmIdoXVrWPxZdbJlEogDIrTnm6wqqZBrYb7ZFPw==
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/memfs/-/memfs-4.5.0.tgz#03082709987760022275e0d3bc0f24545b7fe279"
+  integrity sha512-8QePW5iXi/ZCySFTo39h3ujKGT0rYVnZywuSo5AzR7POAuy4uBEFZKziYkkrlGdWuxACUxKAJ0L/sry3DSG+TA==
   dependencies:
     json-joy "^9.2.0"
     thingies "^1.11.1"
