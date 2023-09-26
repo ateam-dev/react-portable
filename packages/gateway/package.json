@@ -33,6 +33,6 @@
     "unbuild": "^2.0.0",
     "vitest": "^0.34.0",
     "vitest-environment-miniflare": "^2.14.0",
-    "wrangler": "^3.8.0"
+    "wrangler": "^3.9.1"
   }
 }
