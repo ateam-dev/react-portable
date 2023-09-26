@@ -78,7 +78,7 @@ describe("rp-preview", () => {
   test("preview with functional props", async () => {
     vi.spyOn(Math, "random").mockReturnValueOnce(0.000000001);
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2000-01-01:00:00:00"));
+    vi.setSystemTime(new Date("2000-01-01T00:00:00+00:00"));
 
     document.body.innerHTML = `<rp-preview code="code"><rp-preview-area>original content</rp-preview-area></rp-preview>`;
 
@@ -91,7 +91,7 @@ describe("rp-preview", () => {
     // preview
     await element.preview({ foo: "bar", onClick: onClickMock });
     expect(element.innerHTML).toBe(
-      '<rp-preview-area><rp-fragment>code {"foo":"bar","onClick":"__function__#c2vweao00000026d#rp-preview-event"}</rp-fragment></rp-preview-area>',
+      '<rp-preview-area><rp-fragment>code {"foo":"bar","onClick":"__function__#c2wfoqo00000026d#rp-preview-event"}</rp-fragment></rp-preview-area>',
     );
 
     // dispatch event from previewing component
@@ -110,7 +110,7 @@ describe("rp-preview", () => {
     // rerender
     await element.rerender({ foo: "baz", onClick: onClickMock });
     expect(element.innerHTML).toBe(
-      '<rp-preview-area><rp-fragment>code {"foo":"baz","onClick":"__function__#c2vweao00000026d#rp-preview-event"}</rp-fragment></rp-preview-area>',
+      '<rp-preview-area><rp-fragment>code {"foo":"baz","onClick":"__function__#c2wfoqo00000026d#rp-preview-event"}</rp-fragment></rp-preview-area>',
     );
 
     // dispatch event from previewing component
