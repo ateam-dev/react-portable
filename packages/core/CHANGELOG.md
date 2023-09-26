@@ -1,5 +1,17 @@
 # @react-portable/core
 
+## 0.10.0
+
+### Minor Changes
+
+- [#171](https://github.com/ateam-dev/react-portable/pull/171) [`bf1eba7`](https://github.com/ateam-dev/react-portable/commit/bf1eba7595755beee9147c645c11320dd32c0b54) Thanks [@aiji42](https://github.com/aiji42)! - improve the process of preparing previewify (force the assignment of prefixes to identification codes)
+
+- [#179](https://github.com/ateam-dev/react-portable/pull/179) [`b920fda`](https://github.com/ateam-dev/react-portable/commit/b920fda9ffce7cd37564b1cda42a00c97351b9e8) Thanks [@aiji42](https://github.com/aiji42)! - enable automatic generation of configuration files via initialization command
+
+### Patch Changes
+
+- [#180](https://github.com/ateam-dev/react-portable/pull/180) [`1cef9a9`](https://github.com/ateam-dev/react-portable/commit/1cef9a9696ae2f970ad2897a00c757cecf238e8d) Thanks [@aiji42](https://github.com/aiji42)! - bumpup dependencies
+
 ## 0.9.2
 
 ### Patch Changes

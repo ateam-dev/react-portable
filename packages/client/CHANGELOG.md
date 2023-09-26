@@ -1,5 +1,11 @@
 # @react-portable/client
 
+## 0.6.2
+
+### Patch Changes
+
+- [#178](https://github.com/ateam-dev/react-portable/pull/178) [`ac4a94f`](https://github.com/ateam-dev/react-portable/commit/ac4a94fa26d1f3458513049e146c95bb0e5a0df4) Thanks [@aiji42](https://github.com/aiji42)! - fix error due to crypto.randomUUUID not being available for http
+
 ## 0.6.1
 
 ### Patch Changes
