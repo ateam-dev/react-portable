@@ -1,90 +1,74 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { PluginOption } from "vite";
+import type { UserConfig, PluginOption } from "vite";
 import { qwikCity } from "@builder.io/qwik-city/vite";
 import { qwikVite } from "@builder.io/qwik/optimizer";
 import { qwikReact } from "@builder.io/qwik-react/vite";
 import entrySSRRaw from "./statics/entry.ssr.jsx?raw";
 import routeRaw from "./statics/route.jsx?raw";
 
-const putRouteFile = (code: string) => {
-  const destPath = path.resolve(
-    portableConfig.coreDir,
-    `routes/${code}/index.jsx`,
-  );
+export type Config = {
+  css: string | undefined;
+  coreDir: string;
+  entry: string;
+  prefix: string;
+  viteConfig: UserConfig | string;
+};
+
+export type PreviewifyConfig = Partial<Config> & Pick<Config, "entry">;
+
+const putRouteFile = (
+  { coreDir, entry }: Pick<Config, "coreDir" | "entry">,
+  code: string,
+) => {
+  const destPath = path.resolve(coreDir, `routes/${code}/index.jsx`);
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
   fs.writeFileSync(
     destPath,
     routeRaw
       .replaceAll("__code__", code)
-      .replaceAll("__entryPath__", path.resolve(portableConfig.entry)),
+      .replaceAll("__entryPath__", path.resolve(entry)),
     "utf-8",
   );
 };
 
-export const preparePlugin = (): PluginOption => {
+export const preparePlugin = ({
+  coreDir,
+  prefix,
+  entry,
+}: Pick<Config, "coreDir" | "prefix" | "entry">): PluginOption => {
   return {
     name: "react-portable-prepare",
     enforce: "pre",
     config: () => {
-      const destPath = path.resolve(portableConfig.coreDir, "entry.ssr.jsx");
+      const destPath = path.resolve(coreDir, "entry.ssr.jsx");
       // cleanup
       fs.rmSync(path.dirname(destPath), { recursive: true, force: true });
       fs.mkdirSync(path.dirname(destPath), { recursive: true });
       fs.writeFileSync(destPath, entrySSRRaw, "utf-8");
     },
     transform: (code) => {
-      const regex = new RegExp(`${portableConfig.prefix}[^\\s"'\`]+`, "g");
+      const regex = new RegExp(`${prefix}[^\\s"'\`]+`, "g");
       const matches = code.match(regex) ?? [];
-      matches.forEach((code) => putRouteFile(code));
+      matches.forEach((code) => putRouteFile({ coreDir, entry }, code));
     },
   };
 };
 
-type Config = {
-  css: string | undefined;
-  coreDir: string;
-  entry: string;
-  prefix: string;
-};
-const initialConfig: Config = {
-  css: undefined,
-  coreDir: path.resolve("node_modules", ".portable"),
-  entry: "./src",
-  prefix: "pfy-",
-};
-export let portableConfig = initialConfig;
-
-export const previewifyPlugin = ({
-  css,
-  entry,
+export const portablePlugin = ({
   coreDir,
-  prefix,
-}: Partial<Config> = {}): PluginOption => {
-  if (css) portableConfig.css = css;
-  if (entry) portableConfig.entry = entry;
-  if (coreDir) portableConfig.coreDir = coreDir;
-  if (prefix) portableConfig.prefix = prefix;
-
-  return [];
-};
-
-export const resetConfig = () => (portableConfig = initialConfig);
-
-export const portablePlugin = (): PluginOption => {
+  css,
+}: Pick<Config, "coreDir" | "css">): PluginOption => {
   return {
     name: "react-portable-build",
     enforce: "pre",
     transform: (code: string, id: string) => {
-      if (
-        id === path.resolve(portableConfig.coreDir, "entry.ssr.jsx") &&
-        portableConfig.css
-      ) {
-        return `${code}\nimport '${path.resolve(portableConfig.css)}'`;
+      if (id === path.resolve(coreDir, "entry.ssr.jsx") && css) {
+        return `${code}\nimport '${path.resolve(css)}'`;
       }
 
       if (
-        !id.includes(portableConfig.coreDir) &&
+        !id.includes(coreDir) &&
         (id.endsWith(".tsx") || id.endsWith(".jsx"))
       ) {
         return `/** @jsxImportSource react */\n${code}`;
@@ -93,16 +77,18 @@ export const portablePlugin = (): PluginOption => {
   };
 };
 
-export const qwikPlugins = (): PluginOption => {
+export const qwikPlugins = ({
+  coreDir,
+}: Pick<Config, "coreDir">): PluginOption => {
   return [
     qwikCity({
-      routesDir: path.resolve(portableConfig.coreDir, "routes"),
+      routesDir: path.resolve(coreDir, "routes"),
       trailingSlash: false,
     }),
     qwikVite({
-      srcDir: portableConfig.coreDir,
+      srcDir: coreDir,
       ssr: {
-        input: path.resolve(portableConfig.coreDir, "entry.ssr.jsx"),
+        input: path.resolve(coreDir, "entry.ssr.jsx"),
       },
     }),
     qwikReact(),

@@ -45,9 +45,53 @@ npm install -D @react-portable/core
 yarn add -D @react-portable/core
 ```
 
+### 🧰 Bootstrapping Previewify
+
+By running the command below, you will initiate an interactive setup to initialize Previewify.
+
+```bash
+npx previewify init
+```
+
+By answering the prompts, a configuration file (`previewify.config.js`) will be created for you.
+
+::: code-group
+```ts [previewify.config.js]
+/** @type {import('@react/portable').PreviewifyConfig} */
+export default {
+  entry: "./src",
+};
+```
+:::
+
+#### 🎚️ Parameters for `PreviewifyConfig`
+
+- `entry` (Required): Specify the entry file for your project.
+- `css` (Optional): If you have a global CSS file (such as one for Tailwind CSS), specify its path here.
+- `prefix` (Optional): The prefix of the code to pass as the second argument to the `prewiewify` function. Default is `pfy-`.
+- `viteConfig` (Optional): If you have any Vite configurations needed during the build, either specify the file path of your Vite config as a string or pass an object containing Vite configuration data.
+
+Here's an example configuration:
+
+::: code-group
+```js [previewify.config.js]
+import tsconfigPaths from "vite-tsconfig-paths";
+
+/** @type {import('@react/portable').PreviewifyConfig} */
+export default {
+  entry: "./src",
+  css: "./src/global.css",
+  prefix: 'my-prefix-',
+  viteConfig: {
+    plugins: [tsconfigPaths()],
+  },
+};
+```
+:::
+
 ### 🎁 Importing and Wrapping Components
 
-To start, you'll first need to import and wrap your component using Previewify's `previewify` function.
+Import and wrap your component using Previewify's `previewify` function.
 
 Here is a simplified example:
 
@@ -72,44 +116,12 @@ In this example, the `previewify` function wraps `MyComponent`, and you provide 
 
 ::: info
 Don't forget to prefix your code (`pfy-`); Previewify will search for strings with this prefix at build time.
-If you want to change the prefix, see [Custom Configuration](#🛠%EF%B8%8F-custom-configuration).
+If you want to change the prefix, see [Parameters for PreviewifyConfig](#🎚%EF%B8%8F-parameters-for-previewifyconfig).
 :::
 
 ### 🚀 Deploying to Live Application
 
 After you've wrapped your component with previewify, the next step is to import this wrapped component into your live application. Make sure to deploy these changes to your production or staging environment. This is essential for Previewify to be able to preview this component in an environment that closely mimics your live application.
-
-### 🛠️ Custom Configuration
-
-You can customize Previewify's settings by placing a configuration file in your project root. Create `previewify.config.ts` at the root of your project.
-
-To configure Previewify, you'll use the `previewifyPlugin` for Vite.
-
-Here's a sample configuration:
-
-::: code-group
-```ts [previewify.config.ts]
-import { defineConfig } from "vite";
-import { previewifyPlugin } from "@react-portable/core/vite";
-
-export default defineConfig({
-  plugins: [
-    // Insert any required Vite plugins for your build process (e.g., tsconfigPaths)
-    previewifyPlugin({ 
-      entry: "./src/entry.ts",
-      css: "./src/global.css",
-      prefix: 'custom-prefix-'
-    }),
-  ],
-});
-```
-:::
-
-#### 🎚️ Parameters for `previewifyPlugin`
-
-- `entry` (Optional): Specify the entry file for your project if it is not located at `./src/index.(ts|js|tsx|jsx)`.
-- `css` (Optional): If you have a global CSS file (such as one for Tailwind CSS), specify its path here.
-- `prefix` (Optional): The prefix of the code to pass as the second argument to the `prewiewify` function. Default is `pfy-`.
 
 
 ### 🏎️ Starting Preview
@@ -199,22 +211,25 @@ module.exports = {
 Make sure that Previewify references this new Tailwind configuration.
 
 ::: code-group
-```ts [./previewify.config.ts]
-import { defineConfig } from "vite";
+```js [./previewify.config.js]
 import { previewifyPlugin } from "@react-portable/core/vite";
 
-export default defineConfig({
-  plugins: [previewifyPlugin({ css: "./src/previewify.css" })],
-  css: {
-    postcss: {
-      plugins: [
-        require("tailwindcss")({
-          config: "./tailwind.previewify.config.js",
-        }),
-      ],
+/** @type {import('@react/portable').PreviewifyConfig} */
+export default {
+  entry: './src',
+  css: "./src/previewify.css",
+  viteConfig: {
+    css: {
+      postcss: {
+        plugins: [
+          require("tailwindcss")({
+            config: "./tailwind.previewify.config.js",
+          }),
+        ],
+      },
     },
   },
-});
+};
 ```
 :::
 
@@ -225,7 +240,7 @@ By following these steps, you ensure that your Tailwind CSS styles are scoped sp
 Sometimes, the props type of the component you are currently modifying locally may differ from the deployed component in production, making the preview unworkable. The `previewify` function accepts a third argument, `options`, that you can use to override props for such cases.
 
 ```tsx
-export const MyComponent = previewify(Component, "unique-code", { 
+export const MyComponent = previewify(Component, "pfy-unique-code", { 
   props: { /* your overridden props here */ }
 });
 ```
