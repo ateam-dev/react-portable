@@ -51,13 +51,11 @@ const dispatchPreview = () => {
 };
 
 beforeAll(() => {
+  window.__previewifyDebug = true;
   vi.useFakeTimers();
   server.listen({ onUnhandledRequest: "error" });
 });
 beforeEach(() => {
-  vi.spyOn(crypto, "randomUUID").mockReturnValueOnce(
-    "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
-  );
   cleanup();
   register();
 });

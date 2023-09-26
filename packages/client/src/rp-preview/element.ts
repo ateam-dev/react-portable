@@ -39,7 +39,7 @@ export class RpPreview extends HTMLElement {
   private previewArea = document.createElement("pr-preview-area");
 
   private connectedCallback() {
-    this.uuid ||= crypto.randomUUID();
+    this.uuid ||= randomId();
     this.setAttribute("id", this.uuid);
     const area = this.querySelector<HTMLElement>("rp-preview-area");
     if (!area) {
@@ -153,6 +153,11 @@ export class RpPreview extends HTMLElement {
   }
 }
 
+const randomId = () =>
+  window.__previewifyDebug
+    ? "dummy-uuid"
+    : Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
+
 interface RpPreviewAttributes {
   code: string;
 }
@@ -177,5 +182,8 @@ declare global {
         RpSlot
       >;
     }
+  }
+  interface Window {
+    __previewifyDebug?: boolean;
   }
 }

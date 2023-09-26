@@ -36,6 +36,7 @@ restSpy.mockImplementation((req, res, ctx) => {
 const server = setupServer(...restHandlers);
 
 beforeAll(() => {
+  window.__previewifyDebug = true;
   register();
   server.listen({ onUnhandledRequest: "error" });
 });
@@ -76,10 +77,6 @@ describe("rp-preview", () => {
   });
 
   test("preview with functional props", async () => {
-    vi.spyOn(crypto, "randomUUID").mockReturnValueOnce(
-      "dummy-uuid" as ReturnType<typeof crypto.randomUUID>,
-    );
-
     document.body.innerHTML = `<rp-preview code="code"><rp-preview-area>original content</rp-preview-area></rp-preview>`;
 
     const element = document.querySelector<RpPreview>(`rp-preview`)!;
