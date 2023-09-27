@@ -9,16 +9,19 @@ import React, {
   useRef,
   Dispatch,
   ReducerAction,
+  ForwardRefExoticComponent,
+  forwardRef,
 } from "react";
 import { RpPreview } from "@react-portable/client/web-components";
 
-export interface PreviewifyComponent<T extends Record<string, unknown> = {}>
-  extends FunctionComponent<T> {
+export interface PreviewifyComponent<T = {}> extends FunctionComponent<T> {
   __code: string;
   __forQwik: FunctionComponent<T>;
 }
 
 type InferProps<T> = T extends ComponentType<infer U>
+  ? U
+  : T extends ForwardRefExoticComponent<infer U>
   ? U
   : T extends (props: infer U) => JSX.Element
   ? U
@@ -27,17 +30,20 @@ type InferProps<T> = T extends ComponentType<infer U>
 type Reducer = (s: boolean, a: "open" | "close" | undefined) => boolean;
 
 export const previewify = <
-  T extends ComponentType | ((props: any) => JSX.Element),
+  T extends
+    | ForwardRefExoticComponent<unknown>
+    | ComponentType
+    | ((props: any) => JSX.Element),
 >(
   Component: T,
   code: string,
   option: { props?: InferProps<T> } = {},
 ): PreviewifyComponent<InferProps<T>> => {
-  const Wrapped = (props: InferProps<T>) => {
-    const ref = useRef<RpPreview>(null);
+  const Wrapped = forwardRef<any, InferProps<T>>((props, ref) => {
+    const rpRef = useRef<RpPreview>(null);
     const [isPreviewing, dispatcher] = useReducer<Reducer>((s, a) => {
       // re-preview on hot reload
-      if (s) ref.current?.preview();
+      if (s) rpRef.current?.preview();
       return a !== "close";
     }, false);
 
@@ -49,13 +55,15 @@ export const previewify = <
     }, []);
 
     return isPreviewing ? (
-      <Previewify code={code} props={props} rpRef={ref}>
-        <Component {...props} />
+      <Previewify code={code} props={props} rpRef={rpRef}>
+        {/* @ts-ignore */}
+        <Component ref={ref} {...props} />
       </Previewify>
     ) : (
-      <Component {...props} />
+      // @ts-ignore
+      <Component ref={ref} {...props} />
     );
-  };
+  }) as unknown as PreviewifyComponent<InferProps<T>>;
 
   const ForQwik = (props: InferProps<T>) => {
     const [isServer, dispatch] = useReducer(() => false, true);

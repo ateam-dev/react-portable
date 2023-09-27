@@ -141,7 +141,12 @@ export class RpPreview extends HTMLElement {
 
   private serializeProps(_: string, val: unknown) {
     const isElementProps =
-      val != null && typeof val === "object" && "type" in val && "props" in val;
+      val !== null &&
+      typeof val === "object" &&
+      "type" in val &&
+      "props" in val;
+
+    if (hasCircularRef(val)) return null;
 
     if (isElementProps) {
       return `__outlet__`;
@@ -157,6 +162,15 @@ const randomId = () =>
   window.__previewifyDebug
     ? "dummy-uuid"
     : Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
+
+const hasCircularRef = (obj: unknown, seenObjects = new WeakSet()): boolean => {
+  if (typeof obj !== "object" || obj === null) return false;
+  if (seenObjects.has(obj)) return true;
+
+  seenObjects.add(obj);
+
+  return Object.values(obj).some((v) => hasCircularRef(v, seenObjects));
+};
 
 interface RpPreviewAttributes {
   code: string;
