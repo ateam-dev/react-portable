@@ -6,12 +6,11 @@
 
   const initial = localStorage.getItem("previewify[active]") === 'true'
 
-  const preview = () => {
-    window.rpPreviewDispatchers?.forEach(([, dispatcher]) => {
-      dispatcher();
+  const preview = (s) => {
+    window.previewifyDispatchers?.forEach((dispatcher) => {
+      dispatcher(s);
     });
   };
-
 
   let socket
   const previewActivate = () => {
@@ -21,9 +20,7 @@
       }/_ws`,
     );
     socket.addEventListener("open", preview)
-    socket.addEventListener("message", (event) => {
-      if (event.data === "reload") preview()
-    });
+    socket.addEventListener("message", preview);
     socket.addEventListener("error", (event) => {
       console.error("WebSocket Error:", event);
     });
@@ -40,6 +37,7 @@
       const newState = !s
       localStorage.setItem("previewify[active]", (newState).toString())
       if (newState) preview()
+      else preview('close')
       return newState
     }, initial)
 
@@ -117,5 +115,10 @@
 
     .rp-toggle-button input {
         display: none;
+    }
+</style>
+<style>
+    rp-preview, rp-preview-area, rp-fragment, qwik-react {
+        display: inherit;
     }
 </style>

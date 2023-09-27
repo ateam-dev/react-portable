@@ -7,6 +7,8 @@ import React, {
   useEffect,
   useReducer,
   useRef,
+  Dispatch,
+  ReducerAction,
 } from "react";
 import { RpPreview } from "@react-portable/client/web-components";
 
@@ -22,6 +24,8 @@ type InferProps<T> = T extends ComponentType<infer U>
   ? U
   : never;
 
+type Reducer = (s: boolean, a: "open" | "close" | undefined) => boolean;
+
 export const previewify = <
   T extends ComponentType | ((props: any) => JSX.Element),
 >(
@@ -31,17 +35,16 @@ export const previewify = <
 ): PreviewifyComponent<InferProps<T>> => {
   const Wrapped = (props: InferProps<T>) => {
     const ref = useRef<RpPreview>(null);
-    const [isPreviewing, dispatch] = useReducer((status) => {
-      if (status) ref.current?.preview();
-      return true;
+    const [isPreviewing, dispatcher] = useReducer<Reducer>((s, a) => {
+      // re-preview on hot reload
+      if (s) ref.current?.preview();
+      return a !== "close";
     }, false);
+
     useEffect(() => {
-      window.rpPreviewDispatchers ||= [];
-      window.rpPreviewDispatchers.push([code, dispatch]);
+      window.previewifyDispatchers.add(dispatcher);
       return () => {
-        window.rpPreviewDispatchers = window.rpPreviewDispatchers?.filter(
-          ([c, d]) => !(c === code && d === dispatch),
-        );
+        window.previewifyDispatchers.delete(dispatcher);
       };
     }, []);
 
@@ -141,8 +144,12 @@ const qwikifyProps = <T extends Record<string, unknown>>(
   ) as T;
 };
 
+if (typeof window !== "undefined") {
+  window.previewifyDispatchers ||= new Set<Dispatch<ReducerAction<Reducer>>>();
+}
+
 declare global {
   interface Window {
-    rpPreviewDispatchers?: [string, VoidFunction][];
+    previewifyDispatchers: Set<Dispatch<ReducerAction<Reducer>>>;
   }
 }
