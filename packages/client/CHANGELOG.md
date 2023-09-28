@@ -1,5 +1,15 @@
 # @react-portable/client
 
+## 0.7.0
+
+### Minor Changes
+
+- [#182](https://github.com/ateam-dev/react-portable/pull/182) [`8284878`](https://github.com/ateam-dev/react-portable/commit/82848785e61cafc4d1d09c88ce9d00ab77ed25b0) Thanks [@aiji42](https://github.com/aiji42)! - forwardRef components can also be previewed safely
+
+### Patch Changes
+
+- [#182](https://github.com/ateam-dev/react-portable/pull/182) [`ebf7bcc`](https://github.com/ateam-dev/react-portable/commit/ebf7bccc6ca2cc4c24ad6ed5278a99233c056ea9) Thanks [@aiji42](https://github.com/aiji42)! - improved preview stability
+
 ## 0.6.2
 
 ### Patch Changes

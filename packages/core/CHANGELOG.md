@@ -1,5 +1,20 @@
 # @react-portable/core
 
+## 0.11.0
+
+### Minor Changes
+
+- [#182](https://github.com/ateam-dev/react-portable/pull/182) [`764bd28`](https://github.com/ateam-dev/react-portable/commit/764bd286c1a8f8f2b4f5c0515b5b798c29effa6d) Thanks [@aiji42](https://github.com/aiji42)! - automatically switch back to the original component when the preview is closed
+
+- [#182](https://github.com/ateam-dev/react-portable/pull/182) [`8284878`](https://github.com/ateam-dev/react-portable/commit/82848785e61cafc4d1d09c88ce9d00ab77ed25b0) Thanks [@aiji42](https://github.com/aiji42)! - forwardRef components can also be previewed safely
+
+### Patch Changes
+
+- [#182](https://github.com/ateam-dev/react-portable/pull/182) [`ebf7bcc`](https://github.com/ateam-dev/react-portable/commit/ebf7bccc6ca2cc4c24ad6ed5278a99233c056ea9) Thanks [@aiji42](https://github.com/aiji42)! - improved preview stability
+
+- Updated dependencies [[`ebf7bcc`](https://github.com/ateam-dev/react-portable/commit/ebf7bccc6ca2cc4c24ad6ed5278a99233c056ea9), [`764bd28`](https://github.com/ateam-dev/react-portable/commit/764bd286c1a8f8f2b4f5c0515b5b798c29effa6d), [`8284878`](https://github.com/ateam-dev/react-portable/commit/82848785e61cafc4d1d09c88ce9d00ab77ed25b0), [`8200b24`](https://github.com/ateam-dev/react-portable/commit/8200b24d9d27abbecb3cd642f943051e132c132f)]:
+  - @react-portable/gateway@0.7.0
+
 ## 0.10.0
 
 ### Minor Changes
