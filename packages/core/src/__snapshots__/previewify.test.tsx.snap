@@ -62,7 +62,7 @@ exports[`previewify > Component > It will be wrapped by <rp-preview /> when prev
 </DocumentFragment>
 `;
 
-exports[`previewify > Component.__forQwik > \`__outlet__\` is converted to <rp-slot /> and rendered 1`] = `
+exports[`previewify > Component.__forQwik > \`__outlet__\` or children will be converted to <rp-slot /> and rendered 1`] = `
 <DocumentFragment>
   <div>
     sample with children:

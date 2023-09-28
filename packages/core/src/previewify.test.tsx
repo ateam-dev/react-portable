@@ -130,10 +130,13 @@ describe("previewify", () => {
   });
 
   describe("Component.__forQwik", () => {
-    test("`__outlet__` is converted to <rp-slot /> and rendered", () => {
+    test("`__outlet__` or children will be converted to <rp-slot /> and rendered", () => {
       const Component = previewify(SampleWithChildren, "foo");
       const { asFragment } = render(
-        <Component.__forQwik children="__outlet__" element="__outlet__" />,
+        <Component.__forQwik
+          children="children content"
+          element="__outlet__"
+        />,
       );
 
       expect(asFragment()).toMatchSnapshot();

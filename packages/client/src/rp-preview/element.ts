@@ -76,19 +76,18 @@ export class RpPreview extends HTMLElement {
   }
 
   private async render(force = false) {
-    if (this.fetching) return;
+    if (this.fetching || !this.isConnected) return;
 
-    const requestBody = JSON.stringify(
-      this.props,
-      this.serializeProps.bind(this),
-    );
+    const requestBody = JSON.stringify(this.props, this.serializer());
 
     if (requestBody !== this.previousRequestBody || force) {
       this.fetching = true;
       try {
         const fragment = await this.fetchFragmentStream(requestBody);
         if (!fragment.body || !fragment.ok) {
-          throw new Error(`rp-preview: Failed to retrieve fragment`);
+          throw new Error(
+            `rp-preview: Failed to retrieve fragment (${this.code}#${this.id})`,
+          );
         }
         await this.piercing(fragment.body);
       } finally {
@@ -139,22 +138,28 @@ export class RpPreview extends HTMLElement {
     if (typeof receiver === "function") receiver(...args);
   }
 
-  private serializeProps(_: string, val: unknown) {
-    const isElementProps =
-      val !== null &&
-      typeof val === "object" &&
-      "type" in val &&
-      "props" in val;
+  private serializer() {
+    const seen = new WeakSet();
+    return (_: string, val: unknown) => {
+      // detect circular references
+      if (typeof val === "object" && val !== null) {
+        if (seen.has(val)) return;
+        seen.add(val);
+      }
 
-    if (hasCircularRef(val)) return null;
+      const isElementProps =
+        val !== null &&
+        typeof val === "object" &&
+        "type" in val &&
+        "props" in val;
 
-    if (isElementProps) {
-      return `__outlet__`;
-    }
-    if (typeof val === "function") {
-      return `__function__#${this.uuid}#${this.customEventName}`;
-    }
-    return val;
+      if (isElementProps) return `__outlet__`;
+
+      if (typeof val === "function")
+        return `__function__#${this.uuid}#${this.customEventName}`;
+
+      return val;
+    };
   }
 }
 
@@ -162,15 +167,6 @@ const randomId = () =>
   window.__previewifyDebug
     ? "dummy-uuid"
     : Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
-
-const hasCircularRef = (obj: unknown, seenObjects = new WeakSet()): boolean => {
-  if (typeof obj !== "object" || obj === null) return false;
-  if (seenObjects.has(obj)) return true;
-
-  seenObjects.add(obj);
-
-  return Object.values(obj).some((v) => hasCircularRef(v, seenObjects));
-};
 
 interface RpPreviewAttributes {
   code: string;

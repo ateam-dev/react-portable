@@ -12,7 +12,7 @@ export default function Home() {
       <main className="min-h-screen mt-2">
         <Hero>
           <AnchorButton href="#" ref={ref}>
-            <div>Product List</div>
+            Product List
           </AnchorButton>
         </Hero>
         <div className="mt-1">
