@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/core",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "bin": {
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230710.0",
-    "@react-portable/client": "0.6.2",
+    "@react-portable/client": "0.7.0",
     "@testing-library/react": "^14.0.0",
     "@types/node": "^20.7.0",
     "@vitest/coverage-v8": "^0.34.0",
@@ -70,7 +70,7 @@
     "@builder.io/qwik-city": "1.2.12",
     "@builder.io/qwik-react": "0.5.0",
     "@inquirer/prompts": "^3.1.1",
-    "@react-portable/gateway": "^0.6.2",
+    "@react-portable/gateway": "^0.7.0",
     "c12": "^1.4.2",
     "cloudflared": "^0.5.0",
     "commander": "^11.0.0",
