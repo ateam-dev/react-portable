@@ -45,9 +45,17 @@ const server = setupServer(
   }),
 );
 
-const dispatchPreview = () => {
-  act(() => window.rpPreviewDispatchers!.forEach(([, dispatch]) => dispatch()));
+const openPreview = () => {
+  act(() =>
+    window.previewifyDispatchers.forEach((dispatcher) => dispatcher("open")),
+  );
   vi.advanceTimersByTime(500);
+};
+
+const closePreview = () => {
+  act(() =>
+    window.previewifyDispatchers.forEach((dispatcher) => dispatcher("close")),
+  );
 };
 
 beforeAll(() => {
@@ -81,28 +89,32 @@ describe("previewify", () => {
       expect(wrapped.container.innerHTML).toBe(original.container.innerHTML);
     });
 
-    test("Dispatchers are added to rpPreviewDispatchers when rendered and removed when unmounted", () => {
+    test("Dispatchers are added to previewifyDispatchers when rendered and removed when unmounted", () => {
       const Component = previewify(Sample, "foo");
       const { unmount } = render(<Component />);
       render(<Component />);
 
-      expect(window.rpPreviewDispatchers?.length).toBe(2);
+      expect(window.previewifyDispatchers.size).toBe(2);
 
       unmount();
 
-      expect(window.rpPreviewDispatchers?.length).toBe(1);
+      expect(window.previewifyDispatchers.size).toBe(1);
     });
 
-    test("It will be wrapped by <rp-preview /> when rpPreviewDispatchers will be called", () => {
+    test("It will be wrapped by <rp-preview /> when previewifyDispatchers will be called", () => {
       const Component = previewify(Sample, "foo");
       const { asFragment } = render(<Component />);
 
-      dispatchPreview();
+      openPreview();
 
+      expect(asFragment()).toMatchSnapshot();
+
+      // Close the preview to see the original component
+      closePreview();
       expect(asFragment()).toMatchSnapshot();
     });
 
-    test("Elements of type ReactElement will be also rendered in the template when rpPreviewDispatchers will be called", () => {
+    test("Elements of type ReactElement will be also rendered in the template when previewifyDispatchers will be called", () => {
       const Component = previewify(SampleWithChildren, "foo");
       const { container } = render(
         <Component
@@ -111,17 +123,20 @@ describe("previewify", () => {
         />,
       );
 
-      dispatchPreview();
+      openPreview();
 
       expect(container).toMatchSnapshot();
     });
   });
 
   describe("Component.__forQwik", () => {
-    test("`__outlet__` is converted to <rp-slot /> and rendered", () => {
+    test("`__outlet__` or children will be converted to <rp-slot /> and rendered", () => {
       const Component = previewify(SampleWithChildren, "foo");
       const { asFragment } = render(
-        <Component.__forQwik children="__outlet__" element="__outlet__" />,
+        <Component.__forQwik
+          children="children content"
+          element="__outlet__"
+        />,
       );
 
       expect(asFragment()).toMatchSnapshot();
@@ -138,7 +153,7 @@ describe("previewify", () => {
         />,
       );
 
-      dispatchPreview();
+      openPreview();
 
       fireEvent.click(rendered.getByTestId("clickable"));
 

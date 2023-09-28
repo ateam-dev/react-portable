@@ -4,7 +4,11 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 import * as Entries from "__entryPath__";
 
 const Entry = Object.values(Entries).find((module) => {
-  if (typeof module === "function" && "__code" in module)
+  if (
+    ["function", "object"].includes(typeof module) &&
+    module !== null &&
+    "__code" in module
+  )
     return module.__code === "__code__";
 });
 

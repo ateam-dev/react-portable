@@ -3,62 +3,73 @@ import React, {
   ComponentType,
   isValidElement,
   ReactNode,
-  RefObject,
   useEffect,
   useReducer,
   useRef,
+  Dispatch,
+  ReducerAction,
+  ForwardRefExoticComponent,
+  forwardRef,
 } from "react";
 import { RpPreview } from "@react-portable/client/web-components";
 
-export interface PreviewifyComponent<T extends Record<string, unknown> = {}>
-  extends FunctionComponent<T> {
+export interface PreviewifyComponent<T = {}> extends FunctionComponent<T> {
   __code: string;
   __forQwik: FunctionComponent<T>;
 }
 
 type InferProps<T> = T extends ComponentType<infer U>
   ? U
+  : T extends ForwardRefExoticComponent<infer U>
+  ? U
   : T extends (props: infer U) => JSX.Element
   ? U
   : never;
 
+type Reducer = (
+  s: { previewing: boolean; serial: string },
+  a: "open" | "close" | undefined,
+) => { previewing: boolean; serial: string };
+
 export const previewify = <
-  T extends ComponentType | ((props: any) => JSX.Element),
+  T extends
+    | ForwardRefExoticComponent<unknown>
+    | ComponentType
+    | ((props: any) => JSX.Element),
 >(
   Component: T,
   code: string,
   option: { props?: InferProps<T> } = {},
 ): PreviewifyComponent<InferProps<T>> => {
-  const Wrapped = (props: InferProps<T>) => {
-    const ref = useRef<RpPreview>(null);
-    const [isPreviewing, dispatch] = useReducer((status) => {
-      if (status) ref.current?.preview();
-      return true;
-    }, false);
+  const Wrapped = forwardRef<any, InferProps<T>>((props, ref) => {
+    const [{ previewing, serial }, dispatcher] = useReducer<Reducer>(
+      (_, a) => {
+        return { previewing: a !== "close", serial: Date.now().toString(36) };
+      },
+      { previewing: false, serial: "" },
+    );
+
     useEffect(() => {
-      window.rpPreviewDispatchers ||= [];
-      window.rpPreviewDispatchers.push([code, dispatch]);
+      window.previewifyDispatchers.add(dispatcher);
       return () => {
-        window.rpPreviewDispatchers = window.rpPreviewDispatchers?.filter(
-          ([c, d]) => !(c === code && d === dispatch),
-        );
+        window.previewifyDispatchers.delete(dispatcher);
       };
     }, []);
 
-    return isPreviewing ? (
-      <Previewify code={code} props={props} rpRef={ref}>
-        <Component {...props} />
+    return previewing ? (
+      <Previewify code={code} props={props} key={serial}>
+        {/* @ts-ignore */}
+        <Component ref={ref} {...props} />
       </Previewify>
     ) : (
-      <Component {...props} />
+      // @ts-ignore
+      <Component ref={ref} {...props} />
     );
-  };
+  }) as unknown as PreviewifyComponent<InferProps<T>>;
 
   const ForQwik = (props: InferProps<T>) => {
-    const [isServer, dispatch] = useReducer(() => false, true);
-    useEffect(() => {
-      dispatch();
-    }, []);
+    const [isServer, onClient] = useReducer(() => false, true);
+    useEffect(onClient, []);
 
     return (
       <Component
@@ -75,19 +86,17 @@ export const previewify = <
 
 const Previewify = ({
   code,
-  rpRef,
   props,
   children,
 }: {
   code: string;
-  rpRef: RefObject<RpPreview>;
   children: ReactNode;
   props: Record<string, unknown>;
 }) => {
+  const rpRef = useRef<RpPreview>(null);
   useEffect(() => {
-    if (!rpRef.current) return;
-    if (rpRef.current.previewing) rpRef.current.rerender(props);
-    else rpRef.current.preview(props);
+    if (rpRef.current?.previewing) rpRef.current.rerender(props);
+    else rpRef.current?.preview(props);
   }, [props]);
 
   return (
@@ -102,11 +111,15 @@ const rpOutlets = <T extends Record<string, unknown>>(
   props: T,
 ): JSX.Element[] => {
   return Object.entries(props).flatMap(([k, v]) => {
+    const isChildren = (k: string, _: unknown): _ is ReactNode =>
+      k === "children";
     if (
+      isChildren(k, v) ||
       isValidElement(v) ||
       (Array.isArray(v) && v.length > 0 && v.every(isValidElement))
-    )
+    ) {
       return <rp-outlet key={k} _key={k} children={v} />;
+    }
 
     return [];
   });
@@ -141,8 +154,12 @@ const qwikifyProps = <T extends Record<string, unknown>>(
   ) as T;
 };
 
+if (typeof window !== "undefined") {
+  window.previewifyDispatchers ||= new Set<Dispatch<ReducerAction<Reducer>>>();
+}
+
 declare global {
   interface Window {
-    rpPreviewDispatchers?: [string, VoidFunction][];
+    previewifyDispatchers: Set<Dispatch<ReducerAction<Reducer>>>;
   }
 }

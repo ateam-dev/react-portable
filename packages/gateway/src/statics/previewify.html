@@ -6,24 +6,37 @@
 
   const initial = localStorage.getItem("previewify[active]") === 'true'
 
-  const preview = () => {
-    window.rpPreviewDispatchers?.forEach(([, dispatcher]) => {
-      dispatcher();
+  class DispatchersSet extends Set {
+    previewing = initial
+    add(item) {
+      super.add(item)
+      if(this.previewing) {
+        console.log('added!!!')
+        item()
+      }
+      return this
+    }
+    set previewing(s) {
+      this.previewing = s
+    }
+  }
+
+  window.previewifyDispatchers = new DispatchersSet([...(window.previewifyDispatchers ?? [])])
+
+  const preview = (s) => {
+    window.previewifyDispatchers.forEach((dispatcher) => {
+      dispatcher(s);
     });
   };
 
-
-  let socket
   const previewActivate = () => {
-    socket = new WebSocket(
+    const socket = new WebSocket(
       `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${
         window.location.host
       }/_ws`,
     );
-    socket.addEventListener("open", preview)
-    socket.addEventListener("message", (event) => {
-      if (event.data === "reload") preview()
-    });
+
+    socket.addEventListener("message", preview);
     socket.addEventListener("error", (event) => {
       console.error("WebSocket Error:", event);
     });
@@ -31,21 +44,26 @@
       // try to re-connect
       setTimeout(previewActivate, 5000);
     });
-    return () => socket?.close?.()
+
+    return () => socket.close()
   };
 
 
   const PreviewifyBar = () => {
     const [isPreviewing, toggle] = useReducer((s) => {
-      const newState = !s
-      localStorage.setItem("previewify[active]", (newState).toString())
-      if (newState) preview()
-      return newState
+      const newStatus = !s
+      localStorage.setItem("previewify[active]", (newStatus).toString())
+      window.previewifyDispatchers.previewing = newStatus
+      return newStatus
     }, initial)
 
     useEffect(() => {
-      if (isPreviewing) return previewActivate()
-    }, [isPreviewing])
+      preview(isPreviewing ? 'open' : 'close')
+    }, [isPreviewing]);
+
+    useEffect(() => {
+      return previewActivate()
+    }, [])
 
     return (
       <div className="rp-wrapper">
@@ -117,5 +135,10 @@
 
     .rp-toggle-button input {
         display: none;
+    }
+</style>
+<style>
+    rp-preview, rp-preview-area, rp-fragment, qwik-react {
+        display: inherit;
     }
 </style>

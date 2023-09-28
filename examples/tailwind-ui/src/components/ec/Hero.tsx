@@ -1,6 +1,7 @@
 import { previewify } from "@react-portable/core";
+import { ReactNode } from "react";
 
-function Hero() {
+function Hero(props: { children?: ReactNode }) {
   return (
     <div className="relative overflow-hidden bg-white">
       <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
@@ -81,13 +82,7 @@ function Hero() {
                   </div>
                 </div>
               </div>
-
-              <a
-                href="#"
-                className="inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-center font-medium text-white hover:bg-indigo-700"
-              >
-                Shop Collection
-              </a>
+              {props.children}
             </div>
           </div>
         </div>
