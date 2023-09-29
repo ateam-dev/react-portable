@@ -1,5 +1,5 @@
-import inlineRegister from "@react-portable/client/browser?raw";
-import previewify from "../statics/previewify.html?raw";
+import inlineRegister from "@react-portable/client/browser";
+import previewify from "../statics/previewify.html";
 
 export class FragmentBaseReplacer {
   static selector = `rp-fragment,rp-fragment>link[rel="stylesheet"],rp-fragment>link[rel="modulepreload"]`;
