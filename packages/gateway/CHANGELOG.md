@@ -1,5 +1,11 @@
 # @react-portable/gateway
 
+## 0.7.1
+
+### Patch Changes
+
+- [#184](https://github.com/ateam-dev/react-portable/pull/184) [`deb3a5b`](https://github.com/ateam-dev/react-portable/commit/deb3a5b1d60582cbb4580ab810a678e1ab2eb96d) Thanks [@aiji42](https://github.com/aiji42)! - refactor gateway codes
+
 ## 0.7.0
 
 ### Minor Changes
