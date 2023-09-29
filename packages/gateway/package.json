@@ -34,5 +34,16 @@
     "vitest": "^0.34.0",
     "vitest-environment-miniflare": "^2.14.0",
     "wrangler": "^3.9.1"
+  },
+  "unbuild": {
+    "rollup": {
+      "inlineDependencies": true,
+      "esbuild": {
+        "loaders": {
+          ".js": "text"
+        }
+      }
+    },
+    "clean": false
   }
 }
