@@ -33,7 +33,7 @@ type Reducer = (
 
 export const previewify = <
   T extends
-    | ForwardRefExoticComponent<unknown>
+    | ForwardRefExoticComponent<any>
     | ComponentType
     | ((props: any) => JSX.Element),
 >(
