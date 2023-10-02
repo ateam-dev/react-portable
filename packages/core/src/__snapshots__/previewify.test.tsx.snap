@@ -77,7 +77,7 @@ exports[`previewify > Component.__forQwik > \`__outlet__\` or children will be c
 </DocumentFragment>
 `;
 
-exports[`previewify > Component.__forQwik > Allow overriding props for previews 1`] = `
+exports[`previewify > Component.__forQwik > Allow partially overriding props for previews 1`] = `
 <DocumentFragment>
   <div
     data-testid="overwritten-test-it"
@@ -87,17 +87,14 @@ exports[`previewify > Component.__forQwik > Allow overriding props for previews 
 </DocumentFragment>
 `;
 
-exports[`previewify > Component.__forQwik > Allow overriding props for previews 2`] = `
+exports[`previewify > Component.__forQwik > Allow partially overriding props for previews 2`] = `
 <DocumentFragment>
   <div>
     sample with children:
     <div>
       overwritten children
     </div>
-     
-    <div>
-      overwritten element
-    </div>
+     __outlet__
   </div>
 </DocumentFragment>
 `;
