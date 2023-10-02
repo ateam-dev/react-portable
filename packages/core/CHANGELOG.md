@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.11.1
+
+### Patch Changes
+
+- [#188](https://github.com/ateam-dev/react-portable/pull/188) [`55bddb7`](https://github.com/ateam-dev/react-portable/commit/55bddb7c695bfce0495f38307e8e6d12671dc693) Thanks [@aiji42](https://github.com/aiji42)! - fix PreviewifyComponent type
+
 ## 0.11.0
 
 ### Minor Changes
