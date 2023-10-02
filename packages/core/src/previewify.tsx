@@ -39,7 +39,7 @@ export const previewify = <
 >(
   Component: T,
   code: string,
-  option: { props?: InferProps<T> } = {},
+  option: { props?: Partial<InferProps<T>> } = {},
 ): PreviewifyComponent<InferProps<T>> => {
   const Wrapped = forwardRef<any, InferProps<T>>((props, ref) => {
     const [{ previewing, serial }, dispatcher] = useReducer<Reducer>(
@@ -73,7 +73,11 @@ export const previewify = <
 
     return (
       <Component
-        {...qwikifyProps(option.props ?? props, isServer, !!option.props)}
+        {...qwikifyProps(
+          { ...props, ...option.props },
+          isServer,
+          !!option.props,
+        )}
       />
     );
   };

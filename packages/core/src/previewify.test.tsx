@@ -159,7 +159,7 @@ describe("previewify", () => {
 
       expect(onClickSpy).toBeCalled();
     });
-    test("Allow overriding props for previews", () => {
+    test("Allow partially overriding props for previews", () => {
       const ComponentSample = previewify(Sample, "foo", {
         props: { testId: "overwritten-test-it" },
       });
@@ -175,7 +175,6 @@ describe("previewify", () => {
         {
           props: {
             children: <div>overwritten children</div>,
-            element: <div>overwritten element</div>,
           },
         },
       );
