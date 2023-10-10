@@ -1,6 +1,6 @@
 {
   "name": "@react-portable/core",
-  "version": "0.11.1",
+  "version": "0.11.2",
   "repository": "git@github.com:ateam-dev/react-portable.git",
   "license": "Apache-2.0",
   "bin": {

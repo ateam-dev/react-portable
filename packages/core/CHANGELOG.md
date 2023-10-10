@@ -1,5 +1,11 @@
 # @react-portable/core
 
+## 0.11.2
+
+### Patch Changes
+
+- [#190](https://github.com/ateam-dev/react-portable/pull/190) [`54e12a7`](https://github.com/ateam-dev/react-portable/commit/54e12a722339c58e88305eb17048c48f510bab54) Thanks [@aiji42](https://github.com/aiji42)! - allow partial props replacement in previewify props option
+
 ## 0.11.1
 
 ### Patch Changes
